@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { GenerateArticleInput } from '@/types'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Force dynamic rendering - don't try to pre-render this route
+export const dynamic = 'force-dynamic'
 
 const TONE_PROMPTS = {
   authoritative: 'Write in an authoritative, expert tone. Use data, statistics, and confident language. Position the author as a thought leader.',
@@ -50,6 +49,18 @@ const PLATFORM_FORMATS = {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check for API key at runtime
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.' },
+        { status: 500 }
+      )
+    }
+
+    // Initialize OpenAI client at runtime
+    const openai = new OpenAI({ apiKey })
+
     const body: GenerateArticleInput = await request.json()
     const { topic, platform, tone, length } = body
 
