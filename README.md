@@ -1,36 +1,171 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Burst - AI Authority Content Platform
 
-## Getting Started
+Burst is a premium AI-powered content generation platform designed to help professionals build authority on high-trust platforms like LinkedIn, Medium, and Substack.
 
-First, run the development server:
+![Burst Screenshot](https://via.placeholder.com/1200x600/0a0a0f/8b5cf6?text=Burst+AI+Platform)
 
+## ✨ Features
+
+### Core Features
+- **AI Article Generation** - Generate publication-ready articles using ChatGPT API
+- **Multi-Platform Optimization** - Content tailored for LinkedIn, Medium, Substack
+- **Multiple Tone Styles** - Authoritative, Conversational, Bold
+- **Image Enhancement** - AI-suggested images to increase engagement
+- **Content Library** - Save, manage, and reuse your articles
+
+### Premium Upsells
+- **10X Mode** - Generate 10 article variations with different hooks
+- **Infinite Mode** - Remove all generation limits
+- **Automation** - Templates and presets for faster creation
+- **Done-For-You** - Pre-written content packs by niche
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Supabase account
+- OpenAI API key
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/burst.git
+cd burst
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+Create a `.env.local` file in the root directory:
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key
+```
 
-## Learn More
+4. Set up Supabase:
+   - Create a new Supabase project
+   - Enable Email Auth in Authentication settings
+   - Run the following SQL in the SQL editor:
 
-To learn more about Next.js, take a look at the following resources:
+```sql
+-- Users profile extension (optional)
+create table if not exists public.profiles (
+  id uuid references auth.users on delete cascade not null primary key,
+  full_name text,
+  avatar_url text,
+  upsells_unlocked text[] default '{}',
+  articles_generated int default 0,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+-- Enable RLS
+alter table public.profiles enable row level security;
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+-- RLS Policies
+create policy "Users can view own profile"
+  on public.profiles for select
+  using (auth.uid() = id);
 
-## Deploy on Vercel
+create policy "Users can update own profile"
+  on public.profiles for update
+  using (auth.uid() = id);
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Run the development server:
+```bash
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── (auth)/              # Auth pages (login, signup, forgot-password)
+│   ├── (dashboard)/         # Dashboard pages
+│   │   ├── dashboard/       # Main dashboard
+│   │   ├── create/          # Article generator
+│   │   ├── images/          # Image enhancement
+│   │   ├── publish/         # Publish & distribute
+│   │   ├── saved/           # Saved articles
+│   │   ├── unlock/[type]/   # Upsell unlock pages
+│   │   └── upsell/          # Upsell content pages
+│   ├── api/
+│   │   └── generate/        # Article generation API
+│   ├── globals.css          # Global styles
+│   ├── layout.tsx           # Root layout
+│   └── page.tsx             # Landing page
+├── components/
+│   ├── layout/              # Layout components
+│   └── ui/                  # UI components
+├── lib/
+│   └── supabase/            # Supabase client configuration
+├── store/                   # Zustand state management
+└── types/                   # TypeScript types
+```
+
+## 🎨 Design System
+
+Burst uses a custom dark-mode-first design system with:
+- **Primary Colors**: Purple (#8b5cf6) to Cyan (#06b6d4) gradients
+- **Background**: Deep blacks and charcoal (#0a0a0f, #0f0f18)
+- **Typography**: Clash Display (headings), Satoshi (body)
+- **Animations**: Smooth fade-ins, glow effects, and hover states
+
+## 🔐 Authentication
+
+Burst uses Supabase Auth with:
+- Email/Password authentication
+- Session persistence across refreshes
+- Protected route middleware
+- Automatic redirects based on auth state
+
+## 📝 Content Generation
+
+The article generator uses OpenAI's GPT-4 to create:
+- **Hook**: Attention-grabbing opening
+- **Body**: Structured content with formatting
+- **CTA**: Call-to-action section
+
+Content is optimized for each platform's specific requirements and best practices.
+
+## ⚠️ Important Notes
+
+- **No Auto-Posting**: Burst is designed for manual posting only to keep accounts safe
+- **Platform Compliant**: All generated content is meant to be reviewed and edited before publishing
+- **API Key Required**: You need your own OpenAI API key for article generation
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS 4
+- **Authentication**: Supabase Auth
+- **Database**: Supabase (PostgreSQL)
+- **AI**: OpenAI GPT-4
+- **State Management**: Zustand
+- **Icons**: Lucide React
+- **Animations**: Framer Motion (available but not required)
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+
+---
+
+Built with ⚡ by the Burst team
