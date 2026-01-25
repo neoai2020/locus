@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   Zap, 
@@ -38,11 +38,24 @@ export default function TenXPage() {
   const [variations, setVariations] = useState<Array<{ id: string; hook: string; hookType: string; content: string }>>([])
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [isChecking, setIsChecking] = useState(true)
 
-  // Redirect if not unlocked
-  if (!isUpsellUnlocked('10x')) {
-    router.push('/unlock/10x')
-    return null
+  // Check if unlocked and redirect if not
+  useEffect(() => {
+    if (!isUpsellUnlocked('10x')) {
+      router.push('/unlock/10x')
+    } else {
+      setIsChecking(false)
+    }
+  }, [isUpsellUnlocked, router])
+
+  // Show loading while checking unlock status
+  if (isChecking) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+      </div>
+    )
   }
 
   const toggleHook = (hookId: string) => {

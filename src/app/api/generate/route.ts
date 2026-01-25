@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { GenerateArticleInput } from '@/types'
+import { createClient } from '@/lib/supabase/server'
 
 // Force dynamic rendering - don't try to pre-render this route
 export const dynamic = 'force-dynamic'
@@ -49,6 +50,17 @@ const PLATFORM_FORMATS = {
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify user is authenticated
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Please log in to generate articles.' },
+        { status: 401 }
+      )
+    }
+
     // Check for API key at runtime
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {

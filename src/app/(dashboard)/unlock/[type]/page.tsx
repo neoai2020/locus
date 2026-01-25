@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { 
   Zap, 
@@ -41,15 +41,28 @@ export default function UnlockPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [unlocked, setUnlocked] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
 
   const config = UPSELL_CONFIGS[type]
   const Icon = iconMap[type]
   const gradient = gradientMap[type]
 
-  // Redirect if already unlocked
-  if (isUpsellUnlocked(type)) {
-    router.push(`/upsell/${type}`)
-    return null
+  // Check if already unlocked and redirect
+  useEffect(() => {
+    if (isUpsellUnlocked(type)) {
+      router.push(`/upsell/${type}`)
+    } else {
+      setIsChecking(false)
+    }
+  }, [type, isUpsellUnlocked, router])
+
+  // Show loading while checking unlock status
+  if (isChecking) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+      </div>
+    )
   }
 
   const handleUnlock = async (e: React.FormEvent) => {

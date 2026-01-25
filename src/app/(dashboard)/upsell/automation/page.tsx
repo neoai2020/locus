@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   Bot, 
@@ -65,11 +65,24 @@ export default function AutomationPage() {
   const { isUpsellUnlocked, setCurrentArticle } = useAppStore()
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
 
-  // Redirect if not unlocked
-  if (!isUpsellUnlocked('automation')) {
-    router.push('/unlock/automation')
-    return null
+  // Check if unlocked and redirect if not
+  useEffect(() => {
+    if (!isUpsellUnlocked('automation')) {
+      router.push('/unlock/automation')
+    } else {
+      setIsChecking(false)
+    }
+  }, [isUpsellUnlocked, router])
+
+  // Show loading while checking unlock status
+  if (isChecking) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+      </div>
+    )
   }
 
   const handleUseTemplate = async (templateId: string) => {

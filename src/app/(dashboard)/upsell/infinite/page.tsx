@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   Infinity, 
@@ -45,11 +46,24 @@ const benefits = [
 export default function InfinitePage() {
   const router = useRouter()
   const { isUpsellUnlocked, articles } = useAppStore()
+  const [isChecking, setIsChecking] = useState(true)
 
-  // Redirect if not unlocked
-  if (!isUpsellUnlocked('infinite')) {
-    router.push('/unlock/infinite')
-    return null
+  // Check if unlocked and redirect if not
+  useEffect(() => {
+    if (!isUpsellUnlocked('infinite')) {
+      router.push('/unlock/infinite')
+    } else {
+      setIsChecking(false)
+    }
+  }, [isUpsellUnlocked, router])
+
+  // Show loading while checking unlock status
+  if (isChecking) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+      </div>
+    )
   }
 
   return (
