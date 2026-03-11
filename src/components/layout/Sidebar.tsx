@@ -75,11 +75,16 @@ export default function Sidebar() {
           {mainNavItems.map((item) => {
             const isActive = pathname === item.href
             return (
-              <Link
+              <div
                 key={item.href}
-                href={item.href}
+                onClick={() => {
+                  if (item.href === '/create') {
+                    useAppStore.getState().setCurrentArticle(null)
+                  }
+                  router.push(item.href)
+                }}
                 className={`
-                  relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group
+                  relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group cursor-pointer
                   ${isActive 
                     ? 'bg-linear-to-r from-[rgba(20,184,166,0.15)] to-[rgba(16,185,129,0.1)] text-white border border-[rgba(20,184,166,0.3)] shadow-[0_0_15px_rgba(20,184,166,0.1)]' 
                     : 'text-locus-muted hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
@@ -91,7 +96,7 @@ export default function Sidebar() {
                 {isActive && sidebarOpen && (
                   <ChevronRight size={16} className="ml-auto text-locus-teal" />
                 )}
-              </Link>
+              </div>
             )
           })}
         </div>

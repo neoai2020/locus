@@ -83,7 +83,7 @@ Respond ONLY with a JSON array of exactly 5 strings, like:
       { role: 'user', content: prompt }
     ])
 
-    console.log('Headline Generation Result:', result)
+    // console.log('Headline Generation Result:', result)
 
     // Parse the response - try to extract JSON array
     let headlines: string[] = []

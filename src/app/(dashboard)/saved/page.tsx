@@ -21,6 +21,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Badge from '@/components/ui/Badge'
+import { useAppStore } from '@/store'
 import { Article, Platform } from '@/types'
 
 const platformIcons: Record<string, typeof Linkedin> = {
@@ -50,7 +51,9 @@ export default function SavedArticlesPage() {
       const response = await fetch('/api/articles')
       if (response.ok) {
         const data = await response.json()
-        setArticles(data.articles || [])
+        const fetchedArticles = data.articles || []
+        setArticles(fetchedArticles)
+        useAppStore.getState().setArticles(fetchedArticles)
       }
     } catch (error) {
       console.error('Failed to fetch articles:', error)
@@ -77,6 +80,7 @@ export default function SavedArticlesPage() {
       const response = await fetch(`/api/articles?id=${id}`, { method: 'DELETE' })
       if (response.ok) {
         setArticles(prev => prev.filter(a => a.id !== id))
+        useAppStore.getState().deleteArticle(id)
       }
     } catch (error) {
       console.error('Failed to delete article:', error)
@@ -87,7 +91,7 @@ export default function SavedArticlesPage() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', { 
-      month: 'short', 
+      month: 'short',
       day: 'numeric',
       year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
     })
@@ -97,7 +101,12 @@ export default function SavedArticlesPage() {
     if (Array.isArray(platform)) {
       return platform.join(', ')
     }
-    return platform
+    return platform.charAt(0).toUpperCase() + platform.slice(1)
+  }
+
+  const stripHtml = (html: string) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html')
+    return doc.body.textContent || ''
   }
 
   const getPlatformIcon = (platform: Platform | string[]) => {
@@ -176,8 +185,12 @@ export default function SavedArticlesPage() {
             return (
               <Card 
                 key={article.id}
-                className="animate-fade-in group"
+                className="animate-fade-in group cursor-pointer hover:border-locus-teal/50 hover:bg-[rgba(255,255,255,0.02)] transition-all"
                 style={{ animationDelay: `${(index + 3) * 0.05}s` }}
+                onClick={() => {
+                  useAppStore.getState().setCurrentArticle(article)
+                  router.push('/create')
+                }}
               >
                 <div className="flex items-start gap-4">
                   {/* Platform Icon */}
@@ -210,24 +223,27 @@ export default function SavedArticlesPage() {
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleCopy(article)}
+                        <div 
+                          className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          {copiedId === article.id ? <Check size={16} /> : <Copy size={16} />}
-                        </Button>
-                        
-                        {/* More Menu */}
-                        <div className="relative">
                           <Button 
                             variant="ghost" 
                             size="sm"
-                            onClick={() => setOpenMenu(openMenu === article.id ? null : article.id)}
+                            onClick={() => handleCopy(article)}
                           >
-                            <MoreVertical size={16} />
+                            {copiedId === article.id ? <Check size={16} /> : <Copy size={16} />}
                           </Button>
+                          
+                          {/* More Menu */}
+                          <div className="relative">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setOpenMenu(openMenu === article.id ? null : article.id)}
+                            >
+                              <MoreVertical size={16} />
+                            </Button>
                           
                           {openMenu === article.id && (
                             <div className="absolute right-0 top-full mt-1 w-40 bg-locus-card border border-locus-border rounded-xl py-1 z-10 shadow-xl">
@@ -245,7 +261,7 @@ export default function SavedArticlesPage() {
                     </div>
 
                     <p className="text-sm text-locus-muted line-clamp-2">
-                      {article.content.substring(0, 200)}...
+                      {stripHtml(article.content).substring(0, 200)}...
                     </p>
                   </div>
                 </div>

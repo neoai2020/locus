@@ -116,3 +116,56 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
+
+// PATCH — Update an existing article
+export async function PATCH(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json({ error: 'Article ID is required' }, { status: 400 })
+    }
+
+    const body = await request.json()
+    const { title, content, affiliate_link, niche, platform, tone, length, status, hook, cta } = body
+
+    const { data: article, error } = await supabase
+      .from('articles')
+      .update({
+        title,
+        content,
+        affiliate_link,
+        niche,
+        platform,
+        tone,
+        length,
+        status,
+        hook,
+        cta,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Update article error:', error)
+      return NextResponse.json({ error: 'Failed to update article' }, { status: 500 })
+    }
+
+    return NextResponse.json({ article })
+  } catch (error) {
+    console.error('Articles PATCH error:', error)
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  }
+}
+

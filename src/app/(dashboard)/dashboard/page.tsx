@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { 
   PenTool, 
   FileText, 
@@ -29,14 +30,14 @@ const quickActions = [
     icon: PenTool, 
     label: 'Create Article', 
     description: 'Generate a new authority article',
-    gradient: 'from-[var(--color-locus-teal)] to-[var(--color-locus-indigo)]'
+    gradient: 'from-locus-teal to-locus-indigo'
   },
   { 
     href: '/saved', 
     icon: FileText, 
     label: 'Saved Articles', 
     description: 'View and manage your content',
-    gradient: 'from-[var(--color-locus-cyan)] to-[var(--color-locus-blue)]'
+    gradient: 'from-locus-cyan to-locus-blue'
   },
   { 
     href: '/publish', 
@@ -55,6 +56,7 @@ const upsellPreviews = [
 ]
 
 export default function DashboardPage() {
+  const router = useRouter()
   const { articles, unlockedUpsells } = useAppStore()
   const [userName, setUserName] = useState('there')
 
@@ -66,7 +68,21 @@ export default function DashboardPage() {
         setUserName(user.user_metadata.full_name.split(' ')[0])
       }
     }
+    
+    const fetchArticles = async () => {
+      try {
+        const response = await fetch('/api/articles')
+        if (response.ok) {
+          const data = await response.json()
+          useAppStore.getState().setArticles(data.articles || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch articles:', error)
+      }
+    }
+
     fetchUser()
+    fetchArticles()
   }, [])
 
   const stats = {
@@ -82,7 +98,7 @@ export default function DashboardPage() {
         <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Welcome back, <span className="gradient-text">{userName}</span>
         </h1>
-        <p className="text-[var(--color-locus-muted)] text-lg">
+        <p className="text-locus-muted text-lg">
           Ready to dominate authority platforms today?
         </p>
       </div>
@@ -92,10 +108,10 @@ export default function DashboardPage() {
         <Card className="animate-fade-in stagger-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[var(--color-locus-muted)] text-sm mb-1">Articles Generated</p>
+              <p className="text-locus-muted text-sm mb-1">Articles Generated</p>
               <p className="text-3xl font-bold text-white">{stats.articlesGenerated}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-indigo)] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-teal to-locus-indigo flex items-center justify-center">
               <TrendingUp className="text-white" size={24} />
             </div>
           </div>
@@ -104,10 +120,10 @@ export default function DashboardPage() {
         <Card className="animate-fade-in stagger-2">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[var(--color-locus-muted)] text-sm mb-1">Saved Drafts</p>
+              <p className="text-locus-muted text-sm mb-1">Saved Drafts</p>
               <p className="text-3xl font-bold text-white">{stats.savedDrafts}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[var(--color-locus-cyan)] to-[var(--color-locus-blue)] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-cyan to-locus-blue flex items-center justify-center">
               <FileText className="text-white" size={24} />
             </div>
           </div>
@@ -116,10 +132,10 @@ export default function DashboardPage() {
         <Card className="animate-fade-in stagger-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[var(--color-locus-muted)] text-sm mb-1">Published</p>
+              <p className="text-locus-muted text-sm mb-1">Published</p>
               <p className="text-3xl font-bold text-white">{stats.publishedArticles}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[var(--color-locus-success)] to-[var(--color-locus-cyan)] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-success to-locus-cyan flex items-center justify-center">
               <Send className="text-white" size={24} />
             </div>
           </div>
@@ -128,27 +144,33 @@ export default function DashboardPage() {
 
       {/* Primary CTA */}
       <Card className="mb-10 animate-fade-in stagger-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(20,184,166,0.1)] to-[rgba(6,182,212,0.1)]" />
+        <div className="absolute inset-0 bg-linear-to-r from-[rgba(20,184,166,0.1)] to-[rgba(6,182,212,0.1)]" />
         <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 p-2">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center animate-pulse-glow">
+            <div className="w-14 h-14 rounded-2xl bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center animate-pulse-glow">
               <Sparkles className="text-white" size={28} />
             </div>
             <div>
               <h2 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'var(--font-display)' }}>
                 Create Your Next Authority Article
               </h2>
-              <p className="text-[var(--color-locus-muted)]">
+              <p className="text-locus-muted">
                 Generate publication-ready content in seconds with AI
               </p>
             </div>
           </div>
-          <Link href="/create">
+          <div 
+            className="cursor-pointer"
+            onClick={() => {
+              useAppStore.getState().setCurrentArticle(null)
+              router.push('/create')
+            }}
+          >
             <Button size="lg" className="whitespace-nowrap">
               <PenTool size={18} />
               <span>Start Creating</span>
             </Button>
-          </Link>
+          </div>
         </div>
       </Card>
 
@@ -156,13 +178,13 @@ export default function DashboardPage() {
       <Card className="mb-10 animate-fade-in stagger-5 p-0 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Video Thumbnail */}
-          <div className="relative aspect-video md:aspect-auto bg-gradient-to-br from-[var(--color-locus-darker)] to-[var(--color-locus-dark)]">
+          <div className="relative aspect-video md:aspect-auto bg-linear-to-br from-locus-darker to-locus-dark">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center mx-auto mb-4 cursor-pointer hover:scale-110 transition-transform group">
+                <div className="w-20 h-20 rounded-full bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center mx-auto mb-4 cursor-pointer hover:scale-110 transition-transform group">
                   <Play size={32} className="text-white ml-1 group-hover:scale-110 transition-transform" />
                 </div>
-                <p className="text-sm text-[var(--color-locus-muted)]">Watch: 3 min</p>
+                <p className="text-sm text-locus-muted">Watch: 3 min</p>
               </div>
             </div>
             {/* Decorative Elements */}
@@ -172,7 +194,7 @@ export default function DashboardPage() {
                 Training
               </Badge>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-locus-dark)] via-transparent to-transparent opacity-50" />
+            <div className="absolute inset-0 bg-linear-to-t from-locus-dark via-transparent to-transparent opacity-50" />
           </div>
           
           {/* Content */}
@@ -180,7 +202,7 @@ export default function DashboardPage() {
             <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
               Quick Start: Create Your First Viral Article
             </h2>
-            <p className="text-[var(--color-locus-muted)] mb-4">
+            <p className="text-locus-muted mb-4">
               Learn how to generate authority-building content in under 3 minutes. 
               This video walks you through the entire process from topic to publish.
             </p>
@@ -209,27 +231,35 @@ export default function DashboardPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {quickActions.map((action, index) => (
-            <Link key={action.href} href={action.href}>
+            <div 
+              key={action.href} 
+              onClick={() => {
+                if (action.href === '/create') {
+                  useAppStore.getState().setCurrentArticle(null)
+                }
+                router.push(action.href)
+              }}
+            >
               <Card 
                 className={`animate-fade-in cursor-pointer group`}
                 style={{ animationDelay: `${(index + 5) * 0.1}s` }}
               >
                 <div className="flex items-start gap-4">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${action.gradient} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-10 h-10 rounded-xl bg-linear-to-r ${action.gradient} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                     <action.icon className="text-white" size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white mb-1 group-hover:text-[var(--color-locus-teal)] transition-colors">
+                    <h3 className="font-semibold text-white mb-1 group-hover:text-locus-teal transition-colors">
                       {action.label}
                     </h3>
-                    <p className="text-sm text-[var(--color-locus-muted)]">
+                    <p className="text-sm text-locus-muted">
                       {action.description}
                     </p>
                   </div>
-                  <ArrowRight className="text-[var(--color-locus-muted)] group-hover:text-[var(--color-locus-teal)] group-hover:translate-x-1 transition-all flex-shrink-0" size={18} />
+                  <ArrowRight className="text-locus-muted group-hover:text-locus-teal group-hover:translate-x-1 transition-all shrink-0" size={18} />
                 </div>
               </Card>
-            </Link>
+            </div>
           ))}
         </div>
       </div>
@@ -254,15 +284,15 @@ export default function DashboardPage() {
                   style={{ animationDelay: `${(index + 8) * 0.1}s` }}
                 >
                   {!isUnlocked && (
-                    <div className="absolute inset-0 bg-[var(--color-locus-dark)] bg-opacity-60 backdrop-blur-sm z-10 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-locus-dark bg-opacity-60 backdrop-blur-sm z-10 flex items-center justify-center">
                       <Badge variant="purple">Locked</Badge>
                     </div>
                   )}
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${upsell.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-10 h-10 rounded-xl bg-linear-to-r ${upsell.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                     <upsell.icon className="text-white" size={20} />
                   </div>
                   <h3 className="font-semibold text-white mb-1">{config.name}</h3>
-                  <p className="text-sm text-[var(--color-locus-muted)]">{config.description}</p>
+                  <p className="text-sm text-locus-muted">{config.description}</p>
                 </Card>
               </Link>
             )

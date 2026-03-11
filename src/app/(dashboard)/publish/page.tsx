@@ -49,7 +49,7 @@ const platformCards = [
     icon: Globe, 
     name: 'Other Publications', 
     url: '#',
-    gradient: 'from-[var(--color-locus-teal)] to-[var(--color-locus-indigo)]',
+    gradient: 'from-locus-teal to-[var(--color-locus-indigo)]',
     description: 'Guest posts, industry blogs, and niche publications'
   },
 ]
@@ -58,7 +58,9 @@ export default function PublishPage() {
   const { currentArticle, updateArticle } = useAppStore()
   const [copied, setCopied] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(
-    currentArticle?.platform || null
+    currentArticle?.platform 
+      ? (Array.isArray(currentArticle.platform) ? currentArticle.platform[0] as Platform : currentArticle.platform as Platform)
+      : null
   )
 
   const handleCopy = async () => {
@@ -84,7 +86,7 @@ export default function PublishPage() {
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Publish & Distribute
         </h1>
-        <p className="text-[var(--color-locus-muted)]">
+        <p className="text-locus-muted">
           Deploy your article to high-authority platforms and maximize your reach
         </p>
       </div>
@@ -92,12 +94,12 @@ export default function PublishPage() {
       {/* Important Notice */}
       <Card className="mb-8 animate-fade-in stagger-1 border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.05)]">
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-[rgba(245,158,11,0.15)] flex items-center justify-center flex-shrink-0">
-            <AlertTriangle size={20} className="text-[var(--color-locus-warning)]" />
+          <div className="w-10 h-10 rounded-xl bg-[rgba(245,158,11,0.15)] flex items-center justify-center shrink-0">
+            <AlertTriangle size={20} className="text-(--color-locus-warning)" />
           </div>
           <div>
             <h3 className="font-semibold text-white mb-1">Manual Posting Required</h3>
-            <p className="text-sm text-[var(--color-locus-muted)]">
+            <p className="text-sm text-locus-muted">
               Locus generates content but does <strong className="text-white">not auto-post</strong> to any platform. 
               This keeps your accounts safe and compliant. Copy your article and paste it directly on your chosen platform.
             </p>
@@ -118,30 +120,30 @@ export default function PublishPage() {
                 key={platform.id}
                 className={`
                   animate-fade-in cursor-pointer group
-                  ${selectedPlatform === platform.id ? 'border-[var(--color-locus-teal)] ring-2 ring-[rgba(20,184,166,0.2)]' : ''}
+                  ${selectedPlatform === platform.id ? 'border-locus-teal ring-2 ring-[rgba(20,184,166,0.2)]' : ''}
                 `}
                 style={{ animationDelay: `${(index + 2) * 0.1}s` }}
                 onClick={() => setSelectedPlatform(platform.id)}
               >
                 <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${platform.gradient} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-12 h-12 rounded-xl bg-linear-to-r ${platform.gradient} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                     <platform.icon size={24} className="text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-white mb-1">{platform.name}</h3>
-                    <p className="text-sm text-[var(--color-locus-muted)]">
+                    <p className="text-sm text-locus-muted">
                       {platform.description}
                     </p>
                   </div>
                 </div>
                 
                 {selectedPlatform === platform.id && (
-                  <div className="mt-4 pt-4 border-t border-[var(--color-locus-border)]">
+                  <div className="mt-4 pt-4 border-t border-locus-border">
                     <a 
                       href={platform.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm text-[var(--color-locus-teal)] hover:text-[var(--color-locus-emerald)] transition-colors"
+                      className="inline-flex items-center gap-2 text-sm text-locus-teal hover:text-(--color-locus-emerald) transition-colors"
                     >
                       <span>Open {platform.name}</span>
                       <ExternalLink size={14} />
@@ -162,9 +164,9 @@ export default function PublishPage() {
                 </Badge>
               </div>
               
-              <div className="bg-[rgba(255,255,255,0.02)] border border-[var(--color-locus-border)] rounded-xl p-4 mb-4">
+              <div className="bg-[rgba(255,255,255,0.02)] border border-locus-border rounded-xl p-4 mb-4">
                 <h4 className="font-medium text-white mb-2">{currentArticle.title}</h4>
-                <p className="text-sm text-[var(--color-locus-muted)] line-clamp-3">
+                <p className="text-sm text-locus-muted line-clamp-3">
                   {currentArticle.content.substring(0, 200)}...
                 </p>
               </div>
@@ -187,11 +189,11 @@ export default function PublishPage() {
 
           {!currentArticle && (
             <Card className="animate-fade-in text-center py-12" style={{ animationDelay: '0.6s' }}>
-              <div className="w-16 h-16 rounded-2xl bg-[var(--color-locus-border)] flex items-center justify-center mx-auto mb-4">
-                <Send className="text-[var(--color-locus-muted)]" size={28} />
+              <div className="w-16 h-16 rounded-2xl bg-locus-border flex items-center justify-center mx-auto mb-4">
+                <Send className="text-locus-muted" size={28} />
               </div>
-              <p className="text-[var(--color-locus-muted)] mb-2">No article selected</p>
-              <p className="text-sm text-[var(--color-locus-muted)] opacity-75">
+              <p className="text-locus-muted mb-2">No article selected</p>
+              <p className="text-sm text-locus-muted opacity-75">
                 Create or select an article from your saved drafts to publish
               </p>
             </Card>
@@ -202,7 +204,7 @@ export default function PublishPage() {
         <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <Card className="sticky top-8">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center">
                 <Lightbulb size={16} className="text-white" />
               </div>
               <h3 className="font-semibold text-white">Posting Tips</h3>
@@ -212,18 +214,18 @@ export default function PublishPage() {
               <ul className="space-y-3">
                 {tips.map((tip, index) => (
                   <li key={index} className="flex items-start gap-3 text-sm">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-locus-teal)] mt-2 flex-shrink-0" />
-                    <span className="text-[var(--color-locus-text)]">{tip}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-locus-teal mt-2 shrink-0" />
+                    <span className="text-locus-text">{tip}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-[var(--color-locus-muted)]">
+              <p className="text-sm text-locus-muted">
                 Select a platform to see posting tips
               </p>
             )}
 
-            <div className="mt-6 pt-6 border-t border-[var(--color-locus-border)]">
+            <div className="mt-6 pt-6 border-t border-locus-border">
               <h4 className="font-medium text-white text-sm mb-3">Quick Links</h4>
               <div className="space-y-2">
                 {platformCards.filter(p => p.url !== '#').map((platform) => (
@@ -232,7 +234,7 @@ export default function PublishPage() {
                     href={platform.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-[var(--color-locus-muted)] hover:text-[var(--color-locus-teal)] transition-colors"
+                    className="flex items-center gap-2 text-sm text-locus-muted hover:text-locus-teal transition-colors"
                   >
                     <platform.icon size={14} />
                     <span>{platform.name}</span>

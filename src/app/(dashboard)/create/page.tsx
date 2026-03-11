@@ -73,7 +73,7 @@ const steps = [
 
 export default function CreateArticlePage() {
   const router = useRouter()
-  const { isGenerating, setIsGenerating } = useAppStore()
+  const { isGenerating, setIsGenerating, currentArticle } = useAppStore()
   
   // Step control
   const [currentStep, setCurrentStep] = useState(1)
@@ -100,6 +100,27 @@ export default function CreateArticlePage() {
   const [saved, setSaved] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+
+  // Load current article if it exists
+  useEffect(() => {
+    const { currentArticle } = useAppStore.getState()
+    if (currentArticle) {
+      setTopic(currentArticle.title)
+      setEditedContent(currentArticle.content)
+      setAffiliateLink(currentArticle.affiliate_link || '')
+      setNiche(currentArticle.niche || '')
+      setSelectedPlatforms(Array.isArray(currentArticle.platform) ? currentArticle.platform : [currentArticle.platform as string])
+      setTone(currentArticle.tone)
+      setLength(currentArticle.length)
+      setGeneratedArticle({
+        hook: currentArticle.hook || '',
+        body: '',
+        cta: currentArticle.cta || '',
+        fullContent: currentArticle.content
+      })
+      setCurrentStep(3)
+    }
+  }, [])
 
   // Toggle platform selection (multi-select)
   const togglePlatform = (platformValue: string) => {
@@ -235,8 +256,12 @@ export default function CreateArticlePage() {
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      const response = await fetch('/api/articles', {
-        method: 'POST',
+      const isUpdate = !!currentArticle?.id
+      const url = isUpdate ? `/api/articles?id=${currentArticle.id}` : '/api/articles'
+      const method = isUpdate ? 'PATCH' : 'POST'
+
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: topic,
@@ -246,14 +271,25 @@ export default function CreateArticlePage() {
           platform: selectedPlatforms,
           tone,
           length,
-          hook: generatedArticle?.hook,
-          cta: generatedArticle?.cta,
+          hook: generatedArticle?.hook || currentArticle?.hook,
+          cta: generatedArticle?.cta || currentArticle?.cta,
         }),
       })
 
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.details || errorData.error || 'Failed to save')
+      }
+
+      const data = await response.json()
+      if (data.article) {
+        if (isUpdate) {
+          useAppStore.getState().updateArticle(data.article.id, data.article)
+        } else {
+          useAppStore.getState().addArticle(data.article)
+          // Set currentArticle to the newly created one so subsequent saves are updates
+          useAppStore.getState().setCurrentArticle(data.article)
+        }
       }
 
       setSaved(true)
@@ -521,7 +557,7 @@ export default function CreateArticlePage() {
                         window.open((target as HTMLAnchorElement).href, '_blank', 'noopener,noreferrer');
                       }
                     }}
-                    className="w-full h-[550px] bg-[rgba(255,255,255,0.02)] border border-locus-border rounded-2xl p-8 outline-none focus:border-locus-teal focus:ring-1 focus:ring-locus-teal/50 transition-all overflow-y-auto scrollbar-custom editor-content prose-locus"
+                    className="w-full h-[550px] bg-[rgba(255,255,255,0.02)] border border-locus-border rounded-2xl p-8 outline-none focus:border-locus-teal focus:ring-1 focus:ring-locus-teal/50 transition-all overflow-y-auto scrollbar-custom editor-content prose-locus editor-cursor-behavior"
                     ref={(el) => {
                       // Only set innerHTML if it's different and if it's currently empty or strictly matching the current state
                       // This avoids resetting the cursor position when typing
@@ -571,6 +607,19 @@ export default function CreateArticlePage() {
                     {saved ? <Check size={18} /> : <Save size={18} />}
                     <span>{saved ? 'Saved!' : isSaving ? 'Saving...' : 'Save Article'}</span>
                   </Button>
+
+                  {currentArticle && (
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => {
+                        useAppStore.getState().setCurrentArticle(null);
+                        window.location.reload(); // Refresh to clear all local states
+                      }}
+                    >
+                      <PenTool size={18} />
+                      <span>New Article</span>
+                    </Button>
+                  )}
                 </div>
               </>
             ) : (

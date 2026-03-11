@@ -11,12 +11,17 @@ import {
   ArrowRight,
   Check,
   X,
-  Plus
+  Plus,
+  FileText
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
 import { useAppStore } from '@/store'
+import { Article } from '@/types'
+import { useEffect } from 'react'
 
 const imageSuggestions = [
   {
@@ -41,9 +46,41 @@ const imageSuggestions = [
 
 export default function ImagesPage() {
   const router = useRouter()
-  const { currentArticle, updateArticle } = useAppStore()
+  const { currentArticle, articles, setArticles, setCurrentArticle, updateArticle } = useAppStore()
   const [selectedImages, setSelectedImages] = useState<Record<string, string>>({})
   const [uploadingSection, setUploadingSection] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (articles.length === 0) {
+      fetchArticles()
+    }
+  }, [])
+
+  const fetchArticles = async () => {
+    try {
+      const response = await fetch('/api/articles')
+      if (response.ok) {
+        const data = await response.json()
+        setArticles(data.articles || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch articles:', error)
+    }
+  }
+
+  const stripHtml = (content: string) => {
+    if (!content) return ''
+    // First, remove actual HTML tags
+    const cleanText = content.replace(/<\/?[^>]+(>|$)/g, "")
+    // Then decode common entities just in case
+    return cleanText
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .trim()
+  }
 
   const handleSelectSuggestion = (sectionId: string, url: string) => {
     setSelectedImages(prev => ({
@@ -92,21 +129,61 @@ export default function ImagesPage() {
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Enhance with Images
         </h1>
-        <p className="text-[var(--color-locus-muted)]">
+        <p className="text-locus-muted">
           Add visuals to increase engagement and authority. Images are optional but recommended.
         </p>
       </div>
 
       {/* Current Article Preview */}
-      {currentArticle && (
+      {currentArticle ? (
         <Card className="mb-8 animate-fade-in stagger-1">
           <div className="flex items-start justify-between gap-4">
-            <div>
-              <Badge variant="purple" className="mb-2">{currentArticle.platform}</Badge>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="purple">{Array.isArray(currentArticle.platform) ? currentArticle.platform[0] : currentArticle.platform}</Badge>
+                <button 
+                  onClick={() => setCurrentArticle(null)}
+                  className="text-xs text-locus-muted hover:text-white transition-colors"
+                >
+                  Change article
+                </button>
+              </div>
               <h2 className="text-lg font-semibold text-white">{currentArticle.title}</h2>
-              <p className="text-sm text-[var(--color-locus-muted)] mt-1 line-clamp-2">
-                {currentArticle.content.substring(0, 150)}...
+              <p className="text-sm text-locus-muted mt-1 line-clamp-2">
+                {stripHtml(currentArticle.content).substring(0, 150)}...
               </p>
+            </div>
+          </div>
+        </Card>
+      ) : (
+        <Card className="mb-8 animate-fade-in stagger-1 border-dashed border-locus-border">
+          <div className="max-w-md mx-auto py-6 text-center">
+            <h2 className="text-white font-medium mb-2">Select an Article</h2>
+            <p className="text-locus-muted text-sm mb-6">Choose an article from your library to enhance with visuals</p>
+            
+            <div className="flex flex-col gap-4">
+              <Select
+                options={[
+                  { value: '', label: 'Select an article...' },
+                  ...articles.map(a => ({ value: a.id, label: a.title }))
+                ]}
+                onChange={(e) => {
+                  const article = articles.find(a => a.id === e.target.value)
+                  if (article) setCurrentArticle(article)
+                }}
+                className="text-left"
+              />
+              
+              <div className="flex items-center justify-center gap-4 pt-2">
+                <div className="h-px bg-locus-border flex-1" />
+                <span className="text-xs text-locus-muted">OR</span>
+                <div className="h-px bg-locus-border flex-1" />
+              </div>
+
+              <Button variant="ghost" size="sm" onClick={() => router.push('/saved')} className="w-full">
+                <FileText size={16} className="mr-2" />
+                Browse Saved Articles
+              </Button>
             </div>
           </div>
         </Card>
@@ -123,10 +200,10 @@ export default function ImagesPage() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="font-semibold text-white flex items-center gap-2">
-                  <ImageIcon size={18} className="text-[var(--color-locus-cyan)]" />
+                  <ImageIcon size={18} className="text-locus-cyan" />
                   {suggestion.section} Image
                 </h3>
-                <p className="text-sm text-[var(--color-locus-muted)] mt-1">
+                <p className="text-sm text-locus-muted mt-1">
                   {suggestion.suggestion}
                 </p>
               </div>
@@ -140,44 +217,67 @@ export default function ImagesPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* AI Suggestion */}
-              <button
-                onClick={() => handleSelectSuggestion(suggestion.id, suggestion.placeholder)}
-                className={`
-                  relative rounded-xl overflow-hidden border-2 transition-all duration-200 group
-                  ${selectedImages[suggestion.id] === suggestion.placeholder 
-                    ? 'border-[var(--color-locus-teal)] ring-2 ring-[rgba(20,184,166,0.3)]' 
-                    : 'border-[var(--color-locus-border)] hover:border-[var(--color-locus-teal)]'
-                  }
-                `}
-              >
-                <div className="aspect-video relative">
-                  <img 
-                    src={suggestion.placeholder} 
-                    alt={suggestion.suggestion}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center">
-                      <Sparkles size={12} className="text-white" />
-                    </div>
-                    <span className="text-xs text-white font-medium">AI Suggestion</span>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    setIsGenerating(suggestion.id)
+                    setTimeout(() => {
+                      handleSelectSuggestion(suggestion.id, suggestion.placeholder)
+                      setIsGenerating(null)
+                    }, 1500)
+                  }}
+                  disabled={isGenerating === suggestion.id}
+                  className={`
+                    relative rounded-xl overflow-hidden border-2 transition-all duration-200 group h-full
+                    ${selectedImages[suggestion.id] === suggestion.placeholder 
+                      ? 'border-locus-teal ring-2 ring-locus-teal/30' 
+                      : 'border-locus-border hover:border-locus-teal'
+                    }
+                  `}
+                >
+                  <div className="aspect-video relative h-full">
+                    {isGenerating === suggestion.id ? (
+                      <div className="absolute inset-0 bg-locus-dark/80 flex flex-col items-center justify-center p-4 text-center">
+                        <Wand2 size={24} className="text-locus-teal animate-pulse mb-2" />
+                        <span className="text-xs text-white">Analyzing article for best prompt...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <img 
+                          src={suggestion.placeholder} 
+                          alt={suggestion.suggestion}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+                        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center">
+                            <Sparkles size={12} className="text-white" />
+                          </div>
+                          <span className="text-xs text-white font-medium">AI Suggestion</span>
+                        </div>
+                      </>
+                    )}
+                    {selectedImages[suggestion.id] === suggestion.placeholder && !isGenerating && (
+                      <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-locus-teal flex items-center justify-center">
+                        <Check size={14} className="text-white" />
+                      </div>
+                    )}
                   </div>
-                  {selectedImages[suggestion.id] === suggestion.placeholder && (
-                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[var(--color-locus-teal)] flex items-center justify-center">
-                      <Check size={14} className="text-white" />
-                    </div>
-                  )}
+                </button>
+                <div className="px-1">
+                  <p className="text-[10px] text-locus-muted leading-tight">
+                    <span className="text-locus-teal font-medium">Pro Tip:</span> Real AI generation requires an API key (DALL-E 3) and custom prompts based on your niche.
+                  </p>
                 </div>
-              </button>
+              </div>
 
               {/* Upload Option */}
               <label
                 className={`
                   relative rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200
                   ${uploadingSection === suggestion.id 
-                    ? 'border-[var(--color-locus-teal)] bg-[rgba(20,184,166,0.05)]' 
-                    : 'border-[var(--color-locus-border)] hover:border-[var(--color-locus-teal)] hover:bg-[rgba(255,255,255,0.02)]'
+                    ? 'border-locus-teal bg-locus-teal/5' 
+                    : 'border-locus-border hover:border-locus-teal hover:bg-white/5'
                   }
                 `}
               >
@@ -191,17 +291,17 @@ export default function ImagesPage() {
                   }}
                 />
                 <div className="aspect-video flex flex-col items-center justify-center p-4">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--color-locus-border)] flex items-center justify-center mb-3">
-                    <Upload size={20} className="text-[var(--color-locus-muted)]" />
+                  <div className="w-10 h-10 rounded-xl bg-locus-border flex items-center justify-center mb-3">
+                    <Upload size={20} className="text-locus-muted" />
                   </div>
-                  <span className="text-sm text-[var(--color-locus-muted)]">Upload your own</span>
-                  <span className="text-xs text-[var(--color-locus-muted)] opacity-75 mt-1">PNG, JPG up to 5MB</span>
+                  <span className="text-sm text-locus-muted">Upload your own</span>
+                  <span className="text-xs text-locus-muted opacity-75 mt-1">PNG, JPG up to 5MB</span>
                 </div>
               </label>
 
               {/* Custom Uploaded Image or Skip */}
               {selectedImages[suggestion.id] && selectedImages[suggestion.id] !== suggestion.placeholder ? (
-                <div className="relative rounded-xl overflow-hidden border-2 border-[var(--color-locus-teal)] ring-2 ring-[rgba(20,184,166,0.3)]">
+                <div className="relative rounded-xl overflow-hidden border-2 border-locus-teal ring-2 ring-locus-teal/30">
                   <div className="aspect-video relative">
                     <img 
                       src={selectedImages[suggestion.id]} 
@@ -210,7 +310,7 @@ export default function ImagesPage() {
                     />
                     <button
                       onClick={() => setSelectedImages(prev => ({ ...prev, [suggestion.id]: '' }))}
-                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--color-locus-error)] flex items-center justify-center hover:bg-opacity-80 transition-colors"
+                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-locus-error flex items-center justify-center hover:bg-opacity-80 transition-colors"
                     >
                       <X size={14} className="text-white" />
                     </button>
@@ -219,14 +319,14 @@ export default function ImagesPage() {
               ) : (
                 <button
                   onClick={() => setSelectedImages(prev => ({ ...prev, [suggestion.id]: '' }))}
-                  className="rounded-xl border-2 border-[var(--color-locus-border)] hover:border-[var(--color-locus-muted)] transition-all duration-200"
+                  className="rounded-xl border-2 border-locus-border hover:border-locus-muted transition-all duration-200"
                 >
                   <div className="aspect-video flex flex-col items-center justify-center p-4">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--color-locus-border)] flex items-center justify-center mb-3">
-                      <X size={20} className="text-[var(--color-locus-muted)]" />
+                    <div className="w-10 h-10 rounded-xl bg-locus-border flex items-center justify-center mb-3">
+                      <X size={20} className="text-locus-muted" />
                     </div>
-                    <span className="text-sm text-[var(--color-locus-muted)]">Skip this section</span>
-                    <span className="text-xs text-[var(--color-locus-muted)] opacity-75 mt-1">No image needed</span>
+                    <span className="text-sm text-locus-muted">Skip this section</span>
+                    <span className="text-xs text-locus-muted opacity-75 mt-1">No image needed</span>
                   </div>
                 </button>
               )}
@@ -236,7 +336,8 @@ export default function ImagesPage() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="flex items-center justify-between mt-8 pt-8 border-t border-[var(--color-locus-border)]">
+      <div className="flex items-center justify-between mt-8 pt-8 border-t border-locus-border">
+
         <Button variant="ghost" onClick={() => router.back()}>
           <ArrowLeft size={18} />
           <span>Back to Editor</span>
