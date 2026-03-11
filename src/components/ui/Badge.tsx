@@ -8,11 +8,11 @@ interface BadgeProps {
 
 export default function Badge({ children, variant = 'purple', className = '' }: BadgeProps) {
   const variants = {
-    purple: 'bg-[rgba(139,92,246,0.15)] text-[var(--color-burst-purple)] border-[rgba(139,92,246,0.3)]',
-    cyan: 'bg-[rgba(6,182,212,0.15)] text-[var(--color-burst-cyan)] border-[rgba(6,182,212,0.3)]',
-    success: 'bg-[rgba(16,185,129,0.15)] text-[var(--color-burst-success)] border-[rgba(16,185,129,0.3)]',
-    warning: 'bg-[rgba(245,158,11,0.15)] text-[var(--color-burst-warning)] border-[rgba(245,158,11,0.3)]',
-    error: 'bg-[rgba(239,68,68,0.15)] text-[var(--color-burst-error)] border-[rgba(239,68,68,0.3)]',
+    purple: 'bg-[rgba(20,184,166,0.15)] text-[var(--color-locus-teal)] border-[rgba(20,184,166,0.3)]',
+    cyan: 'bg-[rgba(6,182,212,0.15)] text-[var(--color-locus-cyan)] border-[rgba(6,182,212,0.3)]',
+    success: 'bg-[rgba(16,185,129,0.15)] text-[var(--color-locus-success)] border-[rgba(16,185,129,0.3)]',
+    warning: 'bg-[rgba(245,158,11,0.15)] text-[var(--color-locus-warning)] border-[rgba(245,158,11,0.3)]',
+    error: 'bg-[rgba(239,68,68,0.15)] text-[var(--color-locus-error)] border-[rgba(239,68,68,0.3)]',
   }
 
   return (

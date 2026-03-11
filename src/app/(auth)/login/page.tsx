@@ -48,14 +48,14 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
             Welcome Back
           </h1>
-          <p className="text-[var(--color-burst-muted)]">
+          <p className="text-[var(--color-locus-muted)]">
             Sign in to continue building authority
           </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
           {error && (
-            <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-burst-error)] text-sm">
+            <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-locus-error)] text-sm">
               {error}
             </div>
           )}
@@ -83,7 +83,7 @@ export default function LoginPage() {
           <div className="flex justify-end">
             <Link 
               href="/forgot-password" 
-              className="text-sm text-[var(--color-burst-purple)] hover:text-[var(--color-burst-violet)] transition-colors"
+              className="text-sm text-[var(--color-locus-teal)] hover:text-[var(--color-locus-emerald)] transition-colors"
             >
               Forgot password?
             </Link>
@@ -100,18 +100,18 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="text-center mt-6 text-[var(--color-burst-muted)] text-sm">
+        <p className="text-center mt-6 text-[var(--color-locus-muted)] text-sm">
           Don&apos;t have an account?{' '}
           <Link 
             href="/signup" 
-            className="text-[var(--color-burst-purple)] hover:text-[var(--color-burst-violet)] transition-colors font-medium"
+            className="text-[var(--color-locus-teal)] hover:text-[var(--color-locus-emerald)] transition-colors font-medium"
           >
             Sign up
           </Link>
         </p>
       </Card>
 
-      <p className="text-center mt-8 text-xs text-[var(--color-burst-muted)]">
+      <p className="text-center mt-8 text-xs text-[var(--color-locus-muted)]">
         By signing in, you agree to our Terms of Service and Privacy Policy
       </p>
     </div>

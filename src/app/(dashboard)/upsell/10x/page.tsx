@@ -53,7 +53,7 @@ export default function TenXPage() {
   if (isChecking) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-locus-border)] animate-pulse" />
       </div>
     )
   }
@@ -105,7 +105,7 @@ export default function TenXPage() {
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           10X Article Generator
         </h1>
-        <p className="text-[var(--color-burst-muted)]">
+        <p className="text-[var(--color-locus-muted)]">
           Generate multiple hook variations to A/B test your content
         </p>
       </div>
@@ -125,7 +125,7 @@ export default function TenXPage() {
               />
 
               <div>
-                <label className="block text-sm font-medium text-[var(--color-burst-text)] mb-3">
+                <label className="block text-sm font-medium text-[var(--color-locus-text)] mb-3">
                   Hook Styles ({selectedHooks.length} selected)
                 </label>
                 <div className="space-y-2">
@@ -136,20 +136,20 @@ export default function TenXPage() {
                       className={`
                         w-full p-3 rounded-xl border text-left transition-all duration-200
                         ${selectedHooks.includes(hook.id)
-                          ? 'border-[var(--color-burst-purple)] bg-[rgba(139,92,246,0.1)]'
-                          : 'border-[var(--color-burst-border)] hover:border-[var(--color-burst-purple)] hover:border-opacity-50'
+                          ? 'border-[var(--color-locus-teal)] bg-[rgba(20,184,166,0.1)]'
+                          : 'border-[var(--color-locus-border)] hover:border-[var(--color-locus-teal)] hover:border-opacity-50'
                         }
                       `}
                     >
                       <div className="flex items-center justify-between">
-                        <span className={selectedHooks.includes(hook.id) ? 'text-white' : 'text-[var(--color-burst-muted)]'}>
+                        <span className={selectedHooks.includes(hook.id) ? 'text-white' : 'text-[var(--color-locus-muted)]'}>
                           {hook.label}
                         </span>
                         {selectedHooks.includes(hook.id) && (
-                          <Check size={16} className="text-[var(--color-burst-purple)]" />
+                          <Check size={16} className="text-[var(--color-locus-teal)]" />
                         )}
                       </div>
-                      <p className="text-xs text-[var(--color-burst-muted)] mt-1">
+                      <p className="text-xs text-[var(--color-locus-muted)] mt-1">
                         {hook.description}
                       </p>
                     </button>
@@ -178,7 +178,7 @@ export default function TenXPage() {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center mb-4 animate-pulse-glow">
                 <Sparkles className="text-white animate-spin" size={28} />
               </div>
-              <p className="text-[var(--color-burst-muted)]">
+              <p className="text-[var(--color-locus-muted)]">
                 Generating {selectedHooks.length} variations...
               </p>
             </Card>
@@ -193,7 +193,7 @@ export default function TenXPage() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <Badge variant="warning">{variation.hook}</Badge>
-                      <span className="text-sm text-[var(--color-burst-muted)]">
+                      <span className="text-sm text-[var(--color-locus-muted)]">
                         Variation {index + 1}
                       </span>
                     </div>
@@ -216,7 +216,7 @@ export default function TenXPage() {
                   </div>
                   
                   <div className={`
-                    text-sm text-[var(--color-burst-text)] whitespace-pre-wrap
+                    text-sm text-[var(--color-locus-text)] whitespace-pre-wrap
                     ${expandedId === variation.id ? '' : 'line-clamp-4'}
                   `}>
                     {variation.content}
@@ -226,11 +226,11 @@ export default function TenXPage() {
             </div>
           ) : (
             <Card className="text-center py-16">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-[var(--color-burst-border)] flex items-center justify-center mb-4">
-                <Zap className="text-[var(--color-burst-muted)]" size={28} />
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-[var(--color-locus-border)] flex items-center justify-center mb-4">
+                <Zap className="text-[var(--color-locus-muted)]" size={28} />
               </div>
-              <p className="text-[var(--color-burst-muted)] mb-2">No variations generated yet</p>
-              <p className="text-sm text-[var(--color-burst-muted)] opacity-75">
+              <p className="text-[var(--color-locus-muted)] mb-2">No variations generated yet</p>
+              <p className="text-sm text-[var(--color-locus-muted)] opacity-75">
                 Select hook styles and click generate to create variations
               </p>
             </Card>

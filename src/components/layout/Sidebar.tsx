@@ -51,7 +51,6 @@ export default function Sidebar() {
     router.push('/login')
   }
 
-  // Filter upsell items to only show unlocked ones
   const visibleUpsells = upsellNavItems.filter(item => 
     unlockedUpsells.includes(item.type)
   )
@@ -59,13 +58,13 @@ export default function Sidebar() {
   return (
     <aside 
       className={`
-        fixed left-0 top-0 h-screen bg-[var(--color-burst-dark)] border-r border-[var(--color-burst-border)]
+        fixed left-0 top-0 h-screen bg-[var(--color-locus-dark)] border-r border-[var(--color-locus-border)]
         transition-all duration-300 z-50 flex flex-col
         ${sidebarOpen ? 'w-64' : 'w-20'}
       `}
     >
       {/* Logo */}
-      <div className="h-20 flex items-center px-5 border-b border-[var(--color-burst-border)]">
+      <div className="h-20 flex items-center px-5 border-b border-[var(--color-locus-border)]">
         <Logo size="md" showText={sidebarOpen} />
       </div>
 
@@ -81,12 +80,12 @@ export default function Sidebar() {
                 className={`
                   flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200
                   ${isActive 
-                    ? 'bg-gradient-to-r from-[rgba(139,92,246,0.15)] to-[rgba(99,102,241,0.1)] text-white border border-[rgba(139,92,246,0.3)]' 
-                    : 'text-[var(--color-burst-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                    ? 'bg-gradient-to-r from-[rgba(20,184,166,0.15)] to-[rgba(16,185,129,0.1)] text-white border border-[rgba(20,184,166,0.3)]' 
+                    : 'text-[var(--color-locus-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
                   }
                 `}
               >
-                <item.icon size={20} className={isActive ? 'text-[var(--color-burst-purple)]' : ''} />
+                <item.icon size={20} className={isActive ? 'text-[var(--color-locus-teal)]' : ''} />
                 {sidebarOpen && <span className="font-medium text-sm">{item.label}</span>}
               </Link>
             )
@@ -97,7 +96,7 @@ export default function Sidebar() {
         {visibleUpsells.length > 0 && (
           <div className="mt-8">
             {sidebarOpen && (
-              <h3 className="px-3 text-xs font-semibold text-[var(--color-burst-muted)] uppercase tracking-wider mb-3">
+              <h3 className="px-3 text-xs font-semibold text-[var(--color-locus-muted)] uppercase tracking-wider mb-3">
                 Premium Features
               </h3>
             )}
@@ -111,12 +110,12 @@ export default function Sidebar() {
                     className={`
                       flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200
                       ${isActive 
-                        ? 'bg-gradient-to-r from-[rgba(6,182,212,0.15)] to-[rgba(139,92,246,0.1)] text-white border border-[rgba(6,182,212,0.3)]' 
-                        : 'text-[var(--color-burst-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                        ? 'bg-gradient-to-r from-[rgba(6,182,212,0.15)] to-[rgba(20,184,166,0.1)] text-white border border-[rgba(6,182,212,0.3)]' 
+                        : 'text-[var(--color-locus-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
                       }
                     `}
                   >
-                    <item.icon size={20} className={isActive ? 'text-[var(--color-burst-cyan)]' : ''} />
+                    <item.icon size={20} className={isActive ? 'text-[var(--color-locus-cyan)]' : ''} />
                     {sidebarOpen && <span className="font-medium text-sm">{item.label}</span>}
                   </Link>
                 )
@@ -127,10 +126,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className="p-3 border-t border-[var(--color-burst-border)]">
+      <div className="p-3 border-t border-[var(--color-locus-border)]">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl w-full text-[var(--color-burst-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-all duration-200"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl w-full text-[var(--color-locus-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-all duration-200"
         >
           <LogOut size={20} />
           {sidebarOpen && <span className="font-medium text-sm">Logout</span>}
@@ -140,7 +139,7 @@ export default function Sidebar() {
       {/* Toggle Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="absolute -right-3 top-24 bg-[var(--color-burst-card)] border border-[var(--color-burst-border)] rounded-full p-1.5 hover:border-[var(--color-burst-purple)] transition-all duration-200"
+        className="absolute -right-3 top-24 bg-[var(--color-locus-card)] border border-[var(--color-locus-border)] rounded-full p-1.5 hover:border-[var(--color-locus-teal)] transition-all duration-200"
       >
         {sidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
       </button>

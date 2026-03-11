@@ -60,7 +60,7 @@ export default function UnlockPage() {
   if (isChecking) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-locus-border)] animate-pulse" />
       </div>
     )
   }
@@ -94,7 +94,7 @@ export default function UnlockPage() {
           <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
             {config.name} Unlocked!
           </h1>
-          <p className="text-[var(--color-burst-muted)]">
+          <p className="text-[var(--color-locus-muted)]">
             Redirecting you to your new power...
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function UnlockPage() {
         <h1 className="text-4xl font-bold text-white mb-4" style={{ fontFamily: 'var(--font-display)' }}>
           {config.headline}
         </h1>
-        <p className="text-lg text-[var(--color-burst-muted)]">
+        <p className="text-lg text-[var(--color-locus-muted)]">
           {config.description}
         </p>
       </div>
@@ -126,7 +126,7 @@ export default function UnlockPage() {
               <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${gradient} flex items-center justify-center flex-shrink-0`}>
                 <Check size={14} className="text-white" />
               </div>
-              <span className="text-[var(--color-burst-text)]">{feature}</span>
+              <span className="text-[var(--color-locus-text)]">{feature}</span>
             </div>
           ))}
         </div>
@@ -137,7 +137,7 @@ export default function UnlockPage() {
         <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-5`} />
         <div className="relative">
           <div className="flex items-center gap-2 mb-6">
-            <Sparkles size={20} className="text-[var(--color-burst-purple)]" />
+            <Sparkles size={20} className="text-[var(--color-locus-teal)]" />
             <h2 className="text-lg font-semibold text-white">Unlock {config.name}</h2>
           </div>
 
@@ -162,7 +162,7 @@ export default function UnlockPage() {
               <ArrowRight size={18} />
             </Button>
 
-            <p className="text-center text-xs text-[var(--color-burst-muted)]">
+            <p className="text-center text-xs text-[var(--color-locus-muted)]">
               By unlocking, you agree to receive updates about this feature.
               <br />No spam, ever.
             </p>

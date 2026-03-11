@@ -60,7 +60,7 @@ export default function SignupPage() {
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
             Start Building Authority
           </h1>
-          <p className="text-[var(--color-burst-muted)]">
+          <p className="text-[var(--color-locus-muted)]">
             Create your free account and launch in minutes
           </p>
         </div>
@@ -68,8 +68,8 @@ export default function SignupPage() {
         {/* Feature list */}
         <div className="mb-8 space-y-3">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-center gap-3 text-sm text-[var(--color-burst-text)]">
-              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-burst-purple)] to-[var(--color-burst-cyan)] flex items-center justify-center">
+            <div key={index} className="flex items-center gap-3 text-sm text-[var(--color-locus-text)]">
+              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center">
                 <Check size={12} className="text-white" />
               </div>
               {feature}
@@ -79,7 +79,7 @@ export default function SignupPage() {
 
         <form onSubmit={handleSignup} className="space-y-5">
           {error && (
-            <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-burst-error)] text-sm">
+            <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-locus-error)] text-sm">
               {error}
             </div>
           )}
@@ -125,18 +125,18 @@ export default function SignupPage() {
           </Button>
         </form>
 
-        <p className="text-center mt-6 text-[var(--color-burst-muted)] text-sm">
+        <p className="text-center mt-6 text-[var(--color-locus-muted)] text-sm">
           Already have an account?{' '}
           <Link 
             href="/login" 
-            className="text-[var(--color-burst-purple)] hover:text-[var(--color-burst-violet)] transition-colors font-medium"
+            className="text-[var(--color-locus-teal)] hover:text-[var(--color-locus-emerald)] transition-colors font-medium"
           >
             Sign in
           </Link>
         </p>
       </Card>
 
-      <p className="text-center mt-8 text-xs text-[var(--color-burst-muted)]">
+      <p className="text-center mt-8 text-xs text-[var(--color-locus-muted)]">
         By signing up, you agree to our Terms of Service and Privacy Policy
       </p>
     </div>

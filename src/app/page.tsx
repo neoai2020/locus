@@ -22,25 +22,25 @@ const features = [
     icon: Sparkles,
     title: 'AI-Powered Generation',
     description: 'Create publication-ready articles in seconds using advanced AI that understands authority positioning.',
-    gradient: 'from-[var(--color-burst-purple)] to-[var(--color-burst-indigo)]'
+    gradient: 'from-[var(--color-locus-teal)] to-[var(--color-locus-indigo)]'
   },
   {
     icon: Shield,
     title: 'Platform Safe',
     description: 'No auto-posting. No account bans. You maintain full control over what gets published.',
-    gradient: 'from-[var(--color-burst-cyan)] to-[var(--color-burst-blue)]'
+    gradient: 'from-[var(--color-locus-cyan)] to-[var(--color-locus-blue)]'
   },
   {
     icon: Clock,
     title: 'Launch in Minutes',
     description: 'From idea to published article in under 3 minutes. Perfect for busy professionals.',
-    gradient: 'from-[var(--color-burst-pink)] to-[var(--color-burst-purple)]'
+    gradient: 'from-[var(--color-locus-amber)] to-[var(--color-locus-teal)]'
   },
   {
     icon: TrendingUp,
     title: 'Authority Building',
     description: 'Leverage high-trust platforms like LinkedIn and Medium to establish thought leadership.',
-    gradient: 'from-[var(--color-burst-success)] to-[var(--color-burst-cyan)]'
+    gradient: 'from-[var(--color-locus-success)] to-[var(--color-locus-cyan)]'
   },
 ]
 
@@ -60,7 +60,7 @@ const benefits = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen burst-bg">
+    <div className="min-h-screen locus-bg">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -83,7 +83,7 @@ export default function LandingPage() {
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <div className="animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(139,92,246,0.1)] border border-[rgba(139,92,246,0.3)] text-[var(--color-burst-purple)] text-sm font-medium mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(20,184,166,0.1)] border border-[rgba(20,184,166,0.3)] text-[var(--color-locus-teal)] text-sm font-medium mb-8">
               <Zap size={14} />
               Authority Amplification Platform
             </div>
@@ -94,7 +94,7 @@ export default function LandingPage() {
               <span className="gradient-text">Dominate Platforms.</span>
             </h1>
             
-            <p className="text-xl text-[var(--color-burst-muted)] max-w-2xl mx-auto mb-10">
+            <p className="text-xl text-[var(--color-locus-muted)] max-w-2xl mx-auto mb-10">
               Generate AI-powered articles for LinkedIn, Medium, and high-trust publications. 
               Build your personal brand without the grind.
             </p>
@@ -116,11 +116,11 @@ export default function LandingPage() {
 
           {/* Platform Icons */}
           <div className="mt-16 flex items-center justify-center gap-8 animate-fade-in stagger-2">
-            <span className="text-sm text-[var(--color-burst-muted)]">Publish to:</span>
+            <span className="text-sm text-[var(--color-locus-muted)]">Publish to:</span>
             {platforms.map((platform) => (
               <div 
                 key={platform.name}
-                className="flex items-center gap-2 text-[var(--color-burst-text)]"
+                className="flex items-center gap-2 text-[var(--color-locus-text)]"
               >
                 <platform.icon size={20} />
                 <span className="text-sm font-medium">{platform.name}</span>
@@ -137,8 +137,8 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'var(--font-display)' }}>
               Everything You Need to Build Authority
             </h2>
-            <p className="text-[var(--color-burst-muted)] text-lg max-w-2xl mx-auto">
-              Burst isn't an auto-poster. It's your authority amplifier. Generate premium content, 
+            <p className="text-[var(--color-locus-muted)] text-lg max-w-2xl mx-auto">
+              Locus isn't an auto-poster. It's your authority amplifier. Generate premium content, 
               publish manually, and stay platform-compliant.
             </p>
           </div>
@@ -156,7 +156,7 @@ export default function LandingPage() {
                 <h3 className="text-xl font-semibold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
                   {feature.title}
                 </h3>
-                <p className="text-[var(--color-burst-muted)]">
+                <p className="text-[var(--color-locus-muted)]">
                   {feature.description}
                 </p>
               </Card>
@@ -174,40 +174,40 @@ export default function LandingPage() {
                 Create Authority Content in{' '}
                 <span className="gradient-text">Under 3 Minutes</span>
               </h2>
-              <p className="text-[var(--color-burst-muted)] text-lg mb-8">
-                Stop spending hours writing. Burst generates publication-ready content 
+              <p className="text-[var(--color-locus-muted)] text-lg mb-8">
+                Stop spending hours writing. Locus generates publication-ready content 
                 that positions you as an expert on the platforms that matter.
               </p>
               
               <ul className="space-y-4">
                 {benefits.map((benefit, index) => (
                   <li key={index} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[var(--color-burst-purple)] to-[var(--color-burst-cyan)] flex items-center justify-center flex-shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center flex-shrink-0">
                       <Check size={14} className="text-white" />
                     </div>
-                    <span className="text-[var(--color-burst-text)]">{benefit}</span>
+                    <span className="text-[var(--color-locus-text)]">{benefit}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             <Card className="animate-fade-in stagger-1 p-0 overflow-hidden">
-              <div className="bg-gradient-to-br from-[rgba(139,92,246,0.1)] to-[rgba(6,182,212,0.05)] p-8">
-                <div className="bg-[var(--color-burst-dark)] rounded-xl p-6 border border-[var(--color-burst-border)]">
+              <div className="bg-gradient-to-br from-[rgba(20,184,166,0.1)] to-[rgba(6,182,212,0.05)] p-8">
+                <div className="bg-[var(--color-locus-dark)] rounded-xl p-6 border border-[var(--color-locus-border)]">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-3 h-3 rounded-full bg-[var(--color-burst-error)]" />
-                    <div className="w-3 h-3 rounded-full bg-[var(--color-burst-warning)]" />
-                    <div className="w-3 h-3 rounded-full bg-[var(--color-burst-success)]" />
+                    <div className="w-3 h-3 rounded-full bg-[var(--color-locus-error)]" />
+                    <div className="w-3 h-3 rounded-full bg-[var(--color-locus-warning)]" />
+                    <div className="w-3 h-3 rounded-full bg-[var(--color-locus-success)]" />
                   </div>
                   <div className="space-y-4">
-                    <div className="h-4 bg-[var(--color-burst-border)] rounded w-3/4" />
-                    <div className="h-4 bg-[var(--color-burst-border)] rounded w-full" />
-                    <div className="h-4 bg-[var(--color-burst-border)] rounded w-5/6" />
-                    <div className="h-4 bg-gradient-to-r from-[var(--color-burst-purple)] to-[var(--color-burst-cyan)] rounded w-2/3 animate-pulse" />
+                    <div className="h-4 bg-[var(--color-locus-border)] rounded w-3/4" />
+                    <div className="h-4 bg-[var(--color-locus-border)] rounded w-full" />
+                    <div className="h-4 bg-[var(--color-locus-border)] rounded w-5/6" />
+                    <div className="h-4 bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] rounded w-2/3 animate-pulse" />
                   </div>
                 </div>
                 <div className="mt-4 text-center">
-                  <p className="text-sm text-[var(--color-burst-muted)]">AI generating your article...</p>
+                  <p className="text-sm text-[var(--color-locus-muted)]">AI generating your article...</p>
                 </div>
               </div>
             </Card>
@@ -219,16 +219,16 @@ export default function LandingPage() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <Card className="text-center p-12 relative overflow-hidden animate-fade-in">
-            <div className="absolute inset-0 bg-gradient-to-r from-[rgba(139,92,246,0.1)] to-[rgba(6,182,212,0.1)]" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[rgba(20,184,166,0.1)] to-[rgba(6,182,212,0.1)]" />
             <div className="relative">
-              <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-r from-[var(--color-burst-purple)] to-[var(--color-burst-cyan)] flex items-center justify-center mb-6 animate-pulse-glow">
+              <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center mb-6 animate-pulse-glow">
                 <Zap size={40} className="text-white" />
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'var(--font-display)' }}>
                 Ready to Build Your Authority?
               </h2>
-              <p className="text-[var(--color-burst-muted)] text-lg mb-8 max-w-xl mx-auto">
-                Join thousands of professionals using Burst to establish thought leadership 
+              <p className="text-[var(--color-locus-muted)] text-lg mb-8 max-w-xl mx-auto">
+                Join thousands of professionals using Locus to establish thought leadership 
                 and drive visibility on high-trust platforms.
               </p>
               <Link href="/signup">
@@ -237,7 +237,7 @@ export default function LandingPage() {
                   <span>Get Started Free</span>
                 </Button>
               </Link>
-              <p className="mt-4 text-sm text-[var(--color-burst-muted)]">
+              <p className="mt-4 text-sm text-[var(--color-locus-muted)]">
                 No credit card required • Start creating in seconds
               </p>
             </div>
@@ -246,14 +246,14 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-[var(--color-burst-border)]">
+      <footer className="py-12 px-6 border-t border-[var(--color-locus-border)]">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <Logo size="sm" />
-            <p className="text-sm text-[var(--color-burst-muted)]">
-              © 2024 Burst. Authority amplifier for the modern professional.
+            <p className="text-sm text-[var(--color-locus-muted)]">
+              © 2024 Locus. Authority amplifier for the modern professional.
             </p>
-            <div className="flex items-center gap-6 text-sm text-[var(--color-burst-muted)]">
+            <div className="flex items-center gap-6 text-sm text-[var(--color-locus-muted)]">
               <a href="#" className="hover:text-white transition-colors">Privacy</a>
               <a href="#" className="hover:text-white transition-colors">Terms</a>
               <a href="#" className="hover:text-white transition-colors">Support</a>

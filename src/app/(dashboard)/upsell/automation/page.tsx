@@ -80,7 +80,7 @@ export default function AutomationPage() {
   if (isChecking) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-locus-border)] animate-pulse" />
       </div>
     )
   }
@@ -114,7 +114,7 @@ export default function AutomationPage() {
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Automation Workflows
         </h1>
-        <p className="text-[var(--color-burst-muted)]">
+        <p className="text-[var(--color-locus-muted)]">
           Speed up your content creation with templates and presets
         </p>
       </div>
@@ -134,22 +134,22 @@ export default function AutomationPage() {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--color-burst-border)] flex items-center justify-center group-hover:bg-gradient-to-r group-hover:from-green-500 group-hover:to-emerald-500 transition-all">
-                    <template.icon size={20} className="text-[var(--color-burst-muted)] group-hover:text-white transition-colors" />
+                  <div className="w-10 h-10 rounded-xl bg-[var(--color-locus-border)] flex items-center justify-center group-hover:bg-gradient-to-r group-hover:from-green-500 group-hover:to-emerald-500 transition-all">
+                    <template.icon size={20} className="text-[var(--color-locus-muted)] group-hover:text-white transition-colors" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-white">{template.name}</h3>
-                    <p className="text-sm text-[var(--color-burst-muted)]">{template.description}</p>
+                    <p className="text-sm text-[var(--color-locus-muted)]">{template.description}</p>
                   </div>
                 </div>
                 <Badge variant="cyan">{template.platform}</Badge>
               </div>
               
               <div className="space-y-2">
-                <p className="text-xs text-[var(--color-burst-muted)] uppercase tracking-wider">Structure</p>
+                <p className="text-xs text-[var(--color-locus-muted)] uppercase tracking-wider">Structure</p>
                 {template.structure.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-[var(--color-burst-text)]">
-                    <span className="w-5 h-5 rounded-full bg-[rgba(139,92,246,0.2)] text-[var(--color-burst-purple)] text-xs flex items-center justify-center">
+                  <div key={i} className="flex items-center gap-2 text-sm text-[var(--color-locus-text)]">
+                    <span className="w-5 h-5 rounded-full bg-[rgba(20,184,166,0.2)] text-[var(--color-locus-teal)] text-xs flex items-center justify-center">
                       {i + 1}
                     </span>
                     {item}
@@ -157,7 +157,7 @@ export default function AutomationPage() {
                 ))}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-[var(--color-burst-border)]">
+              <div className="mt-4 pt-4 border-t border-[var(--color-locus-border)]">
                 <Button 
                   variant="secondary" 
                   size="sm" 
@@ -184,12 +184,12 @@ export default function AutomationPage() {
               <button
                 key={preset.id}
                 onClick={() => router.push('/create')}
-                className="p-4 rounded-xl border border-[var(--color-burst-border)] hover:border-[var(--color-burst-purple)] hover:bg-[rgba(139,92,246,0.05)] transition-all text-left group"
+                className="p-4 rounded-xl border border-[var(--color-locus-border)] hover:border-[var(--color-locus-teal)] hover:bg-[rgba(20,184,166,0.05)] transition-all text-left group"
               >
-                <h4 className="font-medium text-white mb-2 group-hover:text-[var(--color-burst-purple)]">
+                <h4 className="font-medium text-white mb-2 group-hover:text-[var(--color-locus-teal)]">
                   {preset.name}
                 </h4>
-                <div className="space-y-1 text-xs text-[var(--color-burst-muted)]">
+                <div className="space-y-1 text-xs text-[var(--color-locus-muted)]">
                   <p>Words: {preset.wordCount}</p>
                   <p>Tone: {preset.tone}</p>
                 </div>
@@ -200,14 +200,14 @@ export default function AutomationPage() {
       </div>
 
       {/* Note */}
-      <Card className="mt-8 animate-fade-in border-[var(--color-burst-border)]" style={{ animationDelay: '0.5s' }}>
+      <Card className="mt-8 animate-fade-in border-[var(--color-locus-border)]" style={{ animationDelay: '0.5s' }}>
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-[rgba(139,92,246,0.15)] flex items-center justify-center flex-shrink-0">
-            <Sparkles size={20} className="text-[var(--color-burst-purple)]" />
+          <div className="w-10 h-10 rounded-xl bg-[rgba(20,184,166,0.15)] flex items-center justify-center flex-shrink-0">
+            <Sparkles size={20} className="text-[var(--color-locus-teal)]" />
           </div>
           <div>
             <h3 className="font-semibold text-white mb-1">Platform Compliant</h3>
-            <p className="text-sm text-[var(--color-burst-muted)]">
+            <p className="text-sm text-[var(--color-locus-muted)]">
               Automation helps you work faster, but you still manually post content. 
               This keeps your accounts safe and in compliance with platform terms.
             </p>

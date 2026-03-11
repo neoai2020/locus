@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  /* Premium Burst Color Palette */
-  --color-burst-black: #0a0a0f;
-  --color-burst-dark: #0f0f18;
-  --color-burst-darker: #12121c;
-  --color-burst-card: #16161f;
-  --color-burst-border: #1f1f2e;
-  --color-burst-muted: #6b6b80;
-  --color-burst-text: #e4e4eb;
-  --color-burst-white: #ffffff;
+  /* Locus Color Palette */
+  --color-locus-black: #07090e;
+  --color-locus-dark: #0c1017;
+  --color-locus-darker: #10141c;
+  --color-locus-card: #131820;
+  --color-locus-border: #1c2230;
+  --color-locus-muted: #6a7185;
+  --color-locus-text: #e2e4eb;
+  --color-locus-white: #ffffff;
   
-  /* Gradient Colors */
-  --color-burst-purple: #8b5cf6;
-  --color-burst-violet: #7c3aed;
-  --color-burst-blue: #3b82f6;
-  --color-burst-cyan: #06b6d4;
-  --color-burst-indigo: #6366f1;
-  --color-burst-pink: #ec4899;
+  /* Primary Gradient Colors */
+  --color-locus-teal: #14b8a6;
+  --color-locus-emerald: #10b981;
+  --color-locus-blue: #3b82f6;
+  --color-locus-cyan: #06b6d4;
+  --color-locus-indigo: #6366f1;
+  --color-locus-amber: #f59e0b;
   
   /* Status Colors */
-  --color-burst-success: #10b981;
-  --color-burst-warning: #f59e0b;
-  --color-burst-error: #ef4444;
+  --color-locus-success: #10b981;
+  --color-locus-warning: #f59e0b;
+  --color-locus-error: #ef4444;
   
   /* Font */
   --font-display: 'Clash Display', 'SF Pro Display', system-ui, sans-serif;
@@ -54,32 +54,32 @@ html {
 
 body {
   font-family: var(--font-body);
-  background: var(--color-burst-black);
-  color: var(--color-burst-text);
+  background: var(--color-locus-black);
+  color: var(--color-locus-text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Premium Gradient Background */
-.burst-bg {
+.locus-bg {
   background: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 92, 246, 0.15), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 50%, rgba(59, 130, 246, 0.08), transparent),
-    radial-gradient(ellipse 50% 30% at 20% 80%, rgba(6, 182, 212, 0.06), transparent),
-    var(--color-burst-black);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(20, 184, 166, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 50%, rgba(16, 185, 129, 0.07), transparent),
+    radial-gradient(ellipse 50% 30% at 20% 80%, rgba(6, 182, 212, 0.05), transparent),
+    var(--color-locus-black);
 }
 
 /* Gradient Text */
 .gradient-text {
-  background: linear-gradient(135deg, var(--color-burst-purple), var(--color-burst-cyan));
+  background: linear-gradient(135deg, var(--color-locus-teal), var(--color-locus-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-alt {
-  background: linear-gradient(135deg, var(--color-burst-cyan), var(--color-burst-purple));
+  background: linear-gradient(135deg, var(--color-locus-cyan), var(--color-locus-teal));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -87,8 +87,8 @@ body {
 
 /* Premium Button Styles */
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-burst-purple), var(--color-burst-indigo));
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: linear-gradient(135deg, var(--color-locus-teal), var(--color-locus-emerald));
+  border: 1px solid rgba(20, 184, 166, 0.3);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
@@ -104,14 +104,14 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--color-burst-violet), var(--color-burst-purple));
+  background: linear-gradient(135deg, var(--color-locus-emerald), var(--color-locus-teal));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 30px rgba(20, 184, 166, 0.3);
 }
 
 .btn-primary:hover::before {
@@ -125,8 +125,8 @@ body {
 
 .btn-secondary {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--color-burst-border);
-  color: var(--color-burst-text);
+  border: 1px solid var(--color-locus-border);
+  color: var(--color-locus-text);
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
   font-weight: 500;
@@ -137,20 +137,20 @@ body {
 
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: var(--color-burst-purple);
+  border-color: var(--color-locus-teal);
 }
 
 /* Card Styles */
 .card {
-  background: var(--color-burst-card);
-  border: 1px solid var(--color-burst-border);
+  background: var(--color-locus-card);
+  border: 1px solid var(--color-locus-border);
   border-radius: 1rem;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .card:hover {
-  border-color: rgba(139, 92, 246, 0.3);
+  border-color: rgba(20, 184, 166, 0.3);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -162,7 +162,7 @@ body {
   content: '';
   position: absolute;
   inset: -1px;
-  background: linear-gradient(135deg, var(--color-burst-purple), var(--color-burst-cyan));
+  background: linear-gradient(135deg, var(--color-locus-teal), var(--color-locus-cyan));
   border-radius: inherit;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -176,10 +176,10 @@ body {
 /* Input Styles */
 .input {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--color-burst-border);
+  border: 1px solid var(--color-locus-border);
   border-radius: 0.75rem;
   padding: 0.875rem 1rem;
-  color: var(--color-burst-text);
+  color: var(--color-locus-text);
   font-size: 0.875rem;
   transition: all 0.3s ease;
   width: 100%;
@@ -187,26 +187,26 @@ body {
 
 .input:focus {
   outline: none;
-  border-color: var(--color-burst-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  border-color: var(--color-locus-teal);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
 }
 
 .input::placeholder {
-  color: var(--color-burst-muted);
+  color: var(--color-locus-muted);
 }
 
 /* Select Styles */
 .select {
   appearance: none;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--color-burst-border);
+  border: 1px solid var(--color-locus-border);
   border-radius: 0.75rem;
   padding: 0.875rem 2.5rem 0.875rem 1rem;
-  color: var(--color-burst-text);
+  color: var(--color-locus-text);
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b6b80'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236a7185'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 1.25rem;
@@ -214,7 +214,7 @@ body {
 
 .select:focus {
   outline: none;
-  border-color: var(--color-burst-purple);
+  border-color: var(--color-locus-teal);
 }
 
 /* Scrollbar */
@@ -224,16 +224,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-burst-dark);
+  background: var(--color-locus-dark);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-burst-border);
+  background: var(--color-locus-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-burst-muted);
+  background: var(--color-locus-muted);
 }
 
 /* Animations */
@@ -261,10 +261,10 @@ body {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
   }
   50% {
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 40px rgba(20, 184, 166, 0.5);
   }
 }
 
@@ -300,9 +300,9 @@ body {
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--color-burst-card) 25%,
-    var(--color-burst-border) 50%,
-    var(--color-burst-card) 75%
+    var(--color-locus-card) 25%,
+    var(--color-locus-border) 50%,
+    var(--color-locus-card) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -310,9 +310,9 @@ body {
 
 /* Glass effect */
 .glass {
-  background: rgba(22, 22, 31, 0.8);
+  background: rgba(19, 24, 32, 0.8);
   backdrop-filter: blur(12px);
-  border: 1px solid var(--color-burst-border);
+  border: 1px solid var(--color-locus-border);
 }
 
 /* Badge styles */
@@ -325,21 +325,21 @@ body {
   border-radius: 9999px;
 }
 
-.badge-purple {
-  background: rgba(139, 92, 246, 0.15);
-  color: var(--color-burst-purple);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+.badge-teal {
+  background: rgba(20, 184, 166, 0.15);
+  color: var(--color-locus-teal);
+  border: 1px solid rgba(20, 184, 166, 0.3);
 }
 
 .badge-cyan {
   background: rgba(6, 182, 212, 0.15);
-  color: var(--color-burst-cyan);
+  color: var(--color-locus-cyan);
   border: 1px solid rgba(6, 182, 212, 0.3);
 }
 
 .badge-success {
   background: rgba(16, 185, 129, 0.15);
-  color: var(--color-burst-success);
+  color: var(--color-locus-success);
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
@@ -355,8 +355,8 @@ body {
   left: 50%;
   transform: translateX(-50%);
   padding: 0.5rem 0.75rem;
-  background: var(--color-burst-darker);
-  color: var(--color-burst-text);
+  background: var(--color-locus-darker);
+  color: var(--color-locus-text);
   font-size: 0.75rem;
   border-radius: 0.5rem;
   white-space: nowrap;
@@ -364,7 +364,7 @@ body {
   visibility: hidden;
   transition: all 0.2s ease;
   margin-bottom: 0.5rem;
-  border: 1px solid var(--color-burst-border);
+  border: 1px solid var(--color-locus-border);
 }
 
 .tooltip:hover::after {
@@ -373,57 +373,57 @@ body {
 }
 
 /* Rich text editor styles */
-.prose-burst {
-  color: var(--color-burst-text);
+.prose-locus {
+  color: var(--color-locus-text);
   line-height: 1.75;
 }
 
-.prose-burst h1,
-.prose-burst h2,
-.prose-burst h3 {
+.prose-locus h1,
+.prose-locus h2,
+.prose-locus h3 {
   font-family: var(--font-display);
   font-weight: 600;
-  color: var(--color-burst-white);
+  color: var(--color-locus-white);
   margin-bottom: 1rem;
 }
 
-.prose-burst h1 {
+.prose-locus h1 {
   font-size: 2rem;
 }
 
-.prose-burst h2 {
+.prose-locus h2 {
   font-size: 1.5rem;
 }
 
-.prose-burst h3 {
+.prose-locus h3 {
   font-size: 1.25rem;
 }
 
-.prose-burst p {
+.prose-locus p {
   margin-bottom: 1rem;
 }
 
-.prose-burst strong {
-  color: var(--color-burst-white);
+.prose-locus strong {
+  color: var(--color-locus-white);
   font-weight: 600;
 }
 
-.prose-burst ul,
-.prose-burst ol {
+.prose-locus ul,
+.prose-locus ol {
   margin-left: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.prose-burst li {
+.prose-locus li {
   margin-bottom: 0.5rem;
 }
 
-.prose-burst blockquote {
-  border-left: 3px solid var(--color-burst-purple);
+.prose-locus blockquote {
+  border-left: 3px solid var(--color-locus-teal);
   padding-left: 1rem;
   margin: 1.5rem 0;
   font-style: italic;
-  color: var(--color-burst-muted);
+  color: var(--color-locus-muted);
 }
 
 /* Tab styles */
@@ -431,17 +431,17 @@ body {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-burst-muted);
+  color: var(--color-locus-muted);
   border-bottom: 2px solid transparent;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .tab:hover {
-  color: var(--color-burst-text);
+  color: var(--color-locus-text);
 }
 
 .tab.active {
-  color: var(--color-burst-purple);
-  border-bottom-color: var(--color-burst-purple);
+  color: var(--color-locus-teal);
+  border-bottom-color: var(--color-locus-teal);
 }

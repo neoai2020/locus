@@ -61,7 +61,7 @@ export default function InfinitePage() {
   if (isChecking) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-locus-border)] animate-pulse" />
       </div>
     )
   }
@@ -79,8 +79,8 @@ export default function InfinitePage() {
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Unlimited Everything
         </h1>
-        <p className="text-[var(--color-burst-muted)]">
-          You now have unlimited access to all Burst features
+        <p className="text-[var(--color-locus-muted)]">
+          You now have unlimited access to all Locus features
         </p>
       </div>
 
@@ -99,15 +99,15 @@ export default function InfinitePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-4 rounded-xl bg-[rgba(255,255,255,0.03)]">
               <p className="text-3xl font-bold text-white mb-1">{articles.length}</p>
-              <p className="text-sm text-[var(--color-burst-muted)]">Articles Generated</p>
+              <p className="text-sm text-[var(--color-locus-muted)]">Articles Generated</p>
             </div>
             <div className="text-center p-4 rounded-xl bg-[rgba(255,255,255,0.03)]">
               <p className="text-3xl font-bold gradient-text mb-1">∞</p>
-              <p className="text-sm text-[var(--color-burst-muted)]">Remaining</p>
+              <p className="text-sm text-[var(--color-locus-muted)]">Remaining</p>
             </div>
             <div className="text-center p-4 rounded-xl bg-[rgba(255,255,255,0.03)]">
               <p className="text-3xl font-bold text-white mb-1">0ms</p>
-              <p className="text-sm text-[var(--color-burst-muted)]">Throttle Delay</p>
+              <p className="text-sm text-[var(--color-locus-muted)]">Throttle Delay</p>
             </div>
           </div>
         </div>
@@ -128,9 +128,9 @@ export default function InfinitePage() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-semibold text-white">{benefit.title}</h3>
-                  <Check size={14} className="text-[var(--color-burst-success)]" />
+                  <Check size={14} className="text-[var(--color-locus-success)]" />
                 </div>
-                <p className="text-sm text-[var(--color-burst-muted)]">
+                <p className="text-sm text-[var(--color-locus-muted)]">
                   {benefit.description}
                 </p>
               </div>
@@ -142,7 +142,7 @@ export default function InfinitePage() {
       {/* CTA */}
       <Card className="animate-fade-in text-center" style={{ animationDelay: '0.6s' }}>
         <h3 className="text-xl font-semibold text-white mb-2">Ready to Create?</h3>
-        <p className="text-[var(--color-burst-muted)] mb-6">
+        <p className="text-[var(--color-locus-muted)] mb-6">
           Start generating unlimited content right now
         </p>
         <Button onClick={() => router.push('/create')} size="lg">

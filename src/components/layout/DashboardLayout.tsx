@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { sidebarOpen } = useAppStore()
 
   return (
-    <div className="min-h-screen burst-bg">
+    <div className="min-h-screen locus-bg">
       <Sidebar />
       <main 
         className={`

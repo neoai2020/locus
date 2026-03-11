@@ -1,8 +1,8 @@
-# Deploying Burst to DigitalOcean VPS
+# Deploying Locus to DigitalOcean VPS
 
 ## Prerequisites
 - DigitalOcean Droplet (Ubuntu 22.04 recommended)
-- Domain: burstaiapp.com pointed to your droplet IP
+- Domain: locusaiaccess.com pointed to your droplet IP
 - Node.js 18+ installed on the server
 
 ## Step 1: SSH into your VPS
@@ -35,10 +35,10 @@ sudo apt install nginx -y
 
 ```bash
 cd /var/www
-git clone your-repo-url burst
+git clone your-repo-url locus
 # OR upload via scp/sftp
 
-cd burst
+cd locus
 npm install
 ```
 
@@ -80,7 +80,7 @@ pm2 startup
 Create Nginx config:
 
 ```bash
-sudo nano /etc/nginx/sites-available/burstaiapp.com
+sudo nano /etc/nginx/sites-available/locusaiaccess.com
 ```
 
 Add this configuration:
@@ -88,7 +88,7 @@ Add this configuration:
 ```nginx
 server {
     listen 80;
-    server_name burstaiapp.com www.burstaiapp.com;
+    server_name locusaiaccess.com www.locusaiaccess.com;
 
     location / {
         proxy_pass http://localhost:3000;
@@ -107,7 +107,7 @@ server {
 Enable the site:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/burstaiapp.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/locusaiaccess.com /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
@@ -116,7 +116,7 @@ sudo systemctl restart nginx
 
 ```bash
 sudo apt install certbot python3-certbot-nginx -y
-sudo certbot --nginx -d burstaiapp.com -d www.burstaiapp.com
+sudo certbot --nginx -d locusaiaccess.com -d www.locusaiaccess.com
 ```
 
 ## Step 11: Configure Firewall
@@ -133,21 +133,21 @@ sudo ufw enable
 
 ### View logs
 ```bash
-pm2 logs burst
+pm2 logs locus
 ```
 
 ### Restart app
 ```bash
-pm2 restart burst
+pm2 restart locus
 ```
 
 ### Update deployment
 ```bash
-cd /var/www/burst
+cd /var/www/locus
 git pull
 npm install
 npm run build
-pm2 restart burst
+pm2 restart locus
 ```
 
 ---
@@ -166,16 +166,16 @@ Point your domain to your DigitalOcean droplet:
 ## Important URLs
 
 ### Main Pages
-- Landing: https://burstaiapp.com
-- Login: https://burstaiapp.com/login
-- Signup: https://burstaiapp.com/signup
-- Dashboard: https://burstaiapp.com/dashboard
+- Landing: https://locusaiaccess.com
+- Login: https://locusaiaccess.com/login
+- Signup: https://locusaiaccess.com/signup
+- Dashboard: https://locusaiaccess.com/dashboard
 
 ### Upsell Unlock Pages (Secret Links)
-- 10X Mode: https://burstaiapp.com/unlock/10x
-- Infinite: https://burstaiapp.com/unlock/infinite
-- Automation: https://burstaiapp.com/unlock/automation
-- Done-For-You: https://burstaiapp.com/unlock/dfy
+- 10X Mode: https://locusaiaccess.com/unlock/10x
+- Infinite: https://locusaiaccess.com/unlock/infinite
+- Automation: https://locusaiaccess.com/unlock/automation
+- Done-For-You: https://locusaiaccess.com/unlock/dfy
 
 ---
 
@@ -183,7 +183,7 @@ Point your domain to your DigitalOcean droplet:
 
 ### App not starting
 ```bash
-pm2 logs burst --lines 100
+pm2 logs locus --lines 100
 ```
 
 ### Nginx errors

@@ -1,8 +1,8 @@
-# Burst - AI Authority Content Platform
+# Locus - AI Authority Content Platform
 
-Burst is a premium AI-powered content generation platform designed to help professionals build authority on high-trust platforms like LinkedIn, Medium, and Substack.
+Locus is a premium AI-powered content generation platform designed to help professionals build authority on high-trust platforms like LinkedIn, Medium, and Substack.
 
-![Burst Screenshot](https://via.placeholder.com/1200x600/0a0a0f/8b5cf6?text=Burst+AI+Platform)
+![Locus Screenshot](https://via.placeholder.com/1200x600/07090e/14b8a6?text=Locus+AI+Platform)
 
 ## ✨ Features
 
@@ -31,8 +31,8 @@ Burst is a premium AI-powered content generation platform designed to help profe
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/burst.git
-cd burst
+git clone https://github.com/neoai2020/locus.git
+cd locus
 ```
 
 2. Install dependencies:
@@ -118,15 +118,15 @@ src/
 
 ## 🎨 Design System
 
-Burst uses a custom dark-mode-first design system with:
-- **Primary Colors**: Purple (#8b5cf6) to Cyan (#06b6d4) gradients
-- **Background**: Deep blacks and charcoal (#0a0a0f, #0f0f18)
+Locus uses a custom dark-mode-first design system with:
+- **Primary Colors**: Teal (#14b8a6) to Cyan (#06b6d4) gradients
+- **Background**: Deep blacks and charcoal (#07090e, #0c1017)
 - **Typography**: Clash Display (headings), Satoshi (body)
 - **Animations**: Smooth fade-ins, glow effects, and hover states
 
 ## 🔐 Authentication
 
-Burst uses Supabase Auth with:
+Locus uses Supabase Auth with:
 - Email/Password authentication
 - Session persistence across refreshes
 - Protected route middleware
@@ -143,7 +143,7 @@ Content is optimized for each platform's specific requirements and best practice
 
 ## ⚠️ Important Notes
 
-- **No Auto-Posting**: Burst is designed for manual posting only to keep accounts safe
+- **No Auto-Posting**: Locus is designed for manual posting only to keep accounts safe
 - **Platform Compliant**: All generated content is meant to be reviewed and edited before publishing
 - **API Key Required**: You need your own OpenAI API key for article generation
 
@@ -168,4 +168,4 @@ Contributions are welcome! Please read our contributing guidelines before submit
 
 ---
 
-Built with ⚡ by the Burst team
+Built with ⚡ by the Locus team

@@ -92,7 +92,7 @@ export default function ImagesPage() {
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Enhance with Images
         </h1>
-        <p className="text-[var(--color-burst-muted)]">
+        <p className="text-[var(--color-locus-muted)]">
           Add visuals to increase engagement and authority. Images are optional but recommended.
         </p>
       </div>
@@ -104,7 +104,7 @@ export default function ImagesPage() {
             <div>
               <Badge variant="purple" className="mb-2">{currentArticle.platform}</Badge>
               <h2 className="text-lg font-semibold text-white">{currentArticle.title}</h2>
-              <p className="text-sm text-[var(--color-burst-muted)] mt-1 line-clamp-2">
+              <p className="text-sm text-[var(--color-locus-muted)] mt-1 line-clamp-2">
                 {currentArticle.content.substring(0, 150)}...
               </p>
             </div>
@@ -123,10 +123,10 @@ export default function ImagesPage() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="font-semibold text-white flex items-center gap-2">
-                  <ImageIcon size={18} className="text-[var(--color-burst-cyan)]" />
+                  <ImageIcon size={18} className="text-[var(--color-locus-cyan)]" />
                   {suggestion.section} Image
                 </h3>
-                <p className="text-sm text-[var(--color-burst-muted)] mt-1">
+                <p className="text-sm text-[var(--color-locus-muted)] mt-1">
                   {suggestion.suggestion}
                 </p>
               </div>
@@ -145,8 +145,8 @@ export default function ImagesPage() {
                 className={`
                   relative rounded-xl overflow-hidden border-2 transition-all duration-200 group
                   ${selectedImages[suggestion.id] === suggestion.placeholder 
-                    ? 'border-[var(--color-burst-purple)] ring-2 ring-[rgba(139,92,246,0.3)]' 
-                    : 'border-[var(--color-burst-border)] hover:border-[var(--color-burst-purple)]'
+                    ? 'border-[var(--color-locus-teal)] ring-2 ring-[rgba(20,184,166,0.3)]' 
+                    : 'border-[var(--color-locus-border)] hover:border-[var(--color-locus-teal)]'
                   }
                 `}
               >
@@ -158,13 +158,13 @@ export default function ImagesPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[var(--color-burst-purple)] to-[var(--color-burst-cyan)] flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center">
                       <Sparkles size={12} className="text-white" />
                     </div>
                     <span className="text-xs text-white font-medium">AI Suggestion</span>
                   </div>
                   {selectedImages[suggestion.id] === suggestion.placeholder && (
-                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[var(--color-burst-purple)] flex items-center justify-center">
+                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[var(--color-locus-teal)] flex items-center justify-center">
                       <Check size={14} className="text-white" />
                     </div>
                   )}
@@ -176,8 +176,8 @@ export default function ImagesPage() {
                 className={`
                   relative rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200
                   ${uploadingSection === suggestion.id 
-                    ? 'border-[var(--color-burst-purple)] bg-[rgba(139,92,246,0.05)]' 
-                    : 'border-[var(--color-burst-border)] hover:border-[var(--color-burst-purple)] hover:bg-[rgba(255,255,255,0.02)]'
+                    ? 'border-[var(--color-locus-teal)] bg-[rgba(20,184,166,0.05)]' 
+                    : 'border-[var(--color-locus-border)] hover:border-[var(--color-locus-teal)] hover:bg-[rgba(255,255,255,0.02)]'
                   }
                 `}
               >
@@ -191,17 +191,17 @@ export default function ImagesPage() {
                   }}
                 />
                 <div className="aspect-video flex flex-col items-center justify-center p-4">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--color-burst-border)] flex items-center justify-center mb-3">
-                    <Upload size={20} className="text-[var(--color-burst-muted)]" />
+                  <div className="w-10 h-10 rounded-xl bg-[var(--color-locus-border)] flex items-center justify-center mb-3">
+                    <Upload size={20} className="text-[var(--color-locus-muted)]" />
                   </div>
-                  <span className="text-sm text-[var(--color-burst-muted)]">Upload your own</span>
-                  <span className="text-xs text-[var(--color-burst-muted)] opacity-75 mt-1">PNG, JPG up to 5MB</span>
+                  <span className="text-sm text-[var(--color-locus-muted)]">Upload your own</span>
+                  <span className="text-xs text-[var(--color-locus-muted)] opacity-75 mt-1">PNG, JPG up to 5MB</span>
                 </div>
               </label>
 
               {/* Custom Uploaded Image or Skip */}
               {selectedImages[suggestion.id] && selectedImages[suggestion.id] !== suggestion.placeholder ? (
-                <div className="relative rounded-xl overflow-hidden border-2 border-[var(--color-burst-purple)] ring-2 ring-[rgba(139,92,246,0.3)]">
+                <div className="relative rounded-xl overflow-hidden border-2 border-[var(--color-locus-teal)] ring-2 ring-[rgba(20,184,166,0.3)]">
                   <div className="aspect-video relative">
                     <img 
                       src={selectedImages[suggestion.id]} 
@@ -210,7 +210,7 @@ export default function ImagesPage() {
                     />
                     <button
                       onClick={() => setSelectedImages(prev => ({ ...prev, [suggestion.id]: '' }))}
-                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--color-burst-error)] flex items-center justify-center hover:bg-opacity-80 transition-colors"
+                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--color-locus-error)] flex items-center justify-center hover:bg-opacity-80 transition-colors"
                     >
                       <X size={14} className="text-white" />
                     </button>
@@ -219,14 +219,14 @@ export default function ImagesPage() {
               ) : (
                 <button
                   onClick={() => setSelectedImages(prev => ({ ...prev, [suggestion.id]: '' }))}
-                  className="rounded-xl border-2 border-[var(--color-burst-border)] hover:border-[var(--color-burst-muted)] transition-all duration-200"
+                  className="rounded-xl border-2 border-[var(--color-locus-border)] hover:border-[var(--color-locus-muted)] transition-all duration-200"
                 >
                   <div className="aspect-video flex flex-col items-center justify-center p-4">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--color-burst-border)] flex items-center justify-center mb-3">
-                      <X size={20} className="text-[var(--color-burst-muted)]" />
+                    <div className="w-10 h-10 rounded-xl bg-[var(--color-locus-border)] flex items-center justify-center mb-3">
+                      <X size={20} className="text-[var(--color-locus-muted)]" />
                     </div>
-                    <span className="text-sm text-[var(--color-burst-muted)]">Skip this section</span>
-                    <span className="text-xs text-[var(--color-burst-muted)] opacity-75 mt-1">No image needed</span>
+                    <span className="text-sm text-[var(--color-locus-muted)]">Skip this section</span>
+                    <span className="text-xs text-[var(--color-locus-muted)] opacity-75 mt-1">No image needed</span>
                   </div>
                 </button>
               )}
@@ -236,7 +236,7 @@ export default function ImagesPage() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="flex items-center justify-between mt-8 pt-8 border-t border-[var(--color-burst-border)]">
+      <div className="flex items-center justify-between mt-8 pt-8 border-t border-[var(--color-locus-border)]">
         <Button variant="ghost" onClick={() => router.back()}>
           <ArrowLeft size={18} />
           <span>Back to Editor</span>

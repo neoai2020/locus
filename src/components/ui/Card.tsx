@@ -10,8 +10,8 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className = '', variant = 'default', hover = true, children, ...props }, ref) => {
     const variants = {
-      default: 'bg-[var(--color-burst-card)] border border-[var(--color-burst-border)]',
-      glow: 'bg-[var(--color-burst-card)] border border-[var(--color-burst-border)] card-glow',
+      default: 'bg-[var(--color-locus-card)] border border-[var(--color-locus-border)]',
+      glow: 'bg-[var(--color-locus-card)] border border-[var(--color-locus-border)] card-glow',
       glass: 'glass',
     }
 
@@ -21,7 +21,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         className={`
           rounded-2xl p-6 transition-all duration-300
           ${variants[variant]}
-          ${hover ? 'hover:border-[rgba(139,92,246,0.3)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : ''}
+          ${hover ? 'hover:border-[rgba(20,184,166,0.3)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : ''}
           ${className}
         `}
         {...props}

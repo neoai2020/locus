@@ -44,13 +44,13 @@ export default function ForgotPasswordPage() {
       <Card className="p-8">
         {success ? (
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-[var(--color-burst-purple)] to-[var(--color-burst-cyan)] flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center">
               <CheckCircle size={32} className="text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
               Check Your Email
             </h1>
-            <p className="text-[var(--color-burst-muted)] mb-6">
+            <p className="text-[var(--color-locus-muted)] mb-6">
               We&apos;ve sent a password reset link to <span className="text-white">{email}</span>
             </p>
             <Link href="/login">
@@ -66,14 +66,14 @@ export default function ForgotPasswordPage() {
               <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
                 Reset Password
               </h1>
-              <p className="text-[var(--color-burst-muted)]">
+              <p className="text-[var(--color-locus-muted)]">
                 Enter your email and we&apos;ll send you a reset link
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-burst-error)] text-sm">
+                <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-locus-error)] text-sm">
                   {error}
                 </div>
               )}
@@ -99,11 +99,11 @@ export default function ForgotPasswordPage() {
               </Button>
             </form>
 
-            <p className="text-center mt-6 text-[var(--color-burst-muted)] text-sm">
+            <p className="text-center mt-6 text-[var(--color-locus-muted)] text-sm">
               Remember your password?{' '}
               <Link 
                 href="/login" 
-                className="text-[var(--color-burst-purple)] hover:text-[var(--color-burst-violet)] transition-colors font-medium"
+                className="text-[var(--color-locus-teal)] hover:text-[var(--color-locus-emerald)] transition-colors font-medium"
               >
                 Sign in
               </Link>

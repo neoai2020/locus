@@ -124,7 +124,7 @@ export default function DFYPage() {
   if (isChecking) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-2xl bg-[var(--color-burst-border)] animate-pulse" />
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-locus-border)] animate-pulse" />
       </div>
     )
   }
@@ -165,7 +165,7 @@ export default function DFYPage() {
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Pre-Written Content Packs
         </h1>
-        <p className="text-[var(--color-burst-muted)]">
+        <p className="text-[var(--color-locus-muted)]">
           Professional articles ready to customize and publish. Pick a niche that matches your brand.
         </p>
       </div>
@@ -185,7 +185,7 @@ export default function DFYPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-white">{pack.name}</h3>
-                  <p className="text-sm text-[var(--color-burst-muted)]">{pack.description}</p>
+                  <p className="text-sm text-[var(--color-locus-muted)]">{pack.description}</p>
                 </div>
               </div>
               <Badge variant="cyan">{pack.articleCount} articles</Badge>
@@ -196,13 +196,13 @@ export default function DFYPage() {
               {pack.articles.slice(0, expandedPack === pack.id ? 3 : 2).map((article, i) => (
                 <div 
                   key={i}
-                  className="p-3 rounded-lg bg-[rgba(255,255,255,0.02)] border border-[var(--color-burst-border)] group hover:border-[var(--color-burst-purple)] transition-all cursor-pointer"
+                  className="p-3 rounded-lg bg-[rgba(255,255,255,0.02)] border border-[var(--color-locus-border)] group hover:border-[var(--color-locus-teal)] transition-all cursor-pointer"
                   onClick={() => handleUseArticle(pack.id, i)}
                 >
-                  <h4 className="text-sm font-medium text-white mb-1 group-hover:text-[var(--color-burst-purple)] transition-colors">
+                  <h4 className="text-sm font-medium text-white mb-1 group-hover:text-[var(--color-locus-teal)] transition-colors">
                     {article.title}
                   </h4>
-                  <p className="text-xs text-[var(--color-burst-muted)] line-clamp-1">
+                  <p className="text-xs text-[var(--color-locus-muted)] line-clamp-1">
                     {article.preview}
                   </p>
                 </div>
@@ -212,7 +212,7 @@ export default function DFYPage() {
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setExpandedPack(expandedPack === pack.id ? null : pack.id)}
-                className="text-sm text-[var(--color-burst-muted)] hover:text-[var(--color-burst-purple)] transition-colors flex items-center gap-1"
+                className="text-sm text-[var(--color-locus-muted)] hover:text-[var(--color-locus-teal)] transition-colors flex items-center gap-1"
               >
                 {expandedPack === pack.id ? (
                   <>Show less <ChevronUp size={14} /></>
@@ -239,7 +239,7 @@ export default function DFYPage() {
               1
             </div>
             <h4 className="font-medium text-white mb-1">Choose a Pack</h4>
-            <p className="text-sm text-[var(--color-burst-muted)]">
+            <p className="text-sm text-[var(--color-locus-muted)]">
               Select a content pack that matches your niche
             </p>
           </div>
@@ -248,7 +248,7 @@ export default function DFYPage() {
               2
             </div>
             <h4 className="font-medium text-white mb-1">Customize</h4>
-            <p className="text-sm text-[var(--color-burst-muted)]">
+            <p className="text-sm text-[var(--color-locus-muted)]">
               Edit the content to match your voice and experience
             </p>
           </div>
@@ -257,7 +257,7 @@ export default function DFYPage() {
               3
             </div>
             <h4 className="font-medium text-white mb-1">Publish</h4>
-            <p className="text-sm text-[var(--color-burst-muted)]">
+            <p className="text-sm text-[var(--color-locus-muted)]">
               Post to your favorite platforms and build authority
             </p>
           </div>

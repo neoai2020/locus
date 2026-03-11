@@ -78,7 +78,7 @@ export const useAppStore = create<AppState>()(
       setIsGenerating: (generating) => set({ isGenerating: generating }),
     }),
     {
-      name: 'burst-storage',
+      name: 'locus-storage',
       partialize: (state) => ({
         articles: state.articles,
         unlockedUpsells: state.unlockedUpsells,

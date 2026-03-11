@@ -147,7 +147,7 @@ export default function CreateArticlePage() {
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Create Article
         </h1>
-        <p className="text-[var(--color-burst-muted)]">
+        <p className="text-[var(--color-locus-muted)]">
           Generate authority-building content optimized for your target platform
         </p>
       </div>
@@ -157,7 +157,7 @@ export default function CreateArticlePage() {
         <div className="space-y-6 animate-fade-in stagger-1">
           <Card>
             <h2 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-              <PenTool size={20} className="text-[var(--color-burst-purple)]" />
+              <PenTool size={20} className="text-[var(--color-locus-teal)]" />
               Article Settings
             </h2>
 
@@ -172,7 +172,7 @@ export default function CreateArticlePage() {
 
               {/* Platform Selection */}
               <div>
-                <label className="block text-sm font-medium text-[var(--color-burst-text)] mb-3">
+                <label className="block text-sm font-medium text-[var(--color-locus-text)] mb-3">
                   Target Platform
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -183,13 +183,13 @@ export default function CreateArticlePage() {
                       className={`
                         flex items-center gap-3 p-4 rounded-xl border transition-all duration-200
                         ${platform === option.value 
-                          ? 'border-[var(--color-burst-purple)] bg-[rgba(139,92,246,0.1)]' 
-                          : 'border-[var(--color-burst-border)] bg-[rgba(255,255,255,0.02)] hover:border-[var(--color-burst-purple)] hover:border-opacity-50'
+                          ? 'border-[var(--color-locus-teal)] bg-[rgba(20,184,166,0.1)]' 
+                          : 'border-[var(--color-locus-border)] bg-[rgba(255,255,255,0.02)] hover:border-[var(--color-locus-teal)] hover:border-opacity-50'
                         }
                       `}
                     >
-                      <option.icon size={20} className={platform === option.value ? 'text-[var(--color-burst-purple)]' : 'text-[var(--color-burst-muted)]'} />
-                      <span className={platform === option.value ? 'text-white' : 'text-[var(--color-burst-muted)]'}>
+                      <option.icon size={20} className={platform === option.value ? 'text-[var(--color-locus-teal)]' : 'text-[var(--color-locus-muted)]'} />
+                      <span className={platform === option.value ? 'text-white' : 'text-[var(--color-locus-muted)]'}>
                         {option.label}
                       </span>
                     </button>
@@ -214,7 +214,7 @@ export default function CreateArticlePage() {
               />
 
               {error && (
-                <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-burst-error)] text-sm">
+                <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-locus-error)] text-sm">
                   {error}
                 </div>
               )}
@@ -238,7 +238,7 @@ export default function CreateArticlePage() {
           <Card className="h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <SelectedPlatformIcon size={20} className="text-[var(--color-burst-cyan)]" />
+                <SelectedPlatformIcon size={20} className="text-[var(--color-locus-cyan)]" />
                 Generated Article
               </h2>
               {generatedArticle && (
@@ -248,10 +248,10 @@ export default function CreateArticlePage() {
 
             {isGenerating ? (
               <div className="flex-1 flex flex-col items-center justify-center py-12">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[var(--color-burst-purple)] to-[var(--color-burst-cyan)] flex items-center justify-center mb-4 animate-pulse-glow">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center mb-4 animate-pulse-glow">
                   <Sparkles className="text-white animate-spin" size={28} />
                 </div>
-                <p className="text-[var(--color-burst-muted)]">Creating your authority article...</p>
+                <p className="text-[var(--color-locus-muted)]">Creating your authority article...</p>
               </div>
             ) : generatedArticle ? (
               <>
@@ -260,7 +260,7 @@ export default function CreateArticlePage() {
                   <textarea
                     value={editedContent}
                     onChange={(e) => setEditedContent(e.target.value)}
-                    className="w-full h-[400px] bg-[rgba(255,255,255,0.02)] border border-[var(--color-burst-border)] rounded-xl p-4 text-[var(--color-burst-text)] text-sm leading-relaxed focus:outline-none focus:border-[var(--color-burst-purple)] resize-none"
+                    className="w-full h-[400px] bg-[rgba(255,255,255,0.02)] border border-[var(--color-locus-border)] rounded-xl p-4 text-[var(--color-locus-text)] text-sm leading-relaxed focus:outline-none focus:border-[var(--color-locus-teal)] resize-none"
                     placeholder="Your article will appear here..."
                   />
                 </div>
@@ -290,11 +290,11 @@ export default function CreateArticlePage() {
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-[var(--color-burst-border)] flex items-center justify-center mb-4">
-                  <PenTool className="text-[var(--color-burst-muted)]" size={28} />
+                <div className="w-16 h-16 rounded-2xl bg-[var(--color-locus-border)] flex items-center justify-center mb-4">
+                  <PenTool className="text-[var(--color-locus-muted)]" size={28} />
                 </div>
-                <p className="text-[var(--color-burst-muted)] mb-2">No article generated yet</p>
-                <p className="text-sm text-[var(--color-burst-muted)] opacity-75">
+                <p className="text-[var(--color-locus-muted)] mb-2">No article generated yet</p>
+                <p className="text-sm text-[var(--color-locus-muted)] opacity-75">
                   Enter a topic and click Generate to create your article
                 </p>
               </div>
