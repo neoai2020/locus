@@ -11,10 +11,12 @@ export interface Article {
   user_id: string
   title: string
   content: string
-  platform: Platform
+  platform: Platform | string[]
   tone: ArticleTone
   length: ArticleLength
   status: ArticleStatus
+  affiliate_link?: string
+  niche?: string
   hook?: string
   cta?: string
   images?: ArticleImage[]
@@ -44,9 +46,12 @@ export interface User {
 
 export interface GenerateArticleInput {
   topic: string
-  platform: Platform
+  platform?: Platform
+  platforms?: string[]
   tone: ArticleTone
   length: ArticleLength
+  affiliateLink?: string
+  niche?: string
 }
 
 export interface GeneratedArticle {

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Mail, Lock, User, ArrowRight, Check } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, Check, Eye, EyeOff } from 'lucide-react'
 import Logo from '@/components/ui/Logo'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -23,6 +23,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,7 +61,7 @@ export default function SignupPage() {
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
             Start Building Authority
           </h1>
-          <p className="text-[var(--color-locus-muted)]">
+          <p className="text-locus-muted">
             Create your free account and launch in minutes
           </p>
         </div>
@@ -68,8 +69,8 @@ export default function SignupPage() {
         {/* Feature list */}
         <div className="mb-8 space-y-3">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-center gap-3 text-sm text-[var(--color-locus-text)]">
-              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] flex items-center justify-center">
+            <div key={index} className="flex items-center gap-3 text-sm text-locus-text">
+              <div className="shrink-0 w-5 h-5 rounded-full bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center">
                 <Check size={12} className="text-white" />
               </div>
               {feature}
@@ -79,7 +80,7 @@ export default function SignupPage() {
 
         <form onSubmit={handleSignup} className="space-y-5">
           {error && (
-            <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[var(--color-locus-error)] text-sm">
+            <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-locus-error text-sm">
               {error}
             </div>
           )}
@@ -106,11 +107,20 @@ export default function SignupPage() {
 
           <Input
             label="Password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             icon={<Lock size={18} />}
+            rightElement={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="focus:outline-none"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
             required
           />
 
@@ -125,18 +135,18 @@ export default function SignupPage() {
           </Button>
         </form>
 
-        <p className="text-center mt-6 text-[var(--color-locus-muted)] text-sm">
+        <p className="text-center mt-6 text-locus-muted text-sm">
           Already have an account?{' '}
           <Link 
             href="/login" 
-            className="text-[var(--color-locus-teal)] hover:text-[var(--color-locus-emerald)] transition-colors font-medium"
+            className="text-locus-teal hover:text-locus-emerald transition-colors font-medium"
           >
             Sign in
           </Link>
         </p>
       </Card>
 
-      <p className="text-center mt-8 text-xs text-[var(--color-locus-muted)]">
+      <p className="text-center mt-8 text-xs text-locus-muted">
         By signing up, you agree to our Terms of Service and Privacy Policy
       </p>
     </div>

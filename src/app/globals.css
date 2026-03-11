@@ -426,6 +426,18 @@ body {
   color: var(--color-locus-muted);
 }
 
+.prose-locus a {
+  color: var(--color-locus-teal);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.prose-locus a:hover {
+  color: var(--color-locus-cyan);
+}
+
 /* Tab styles */
 .tab {
   padding: 0.5rem 1rem;

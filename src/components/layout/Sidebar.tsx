@@ -23,12 +23,13 @@ import { useAppStore } from '@/store'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
+
 const mainNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/create', icon: PenTool, label: 'Create Article' },
+  { href: '/saved', icon: FileText, label: 'Saved Articles' },
   { href: '/images', icon: Image, label: 'Images' },
   { href: '/publish', icon: Send, label: 'Publish' },
-  { href: '/saved', icon: FileText, label: 'Saved Articles' },
   { href: '/training', icon: GraduationCap, label: 'Training' },
   { href: '/support', icon: HelpCircle, label: 'Support' },
 ]
@@ -58,13 +59,13 @@ export default function Sidebar() {
   return (
     <aside 
       className={`
-        fixed left-0 top-0 h-screen bg-[var(--color-locus-dark)] border-r border-[var(--color-locus-border)]
+        fixed left-0 top-0 h-screen bg-locus-dark border-r border-locus-border
         transition-all duration-300 z-50 flex flex-col
         ${sidebarOpen ? 'w-64' : 'w-20'}
       `}
     >
       {/* Logo */}
-      <div className="h-20 flex items-center px-5 border-b border-[var(--color-locus-border)]">
+      <div className="h-20 flex items-center px-5 border-b border-locus-border">
         <Logo size="md" showText={sidebarOpen} />
       </div>
 
@@ -78,15 +79,18 @@ export default function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={`
-                  flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200
+                  relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group
                   ${isActive 
-                    ? 'bg-gradient-to-r from-[rgba(20,184,166,0.15)] to-[rgba(16,185,129,0.1)] text-white border border-[rgba(20,184,166,0.3)]' 
-                    : 'text-[var(--color-locus-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                    ? 'bg-linear-to-r from-[rgba(20,184,166,0.15)] to-[rgba(16,185,129,0.1)] text-white border border-[rgba(20,184,166,0.3)] shadow-[0_0_15px_rgba(20,184,166,0.1)]' 
+                    : 'text-locus-muted hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
                   }
                 `}
               >
-                <item.icon size={20} className={isActive ? 'text-[var(--color-locus-teal)]' : ''} />
+                <item.icon size={20} className={isActive ? 'text-locus-teal' : 'group-hover:text-locus-teal transition-colors'} />
                 {sidebarOpen && <span className="font-medium text-sm">{item.label}</span>}
+                {isActive && sidebarOpen && (
+                  <ChevronRight size={16} className="ml-auto text-locus-teal" />
+                )}
               </Link>
             )
           })}
@@ -96,7 +100,7 @@ export default function Sidebar() {
         {visibleUpsells.length > 0 && (
           <div className="mt-8">
             {sidebarOpen && (
-              <h3 className="px-3 text-xs font-semibold text-[var(--color-locus-muted)] uppercase tracking-wider mb-3">
+              <h3 className="px-3 text-xs font-semibold text-locus-muted uppercase tracking-wider mb-3">
                 Premium Features
               </h3>
             )}
@@ -108,14 +112,14 @@ export default function Sidebar() {
                     key={item.href}
                     href={item.href}
                     className={`
-                      flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200
+                      relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group
                       ${isActive 
-                        ? 'bg-gradient-to-r from-[rgba(6,182,212,0.15)] to-[rgba(20,184,166,0.1)] text-white border border-[rgba(6,182,212,0.3)]' 
-                        : 'text-[var(--color-locus-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
+                        ? 'bg-linear-to-r from-[rgba(6,182,212,0.15)] to-[rgba(20,184,166,0.1)] text-white border border-[rgba(6,182,212,0.3)] shadow-[0_0_15px_rgba(6,182,212,0.1)]' 
+                        : 'text-locus-muted hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
                       }
                     `}
                   >
-                    <item.icon size={20} className={isActive ? 'text-[var(--color-locus-cyan)]' : ''} />
+                    <item.icon size={20} className={isActive ? 'text-locus-cyan' : 'group-hover:text-locus-cyan transition-colors'} />
                     {sidebarOpen && <span className="font-medium text-sm">{item.label}</span>}
                   </Link>
                 )
@@ -125,24 +129,16 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {/* Bottom Section */}
-      <div className="p-3 border-t border-[var(--color-locus-border)]">
+      <div className="p-3 border-t border-locus-border">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl w-full text-[var(--color-locus-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-all duration-200"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl w-full text-locus-muted hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-all duration-200"
         >
           <LogOut size={20} />
           {sidebarOpen && <span className="font-medium text-sm">Logout</span>}
         </button>
       </div>
 
-      {/* Toggle Button */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="absolute -right-3 top-24 bg-[var(--color-locus-card)] border border-[var(--color-locus-border)] rounded-full p-1.5 hover:border-[var(--color-locus-teal)] transition-all duration-200"
-      >
-        {sidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-      </button>
     </aside>
   )
 }
