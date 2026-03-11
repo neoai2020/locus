@@ -103,7 +103,7 @@ export default function LoginPage() {
         <p className="text-center mt-6 text-[var(--color-locus-muted)] text-sm">
           Don&apos;t have an account?{' '}
           <Link 
-            href="/signup" 
+            href="/signup-pro" 
             className="text-[var(--color-locus-teal)] hover:text-[var(--color-locus-emerald)] transition-colors font-medium"
           >
             Sign up

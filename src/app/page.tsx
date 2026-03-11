@@ -69,7 +69,7 @@ export default function LandingPage() {
             <Link href="/login">
               <Button variant="ghost">Sign In</Button>
             </Link>
-            <Link href="/signup">
+            <Link href="/signup-pro">
               <Button>
                 <span>Get Started</span>
                 <ArrowRight size={16} />
@@ -100,7 +100,7 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/signup">
+              <Link href="/signup-pro">
                 <Button size="lg" className="text-lg px-8">
                   <Sparkles size={20} />
                   <span>Start Creating Free</span>
@@ -231,7 +231,7 @@ export default function LandingPage() {
                 Join thousands of professionals using Locus to establish thought leadership 
                 and drive visibility on high-trust platforms.
               </p>
-              <Link href="/signup">
+              <Link href="/signup-pro">
                 <Button size="lg" className="text-lg px-10">
                   <Sparkles size={20} />
                   <span>Get Started Free</span>
