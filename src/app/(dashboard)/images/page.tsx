@@ -1,55 +1,51 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   Image as ImageIcon, 
   Upload, 
-  Sparkles, 
   Wand2, 
   ArrowLeft, 
   ArrowRight,
   Check,
-  X,
-  Plus,
-  FileText
+  FileText,
+  Loader2
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
 import { useAppStore } from '@/store'
-import { Article } from '@/types'
-import { useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
-const imageSuggestions = [
+const imageSections = [
   {
-    id: '1',
-    section: 'Header',
+    id: 'header',
+    section: 'Header Image',
     suggestion: 'Professional hero image related to your topic',
-    placeholder: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
   },
   {
-    id: '2',
-    section: 'Mid-Article',
+    id: 'mid',
+    section: 'Mid-Article Image',
     suggestion: 'Data visualization or infographic',
-    placeholder: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
   },
   {
-    id: '3',
-    section: 'Conclusion',
+    id: 'conclusion',
+    section: 'Conclusion Image',
     suggestion: 'Call-to-action or engagement visual',
-    placeholder: 'https://images.unsplash.com/photo-1553484771-371a605b060b?w=800&q=80',
   },
 ]
 
 export default function ImagesPage() {
   const router = useRouter()
   const { currentArticle, articles, setArticles, setCurrentArticle, updateArticle } = useAppStore()
-  const [selectedImages, setSelectedImages] = useState<Record<string, string>>({})
-  const [uploadingSection, setUploadingSection] = useState<string | null>(null)
-  const [isGenerating, setIsGenerating] = useState<string | null>(null)
+  
+  const [slotUrls, setSlotUrls] = useState<Record<string, string>>({})
+  const [generatedSlots, setGeneratedSlots] = useState<Record<string, boolean>>({})
+  const [generatingSlots, setGeneratingSlots] = useState<Record<string, boolean>>({})
+  const [uploadingSlots, setUploadingSlots] = useState<Record<string, boolean>>({})
+  const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (articles.length === 0) {
@@ -71,9 +67,7 @@ export default function ImagesPage() {
 
   const stripHtml = (content: string) => {
     if (!content) return ''
-    // First, remove actual HTML tags
     const cleanText = content.replace(/<\/?[^>]+(>|$)/g, "")
-    // Then decode common entities just in case
     return cleanText
       .replace(/&nbsp;/g, ' ')
       .replace(/&amp;/g, '&')
@@ -82,36 +76,101 @@ export default function ImagesPage() {
       .trim()
   }
 
-  const handleSelectSuggestion = (sectionId: string, url: string) => {
-    setSelectedImages(prev => ({
-      ...prev,
-      [sectionId]: prev[sectionId] === url ? '' : url
-    }))
+  const handleGenerateImage = async (sectionId: string, slotIndex: number, suggestion: string) => {
+    if (!currentArticle) return
+    const slotId = `${sectionId}-${slotIndex}`
+    
+    setGeneratingSlots(prev => ({ ...prev, [slotId]: true }))
+    
+    try {
+      // Extract a short excerpt from the article content to give the AI more context
+      const contentExcerpt = stripHtml(currentArticle.content).substring(0, 300);
+      
+      // Construct a highly detailed prompt targeting expressive, clear, high-quality images
+      const prompt = `Cinematic, highly detailed, expressive professional photography. Subject: An image conceptually representing the article titled "${currentArticle.title}". Context: "${contentExcerpt}...". Specific requirement: ${suggestion}. Style: photorealistic, 8k resolution, modern, clear, engaging. IMPORTANT: Do not include any text, letters, or words in the image.`;
+      
+      const response = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate image')
+      }
+      
+      if (data.url) {
+        setSlotUrls(prev => ({ ...prev, [slotId]: data.url }))
+        setGeneratedSlots(prev => ({ ...prev, [slotId]: true }))
+        
+        setSelectedSlots(prev => {
+          if (!prev[sectionId]) return { ...prev, [sectionId]: slotId }
+          return prev
+        })
+      } else {
+        throw new Error('No image URL returned')
+      }
+    } catch (error: any) {
+      console.error('Error generating image:', error)
+      alert(error.message || "Failed to generate image. Please ensure your 'article-images' storage bucket is created and public.")
+    } finally {
+      setGeneratingSlots(prev => ({ ...prev, [slotId]: false }))
+    }
   }
 
-  const handleFileUpload = async (sectionId: string, file: File) => {
-    // In a real app, upload to storage and get URL
-    const url = URL.createObjectURL(file)
-    setSelectedImages(prev => ({
-      ...prev,
-      [sectionId]: url
-    }))
-    setUploadingSection(null)
+  const handleFileUpload = async (sectionId: string, slotIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const slotId = `${sectionId}-${slotIndex}`
+    setUploadingSlots(prev => ({ ...prev, [slotId]: true }))
+    
+    try {
+      const supabase = createClient()
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${currentArticle?.id || Date.now()}/${Math.random().toString(36).substring(7)}.${fileExt}`
+      
+      const { data, error } = await supabase.storage
+        .from('article-images')
+        .upload(fileName, file)
+        
+      if (error) throw error
+      
+      const { data: { publicUrl } } = supabase.storage.from('article-images').getPublicUrl(fileName)
+      
+      setSlotUrls(prev => ({ ...prev, [slotId]: publicUrl }))
+
+      setSelectedSlots(prev => {
+         if (!prev[sectionId]) return { ...prev, [sectionId]: slotId }
+         return prev
+      })
+    } catch (error) {
+      console.error('Upload failed:', error)
+      alert("Failed to upload image. Please ensure your 'article-images' storage bucket is created and public.")
+    } finally {
+      setUploadingSlots(prev => ({ ...prev, [slotId]: false }))
+    }
   }
 
   const handleContinue = () => {
     if (currentArticle) {
-      const images = Object.entries(selectedImages)
-        .filter(([, url]) => url)
-        .map(([id, url]) => ({
-          id,
-          url,
-          alt: imageSuggestions.find(s => s.id === id)?.section || '',
-          section: imageSuggestions.find(s => s.id === id)?.section || '',
-          position: 'middle' as const
-        }))
+      const images = Object.entries(selectedSlots)
+        .map(([sectionId, slotId]) => {
+          const url = slotUrls[slotId]
+          const sectionName = imageSections.find(s => s.id === sectionId)?.section || ''
+          return url ? {
+            id: slotId,
+            url,
+            alt: sectionName,
+            section: sectionName,
+            position: 'middle' as const
+          } : null
+        })
+        .filter(Boolean)
       
-      updateArticle(currentArticle.id, { images })
+      updateArticle(currentArticle.id, { images: images as any })
     }
     router.push('/publish')
   }
@@ -140,7 +199,9 @@ export default function ImagesPage() {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant="purple">{Array.isArray(currentArticle.platform) ? currentArticle.platform[0] : currentArticle.platform}</Badge>
+                <Badge variant="purple">
+                  {Array.isArray(currentArticle.platform) ? currentArticle.platform[0] : currentArticle.platform}
+                </Badge>
                 <button 
                   onClick={() => setCurrentArticle(null)}
                   className="text-xs text-locus-muted hover:text-white transition-colors"
@@ -189,147 +250,114 @@ export default function ImagesPage() {
         </Card>
       )}
 
-      {/* Image Suggestions */}
+      {/* Image Sections */}
       <div className="space-y-6">
-        {imageSuggestions.map((suggestion, index) => (
+        {imageSections.map((section, index) => (
           <Card 
-            key={suggestion.id} 
+            key={section.id} 
             className="animate-fade-in"
             style={{ animationDelay: `${(index + 2) * 0.1}s` }}
           >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="font-semibold text-white flex items-center gap-2">
-                  <ImageIcon size={18} className="text-locus-cyan" />
-                  {suggestion.section} Image
-                </h3>
-                <p className="text-sm text-locus-muted mt-1">
-                  {suggestion.suggestion}
-                </p>
-              </div>
-              {selectedImages[suggestion.id] && (
-                <Badge variant="success">
-                  <Check size={12} className="mr-1" />
-                  Selected
-                </Badge>
-              )}
+            <div className="mb-4">
+              <h3 className="font-semibold text-white flex items-center gap-2">
+                <ImageIcon size={18} className="text-locus-cyan" />
+                {section.section}
+              </h3>
+              <p className="text-sm text-locus-muted mt-1">
+                {section.suggestion}
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* AI Suggestion */}
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => {
-                    setIsGenerating(suggestion.id)
-                    setTimeout(() => {
-                      handleSelectSuggestion(suggestion.id, suggestion.placeholder)
-                      setIsGenerating(null)
-                    }, 1500)
-                  }}
-                  disabled={isGenerating === suggestion.id}
-                  className={`
-                    relative rounded-xl overflow-hidden border-2 transition-all duration-200 group h-full
-                    ${selectedImages[suggestion.id] === suggestion.placeholder 
-                      ? 'border-locus-teal ring-2 ring-locus-teal/30' 
-                      : 'border-locus-border hover:border-locus-teal'
-                    }
-                  `}
-                >
-                  <div className="aspect-video relative h-full">
-                    {isGenerating === suggestion.id ? (
-                      <div className="absolute inset-0 bg-locus-dark/80 flex flex-col items-center justify-center p-4 text-center">
-                        <Wand2 size={24} className="text-locus-teal animate-pulse mb-2" />
-                        <span className="text-xs text-white">Analyzing article for best prompt...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <img 
-                          src={suggestion.placeholder} 
-                          alt={suggestion.suggestion}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-                        <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center">
-                            <Sparkles size={12} className="text-white" />
-                          </div>
-                          <span className="text-xs text-white font-medium">AI Suggestion</span>
-                        </div>
-                      </>
-                    )}
-                    {selectedImages[suggestion.id] === suggestion.placeholder && !isGenerating && (
-                      <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-locus-teal flex items-center justify-center">
-                        <Check size={14} className="text-white" />
-                      </div>
-                    )}
-                  </div>
-                </button>
-                <div className="px-1">
-                  <p className="text-[10px] text-locus-muted leading-tight">
-                    <span className="text-locus-teal font-medium">Pro Tip:</span> Real AI generation requires an API key (DALL-E 3) and custom prompts based on your niche.
-                  </p>
-                </div>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[0, 1, 2].map(slotIndex => {
+                const slotId = `${section.id}-${slotIndex}`
+                const url = slotUrls[slotId]
+                const isSelected = selectedSlots[section.id] === slotId
+                const hasGenerated = generatedSlots[slotId]
+                const isGenerating = generatingSlots[slotId]
+                const isUploading = uploadingSlots[slotId]
 
-              {/* Upload Option */}
-              <label
-                className={`
-                  relative rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200
-                  ${uploadingSection === suggestion.id 
-                    ? 'border-locus-teal bg-locus-teal/5' 
-                    : 'border-locus-border hover:border-locus-teal hover:bg-white/5'
-                  }
-                `}
-              >
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) handleFileUpload(suggestion.id, file)
-                  }}
-                />
-                <div className="aspect-video flex flex-col items-center justify-center p-4">
-                  <div className="w-10 h-10 rounded-xl bg-locus-border flex items-center justify-center mb-3">
-                    <Upload size={20} className="text-locus-muted" />
-                  </div>
-                  <span className="text-sm text-locus-muted">Upload your own</span>
-                  <span className="text-xs text-locus-muted opacity-75 mt-1">PNG, JPG up to 5MB</span>
-                </div>
-              </label>
-
-              {/* Custom Uploaded Image or Skip */}
-              {selectedImages[suggestion.id] && selectedImages[suggestion.id] !== suggestion.placeholder ? (
-                <div className="relative rounded-xl overflow-hidden border-2 border-locus-teal ring-2 ring-locus-teal/30">
-                  <div className="aspect-video relative">
-                    <img 
-                      src={selectedImages[suggestion.id]} 
-                      alt="Custom upload"
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      onClick={() => setSelectedImages(prev => ({ ...prev, [suggestion.id]: '' }))}
-                      className="absolute top-2 right-2 w-6 h-6 rounded-full bg-locus-error flex items-center justify-center hover:bg-opacity-80 transition-colors"
+                return (
+                  <div key={slotId} className="flex flex-col gap-3">
+                    {/* Image Area */}
+                    <button 
+                      onClick={() => url && setSelectedSlots(prev => {
+                        if (prev[section.id] === slotId) {
+                           const newSelected = { ...prev }
+                           delete newSelected[section.id]
+                           return newSelected
+                        }
+                        return { ...prev, [section.id]: slotId }
+                      })}
+                      disabled={!url}
+                      className={`
+                        relative w-full aspect-video rounded-xl overflow-hidden border-2 transition-all duration-200 focus:outline-hidden
+                        ${isSelected ? 'border-locus-teal ring-4 ring-locus-teal/20' : 'border-locus-border hover:border-locus-muted'}
+                        ${!url && !isGenerating && !isUploading ? 'border-dashed bg-locus-dark/20' : ''}
+                      `}
                     >
-                      <X size={14} className="text-white" />
+                      {url ? (
+                        <>
+                          <img src={url} alt={`Slot ${slotIndex + 1}`} className="w-full h-full object-cover" />
+                          {isSelected && (
+                            <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-locus-teal flex items-center justify-center shadow-lg transform transition-transform scale-100">
+                              <Check size={18} className="text-white" />
+                            </div>
+                          )}
+                        </>
+                      ) : isGenerating ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-transparent">
+                          <Wand2 size={24} className="text-locus-teal animate-pulse mb-3" />
+                          <span className="text-xs text-locus-muted">Generating...</span>
+                        </div>
+                      ) : isUploading ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-transparent">
+                          <Loader2 size={24} className="text-locus-teal animate-spin mb-3" />
+                          <span className="text-xs text-locus-muted">Uploading...</span>
+                        </div>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center opacity-40">
+                          <ImageIcon size={32} className="mb-3" />
+                          <span className="text-sm font-medium">Empty Slot {slotIndex + 1}</span>
+                        </div>
+                      )}
                     </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setSelectedImages(prev => ({ ...prev, [suggestion.id]: '' }))}
-                  className="rounded-xl border-2 border-locus-border hover:border-locus-muted transition-all duration-200"
-                >
-                  <div className="aspect-video flex flex-col items-center justify-center p-4">
-                    <div className="w-10 h-10 rounded-xl bg-locus-border flex items-center justify-center mb-3">
-                      <X size={20} className="text-locus-muted" />
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 h-9 items-stretch w-full">
+                      {!hasGenerated && (
+                        <Button 
+                          variant="primary" 
+                          size="sm" 
+                          className="flex-1 text-xs"
+                          disabled={isGenerating || isUploading}
+                          onClick={() => handleGenerateImage(section.id, slotIndex, section.suggestion)}
+                        >
+                          <Wand2 size={14} className="mr-1" /> Generate
+                        </Button>
+                      )}
+                      
+                      <div className={`relative ${hasGenerated ? 'w-full' : 'flex-1'}`}>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          key={url ? `file-${slotId}-uploaded` : `file-${slotId}-empty`}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10" 
+                          onChange={(e) => handleFileUpload(section.id, slotIndex, e)} 
+                          disabled={isGenerating || isUploading}
+                        />
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="w-full h-full text-xs pointer-events-none"
+                        >
+                          <Upload size={14} className="mr-1" /> Upload
+                        </Button>
+                      </div>
                     </div>
-                    <span className="text-sm text-locus-muted">Skip this section</span>
-                    <span className="text-xs text-locus-muted opacity-75 mt-1">No image needed</span>
                   </div>
-                </button>
-              )}
+                )
+              })}
             </div>
           </Card>
         ))}
@@ -337,7 +365,6 @@ export default function ImagesPage() {
 
       {/* Bottom Actions */}
       <div className="flex items-center justify-between mt-8 pt-8 border-t border-locus-border">
-
         <Button variant="ghost" onClick={() => router.back()}>
           <ArrowLeft size={18} />
           <span>Back to Editor</span>
