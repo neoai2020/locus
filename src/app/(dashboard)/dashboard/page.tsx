@@ -15,7 +15,10 @@ import {
   ArrowRight,
   Sparkles,
   Play,
-  GraduationCap
+  GraduationCap,
+  DollarSign,
+  Users,
+  Star
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -23,6 +26,24 @@ import Badge from '@/components/ui/Badge'
 import { useAppStore } from '@/store'
 import { createClient } from '@/lib/supabase/client'
 import { UPSELL_CONFIGS, UpsellType } from '@/types'
+
+const earningsMembers = [
+  { name: 'Ashley D.', initial: 'A', color: 'bg-rose-500', amount: 2150, timeframe: 'past 3 weeks', badge: 'consistent daily posting' },
+  { name: 'Marcus T.', initial: 'M', color: 'bg-blue-500', amount: 1875, timeframe: 'past month', badge: '3 articles/week' },
+  { name: 'Jordan K.', initial: 'J', color: 'bg-emerald-500', amount: 980, timeframe: 'past 2 weeks', badge: 'daily content creator' },
+  { name: 'Priya S.', initial: 'P', color: 'bg-violet-500', amount: 2340, timeframe: 'past month', badge: 'power user' },
+  { name: 'Tyler R.', initial: 'T', color: 'bg-cyan-500', amount: 425, timeframe: 'past 2 weeks', badge: 'weekly publisher' },
+  { name: 'Samantha L.', initial: 'S', color: 'bg-pink-500', amount: 1590, timeframe: 'past 3 weeks', badge: 'consistent daily posting' },
+  { name: 'Derek W.', initial: 'D', color: 'bg-orange-500', amount: 760, timeframe: 'past 2 weeks', badge: '3 articles/week' },
+  { name: 'Nina C.', initial: 'N', color: 'bg-teal-500', amount: 2480, timeframe: 'past month', badge: 'power user' },
+  { name: 'Ethan B.', initial: 'E', color: 'bg-indigo-500', amount: 310, timeframe: 'past 2 weeks', badge: 'weekly publisher' },
+  { name: 'Rachel M.', initial: 'R', color: 'bg-amber-500', amount: 1220, timeframe: 'past 3 weeks', badge: 'daily content creator' },
+  { name: 'Chris F.', initial: 'C', color: 'bg-lime-500', amount: 1950, timeframe: 'past month', badge: 'consistent daily posting' },
+  { name: 'Olivia H.', initial: 'O', color: 'bg-fuchsia-500', amount: 540, timeframe: 'past 2 weeks', badge: '3 articles/week' },
+  { name: 'Brandon J.', initial: 'B', color: 'bg-sky-500', amount: 1680, timeframe: 'past 3 weeks', badge: 'power user' },
+  { name: 'Kayla P.', initial: 'K', color: 'bg-red-500', amount: 890, timeframe: 'past 2 weeks', badge: 'daily content creator' },
+  { name: 'Liam G.', initial: 'L', color: 'bg-green-500', amount: 150, timeframe: 'past 2 weeks', badge: 'weekly publisher' },
+]
 
 const quickActions = [
   { 
@@ -35,8 +56,8 @@ const quickActions = [
   { 
     href: '/saved', 
     icon: FileText, 
-    label: 'Saved Articles', 
-    description: 'View and manage your content',
+    label: 'My Portfolio', 
+    description: 'View articles and affiliate links',
     gradient: 'from-locus-cyan to-locus-blue'
   },
   { 
@@ -84,6 +105,26 @@ export default function DashboardPage() {
     fetchUser()
     fetchArticles()
   }, [])
+
+  const [activeMemberIndex, setActiveMemberIndex] = useState(0)
+
+  useEffect(() => {
+    const scheduleNext = () => {
+      const delay = Math.floor(Math.random() * 5000) + 3000
+      return setTimeout(() => {
+        setActiveMemberIndex(prev => {
+          let next: number
+          do { next = Math.floor(Math.random() * earningsMembers.length) } while (next === prev)
+          return next
+        })
+        timerId = scheduleNext()
+      }, delay)
+    }
+    let timerId = scheduleNext()
+    return () => clearTimeout(timerId)
+  }, [])
+
+  const activeMember = earningsMembers[activeMemberIndex]
 
   const stats = {
     articlesGenerated: articles.length,
@@ -141,6 +182,74 @@ export default function DashboardPage() {
           </div>
         </Card>
       </div>
+
+      {/* Member Earnings Dashboard */}
+      <Card className="mb-10 animate-fade-in border border-amber-500/30 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="relative">
+          {/* Header */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+              <DollarSign className="text-amber-400" size={24} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+                Member Earnings Dashboard
+              </h2>
+              <p className="text-locus-muted text-sm">Real results from Locus members</p>
+            </div>
+          </div>
+
+          {/* Featured Member Spotlight */}
+          <div className="bg-locus-darker/60 rounded-xl p-5 mb-6 border border-white/5 transition-all duration-500">
+            <div className="flex items-center gap-4">
+              <div className={`w-14 h-14 rounded-full ${activeMember.color} flex items-center justify-center text-white text-xl font-bold shrink-0 transition-all duration-500`}>
+                {activeMember.initial}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <span className="font-semibold text-white text-lg">{activeMember.name}</span>
+                  <Star className="text-amber-400 fill-amber-400" size={16} />
+                  <Badge variant="success" className="text-[10px] uppercase tracking-wider">Verified Member</Badge>
+                </div>
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-3xl font-bold text-amber-400 tabular-nums transition-all duration-500">
+                    ${activeMember.amount.toLocaleString()}
+                  </span>
+                  <span className="text-locus-muted text-sm">Earned in {activeMember.timeframe}</span>
+                </div>
+                <Badge variant="default" className="text-xs">
+                  {activeMember.badge}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Community Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
+              <DollarSign className="text-amber-400 mx-auto mb-1" size={20} />
+              <p className="text-2xl font-bold text-white">$847K+</p>
+              <p className="text-locus-muted text-xs">Community Total</p>
+            </div>
+            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
+              <Users className="text-amber-400 mx-auto mb-1" size={20} />
+              <p className="text-2xl font-bold text-white">1,847</p>
+              <p className="text-locus-muted text-xs">Active Earners</p>
+            </div>
+            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
+              <TrendingUp className="text-amber-400 mx-auto mb-1" size={20} />
+              <p className="text-2xl font-bold text-white">$459</p>
+              <p className="text-locus-muted text-xs">Avg/Member</p>
+            </div>
+          </div>
+
+          {/* Disclaimer */}
+          <p className="text-[11px] text-locus-muted/60 leading-relaxed">
+            Results shown are from select members and not typical. Your results will vary. No earnings are guaranteed. Past performance does not indicate future results.
+          </p>
+        </div>
+      </Card>
 
       {/* Primary CTA */}
       <Card className="mb-10 animate-fade-in stagger-4 relative overflow-hidden">

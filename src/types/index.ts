@@ -32,6 +32,17 @@ export interface ArticleImage {
   position: 'top' | 'middle' | 'bottom'
 }
 
+export type AffiliatePlatform = 'digistore24' | 'etsy' | 'amazon' | 'ebay'
+
+export interface AffiliateLink {
+  id: string
+  platform: AffiliatePlatform
+  link: string
+  label?: string
+  created_at: string
+  updated_at: string
+}
+
 export type UpsellType = '10x' | 'infinite' | 'automation' | 'dfy'
 
 export interface User {

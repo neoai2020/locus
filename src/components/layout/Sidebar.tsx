@@ -27,7 +27,7 @@ import { useRouter } from 'next/navigation'
 const mainNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/create', icon: PenTool, label: 'Create Article' },
-  { href: '/saved', icon: FileText, label: 'Saved Articles' },
+  { href: '/saved', icon: FileText, label: 'My Portfolio' },
   { href: '/images', icon: Image, label: 'Images' },
   { href: '/publish', icon: Send, label: 'Publish' },
   { href: '/training', icon: GraduationCap, label: 'Training' },

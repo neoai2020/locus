@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Article, UpsellType, User } from '@/types'
+import { Article, AffiliateLink, UpsellType, User } from '@/types'
 
 interface AppState {
   // User state
@@ -15,6 +15,13 @@ interface AppState {
   addArticle: (article: Article) => void
   updateArticle: (id: string, updates: Partial<Article>) => void
   deleteArticle: (id: string) => void
+
+  // Affiliate links state
+  affiliateLinks: AffiliateLink[]
+  setAffiliateLinks: (links: AffiliateLink[]) => void
+  addAffiliateLink: (link: AffiliateLink) => void
+  updateAffiliateLink: (id: string, updates: Partial<AffiliateLink>) => void
+  deleteAffiliateLink: (id: string) => void
   
   // Upsell state
   unlockedUpsells: UpsellType[]
@@ -60,6 +67,21 @@ export const useAppStore = create<AppState>()(
           : state.currentArticle
       })),
       
+      // Affiliate Links
+      affiliateLinks: [],
+      setAffiliateLinks: (links) => set({ affiliateLinks: links }),
+      addAffiliateLink: (link) => set((state) => ({
+        affiliateLinks: [link, ...state.affiliateLinks]
+      })),
+      updateAffiliateLink: (id, updates) => set((state) => ({
+        affiliateLinks: state.affiliateLinks.map(l =>
+          l.id === id ? { ...l, ...updates } : l
+        )
+      })),
+      deleteAffiliateLink: (id) => set((state) => ({
+        affiliateLinks: state.affiliateLinks.filter(l => l.id !== id)
+      })),
+
       // Upsells
       unlockedUpsells: [],
       unlockUpsell: (type) => set((state) => ({
@@ -81,6 +103,7 @@ export const useAppStore = create<AppState>()(
       name: 'locus-storage',
       partialize: (state) => ({
         articles: state.articles,
+        affiliateLinks: state.affiliateLinks,
         unlockedUpsells: state.unlockedUpsells,
       }),
     }

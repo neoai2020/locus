@@ -19,14 +19,21 @@ import {
   Lightbulb,
   Loader2,
   CheckCircle2,
-  Eye
+  Eye,
+  ChevronUp,
+  ChevronDown,
+  ExternalLink,
+  ShoppingBag,
+  Store,
+  ShoppingCart,
+  Tag
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { useAppStore } from '@/store'
-import { Platform, ArticleTone, ArticleLength, GeneratedArticle } from '@/types'
+import { Platform, ArticleTone, ArticleLength, GeneratedArticle, AffiliateLink as AffiliateLinkType, AffiliatePlatform } from '@/types'
 
 const nicheOptions = [
   { value: 'health', label: 'Health & Wellness' },
@@ -71,6 +78,60 @@ const steps = [
   { number: 3, title: 'Generated Article', description: 'Review and save your article' },
 ]
 
+const affiliatePlatforms: { value: AffiliatePlatform; label: string; description: string; icon: typeof ShoppingBag }[] = [
+  { value: 'digistore24', label: 'Digistore24', description: 'Digital products marketplace', icon: ShoppingBag },
+  { value: 'amazon', label: 'Amazon', description: 'Amazon Associates program', icon: ShoppingCart },
+  { value: 'etsy', label: 'Etsy', description: 'Etsy affiliate program', icon: Tag },
+  { value: 'ebay', label: 'eBay', description: 'eBay Partner Network', icon: Store },
+]
+
+const platformInstructions: Record<AffiliatePlatform, { steps: string[]; linkUrl: string; linkLabel: string }> = {
+  digistore24: {
+    steps: [
+      'Go to Digistore24.com and create a free account',
+      'Navigate to the Marketplace and find your product',
+      'Click "Promote Now" to get your unique affiliate link',
+      'Copy your affiliate link',
+      'Paste it below and click "Save Link"',
+    ],
+    linkUrl: 'https://www.digistore24.com',
+    linkLabel: 'Open Digistore24',
+  },
+  amazon: {
+    steps: [
+      'Go to Amazon Associates and create a free account',
+      'Search for a product you want to promote',
+      'Use the SiteStripe bar to generate your affiliate link',
+      'Copy your affiliate link',
+      'Paste it below and click "Save Link"',
+    ],
+    linkUrl: 'https://affiliate-program.amazon.com',
+    linkLabel: 'Open Amazon Associates',
+  },
+  etsy: {
+    steps: [
+      "Go to Etsy's Affiliate Program via Awin",
+      'Sign up and get approved as an affiliate',
+      'Browse Etsy and find products to promote',
+      'Generate your affiliate link through Awin dashboard',
+      'Paste it below and click "Save Link"',
+    ],
+    linkUrl: 'https://www.awin.com/us/affiliate/etsy',
+    linkLabel: 'Open Etsy Affiliates',
+  },
+  ebay: {
+    steps: [
+      'Go to eBay Partner Network',
+      'Create a free account and get approved',
+      'Use the link generator to create affiliate links for any eBay listing',
+      'Copy your affiliate link',
+      'Paste it below and click "Save Link"',
+    ],
+    linkUrl: 'https://partnernetwork.ebay.com',
+    linkLabel: 'Open eBay Partners',
+  },
+}
+
 export default function CreateArticlePage() {
   const router = useRouter()
   const { isGenerating, setIsGenerating, currentArticle } = useAppStore()
@@ -83,6 +144,9 @@ export default function CreateArticlePage() {
   const [niche, setNiche] = useState('')
   const [productInfo, setProductInfo] = useState<Record<string, string> | null>(null)
   const [isScraping, setIsScraping] = useState(false)
+  const [selectedAffiliatePlatform, setSelectedAffiliatePlatform] = useState<AffiliatePlatform | null>(null)
+  const [showInstructions, setShowInstructions] = useState(true)
+  const [linkSaved, setLinkSaved] = useState(false)
   
   // Step 2 — Topic & Settings
   const [topic, setTopic] = useState('')
@@ -350,7 +414,8 @@ export default function CreateArticlePage() {
       
       {/* ═══════════════ STEP 1: Link & Niche ═══════════════ */}
       {currentStep === 1 && (
-        <div className="animate-fade-in">
+        <div className="animate-fade-in space-y-6">
+          {/* Part A: Platform Selection */}
           <Card>
             <h2 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
               <LinkIcon size={20} className="text-locus-teal" />
@@ -358,13 +423,142 @@ export default function CreateArticlePage() {
             </h2>
 
             <div className="space-y-6">
-              <Input
-                label="Affiliate Link (optional)"
-                placeholder="https://example.com/product?ref=your-id"
-                value={affiliateLink}
-                onChange={(e) => setAffiliateLink(e.target.value)}
-              />
+              <div>
+                <label className="block text-sm font-medium text-locus-text mb-3">
+                  Choose Your Affiliate Platform
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {affiliatePlatforms.map((platform) => {
+                    const isSelected = selectedAffiliatePlatform === platform.value
+                    return (
+                      <button
+                        key={platform.value}
+                        onClick={() => {
+                          setSelectedAffiliatePlatform(platform.value)
+                          setLinkSaved(false)
+                        }}
+                        className={`
+                          flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left
+                          ${isSelected
+                            ? 'border-locus-teal bg-locus-teal/10 shadow-[0_0_15px_rgba(20,184,166,0.15)]'
+                            : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-locus-teal/50 hover:bg-[rgba(255,255,255,0.04)]'
+                          }
+                        `}
+                      >
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-locus-teal/20' : 'bg-locus-border'}`}>
+                          <platform.icon size={20} className={isSelected ? 'text-locus-teal' : 'text-locus-muted'} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-locus-text'}`}>
+                            {platform.label}
+                          </p>
+                          <p className="text-xs text-locus-muted truncate">{platform.description}</p>
+                        </div>
+                        {isSelected && <Check size={16} className="ml-auto text-locus-teal shrink-0" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </Card>
 
+          {/* Part B: Collapsible Instructions */}
+          {selectedAffiliatePlatform && (
+            <Card>
+              <button
+                onClick={() => setShowInstructions(!showInstructions)}
+                className="w-full flex items-center justify-between text-left"
+              >
+                <h3 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2">
+                  <Lightbulb size={16} className="text-locus-teal" />
+                  How to Get Your Affiliate Link
+                </h3>
+                {showInstructions ? (
+                  <ChevronUp size={18} className="text-locus-muted" />
+                ) : (
+                  <ChevronDown size={18} className="text-locus-muted" />
+                )}
+              </button>
+
+              {showInstructions && (
+                <div className="mt-5 space-y-3">
+                  {platformInstructions[selectedAffiliatePlatform].steps.map((step, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-7 h-7 rounded-full bg-locus-teal/20 text-locus-teal flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        {i + 1}
+                      </div>
+                      <div className="text-sm text-locus-text pt-1">
+                        {step}
+                        {i === 0 && (
+                          <a
+                            href={platformInstructions[selectedAffiliatePlatform].linkUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 ml-2 text-locus-teal hover:underline font-medium"
+                          >
+                            {platformInstructions[selectedAffiliatePlatform].linkLabel}
+                            <ExternalLink size={13} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          )}
+
+          {/* Part C: Link Input & Save */}
+          {selectedAffiliatePlatform && (
+            <Card>
+              <div className="space-y-4">
+                <Input
+                  label="Your Affiliate Link"
+                  placeholder="https://example.com/product?ref=your-id"
+                  value={affiliateLink}
+                  onChange={(e) => {
+                    setAffiliateLink(e.target.value)
+                    setLinkSaved(false)
+                  }}
+                />
+
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => {
+                      if (!affiliateLink.trim()) return
+                      const newLink: AffiliateLinkType = {
+                        id: crypto.randomUUID(),
+                        platform: selectedAffiliatePlatform,
+                        link: affiliateLink.trim(),
+                        label: affiliatePlatforms.find(p => p.value === selectedAffiliatePlatform)?.label,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                      }
+                      useAppStore.getState().addAffiliateLink(newLink)
+                      setLinkSaved(true)
+                    }}
+                    disabled={!affiliateLink.trim()}
+                    variant={linkSaved ? 'secondary' : 'primary'}
+                  >
+                    {linkSaved ? <Check size={18} /> : <Save size={18} />}
+                    <span>{linkSaved ? 'Link Saved' : 'Save Link'}</span>
+                  </Button>
+
+                  {linkSaved && (
+                    <span className="text-sm text-locus-teal flex items-center gap-1.5">
+                      <CheckCircle2 size={15} />
+                      Affiliate link saved successfully
+                    </span>
+                  )}
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Part D: Niche Selection */}
+          <Card>
+            <div className="space-y-6">
               <Select
                 label="Niche"
                 options={[{ value: '', label: 'Select your niche...' }, ...nicheOptions]}
