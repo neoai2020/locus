@@ -19,7 +19,11 @@ import {
   ChevronUp,
   Share2,
   Target,
-  BarChart3
+  BarChart3,
+  Lightbulb,
+  Clock,
+  Users,
+  MessageCircle,
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -27,6 +31,26 @@ import Badge from '@/components/ui/Badge'
 import Input from '@/components/ui/Input'
 import { useAppStore } from '@/store'
 import { AffiliateLink as AffiliateLinkType } from '@/types'
+
+const LOADING_MESSAGES = [
+  'Analyzing your link...',
+  'Crafting urgency hooks...',
+  'Writing social proof angles...',
+  'Building storytelling posts...',
+  'Adding curiosity triggers...',
+  'Optimizing for engagement...',
+  'Creating contrarian angles...',
+  'Polishing call-to-actions...',
+  'Making posts scroll-stopping...',
+  'Finalizing your 10 posts...',
+]
+
+interface GeneratedPost {
+  hook: string
+  body: string
+  cta: string
+  angle: string
+}
 
 export default function TenXPage() {
   const router = useRouter()
@@ -39,9 +63,10 @@ export default function TenXPage() {
   const [showPortfolio, setShowPortfolio] = useState(false)
 
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedPosts, setGeneratedPosts] = useState<any[]>([])
+  const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([])
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
   const [error, setError] = useState('')
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0)
 
   useEffect(() => {
     if (!isUpsellUnlocked('10x')) {
@@ -51,6 +76,14 @@ export default function TenXPage() {
     }
   }, [isUpsellUnlocked, router])
 
+  useEffect(() => {
+    if (!isGenerating) return
+    const interval = setInterval(() => {
+      setLoadingMsgIdx(prev => (prev + 1) % LOADING_MESSAGES.length)
+    }, 2500)
+    return () => clearInterval(interval)
+  }, [isGenerating])
+
   const handleGenerate10Posts = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedLink.trim()) return
@@ -58,19 +91,15 @@ export default function TenXPage() {
     setIsGenerating(true)
     setGeneratedPosts([])
     setError('')
+    setLoadingMsgIdx(0)
 
     try {
-      const response = await fetch('/api/generate', {
+      const response = await fetch('/api/generate-posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          topic: `Generate exactly 10 unique, high-converting Facebook posts promoting the product at: ${selectedLink}. Each post should have a different angle/hook — urgency, social proof, storytelling, curiosity, pain point, benefit-focused, contrarian, question-based, listicle, and testimonial style. Return a JSON array of 10 objects, each with "hook" (attention-grabbing first line), "body" (main post content, 3-5 sentences), and "cta" (call-to-action with the link). Make each post ready to copy-paste into Facebook.`,
-          platform: 'facebook',
-          tone: 'bold',
-          length: 'medium',
-          affiliateLink: selectedLink,
-          niche: 'ecommerce',
-          raw: true
+          link: selectedLink.trim(),
+          linkName: linkLabel.trim() || undefined,
         })
       })
 
@@ -80,53 +109,31 @@ export default function TenXPage() {
       }
       
       const data = await response.json()
-
-      let posts: any[] = []
-      const content = data.body || data.content || ''
-      const raw = typeof content === 'string' ? content : JSON.stringify(content)
-      
-      try {
-        const jsonMatch = raw.match(/\[[\s\S]*\]/)
-        if (jsonMatch) {
-          posts = JSON.parse(jsonMatch[0])
-        }
-      } catch {}
-
-      if (posts.length === 0) {
-        posts = [{
-          hook: data.hook || 'Your attention-grabbing hook',
-          body: data.body || raw || 'Post content',
-          cta: data.cta || `Check it out here: ${selectedLink}`
-        }]
-      }
-
-      setGeneratedPosts(posts)
-    } catch (error: any) {
-      console.error('Error generating posts:', error)
-      setError(error.message || 'Failed to generate posts. Please try again.')
+      setGeneratedPosts(data.posts || [])
+    } catch (err: any) {
+      console.error('Error generating posts:', err)
+      setError(err.message || 'Failed to generate posts. Please try again.')
     } finally {
       setIsGenerating(false)
     }
   }
 
+  const getPostText = (post: GeneratedPost) => {
+    return `${post.hook}\n\n${post.body}\n\n${post.cta}`
+  }
+
   const handleCopy = (index: number) => {
     const post = generatedPosts[index]
     if (!post) return
-    const hook = (post.hook || '').replace(/<[^>]*>/g, '')
-    const body = (post.body || '').replace(/<[^>]*>/g, '')
-    const cta = (post.cta || '').replace(/<[^>]*>/g, '')
-    navigator.clipboard.writeText(`${hook}\n\n${body}\n\n${cta}`)
+    navigator.clipboard.writeText(getPostText(post))
     setCopiedIndex(index)
     setTimeout(() => setCopiedIndex(null), 2000)
   }
 
   const handleCopyAll = () => {
-    const allText = generatedPosts.map((post, i) => {
-      const hook = (post.hook || '').replace(/<[^>]*>/g, '')
-      const body = (post.body || '').replace(/<[^>]*>/g, '')
-      const cta = (post.cta || '').replace(/<[^>]*>/g, '')
-      return `--- Post ${i + 1} ---\n\n${hook}\n\n${body}\n\n${cta}`
-    }).join('\n\n\n')
+    const allText = generatedPosts.map((post, i) =>
+      `--- Post ${i + 1}: ${post.angle} ---\n\n${getPostText(post)}`
+    ).join('\n\n\n')
     navigator.clipboard.writeText(allText)
     setCopiedIndex(-1)
     setTimeout(() => setCopiedIndex(null), 2000)
@@ -167,16 +174,16 @@ export default function TenXPage() {
           10X Facebook Post Generator
         </h1>
         <p className="text-locus-muted">
-          Generate 10 unique, high-converting Facebook posts from a single link — each with a different angle to maximize reach.
+          Generate 10 unique, high-converting Facebook posts from a single link — each with a different angle to maximize reach and clicks.
         </p>
       </div>
 
       {/* What You Get Panels */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 animate-fade-in stagger-1">
         {[
-          { icon: Share2, title: '10 Unique Posts', desc: 'Different hooks, angles & styles per generation', gradient: 'from-blue-500 to-blue-400' },
-          { icon: Target, title: 'High-Converting Copy', desc: 'Each post optimized for clicks & engagement', gradient: 'from-orange-500 to-amber-500' },
-          { icon: BarChart3, title: 'Ready to Publish', desc: 'Copy-paste directly into Facebook', gradient: 'from-emerald-500 to-teal-500' },
+          { icon: Share2, title: '10 Unique Posts', desc: '10 different hooks & angles per link', gradient: 'from-blue-500 to-blue-400' },
+          { icon: Target, title: 'High-Converting Copy', desc: 'Optimized for clicks & engagement', gradient: 'from-orange-500 to-amber-500' },
+          { icon: BarChart3, title: 'Ready to Post', desc: 'Copy-paste directly into Facebook', gradient: 'from-emerald-500 to-teal-500' },
         ].map((item) => (
           <Card key={item.title} className="p-4">
             <div className="flex items-center gap-3">
@@ -201,11 +208,10 @@ export default function TenXPage() {
               <Facebook size={18} className="text-white" />
             </div>
             <h2 className="text-xl font-bold text-white">Generate 10 Facebook Posts</h2>
-            <Badge variant="warning" className="ml-auto">10X Exclusive</Badge>
+            <Badge variant="warning" className="ml-auto">10X</Badge>
           </div>
 
           <form onSubmit={handleGenerate10Posts} className="space-y-5">
-            {/* Saved Links from Portfolio */}
             {affiliateLinks.length > 0 && (
               <div>
                 <button
@@ -232,13 +238,7 @@ export default function TenXPage() {
                             setLinkSaved(true)
                             setShowPortfolio(false)
                           }}
-                          className={`
-                            w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all duration-200
-                            ${isSelected
-                              ? 'border-locus-teal bg-locus-teal/10'
-                              : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-locus-teal/50'
-                            }
-                          `}
+                          className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all duration-200 ${isSelected ? 'border-locus-teal bg-locus-teal/10' : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-locus-teal/50'}`}
                         >
                           <LinkIcon size={16} className={isSelected ? 'text-locus-teal shrink-0' : 'text-locus-muted shrink-0'} />
                           <div className="flex-1 min-w-0">
@@ -256,11 +256,10 @@ export default function TenXPage() {
               </div>
             )}
 
-            {/* Manual Input */}
             <div className="space-y-3">
               <Input
                 label="Link Name"
-                placeholder="e.g. My Fitness eBook, Keto Supplement, etc."
+                placeholder="e.g. My Fitness eBook, Water Filter System, etc."
                 value={linkLabel}
                 onChange={(e) => { setLinkLabel(e.target.value); setLinkSaved(false) }}
               />
@@ -274,7 +273,6 @@ export default function TenXPage() {
               />
             </div>
 
-            {/* Save Link Option */}
             {selectedLink.trim() && !linkSaved && (
               <button
                 type="button"
@@ -310,6 +308,17 @@ export default function TenXPage() {
                 </>
               )}
             </Button>
+
+            {isGenerating && (
+              <div className="flex items-center justify-center gap-3 py-3 animate-fade-in">
+                <div className="flex gap-1">
+                  {[0,1,2].map(i => (
+                    <div key={i} className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                  ))}
+                </div>
+                <span className="text-sm text-amber-400 transition-all duration-300">{LOADING_MESSAGES[loadingMsgIdx]}</span>
+              </div>
+            )}
             
             {error && (
               <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm animate-fade-in">
@@ -317,78 +326,131 @@ export default function TenXPage() {
               </div>
             )}
           </form>
-
-          {/* Generated Posts */}
-          {generatedPosts.length > 0 && (
-            <div className="mt-8 border-t border-white/5 pt-6 animate-fade-in">
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="font-semibold text-white flex items-center gap-2">
-                  <Sparkles size={16} className="text-amber-400" />
-                  {generatedPosts.length} Posts Generated
-                </h3>
-                <button 
-                  onClick={handleCopyAll}
-                  className="flex items-center gap-2 text-xs font-medium text-locus-teal hover:text-white transition-colors"
-                >
-                  {copiedIndex === -1 ? <Check size={14} /> : <Copy size={14} />}
-                  {copiedIndex === -1 ? 'All Copied!' : 'Copy All Posts'}
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                {generatedPosts.map((post, index) => (
-                  <div
-                    key={index}
-                    className="bg-[rgba(255,255,255,0.03)] rounded-xl p-5 border border-white/5 hover:border-white/10 transition-all group"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">
-                          {index + 1}
-                        </span>
-                        <span className="text-xs text-locus-muted font-medium">Post {index + 1}</span>
-                      </div>
-                      <button 
-                        onClick={() => handleCopy(index)}
-                        className="flex items-center gap-1.5 text-xs text-locus-muted hover:text-locus-teal transition-colors opacity-0 group-hover:opacity-100"
-                      >
-                        {copiedIndex === index ? <Check size={13} /> : <Copy size={13} />}
-                        {copiedIndex === index ? 'Copied!' : 'Copy'}
-                      </button>
-                    </div>
-                    <div className="font-bold text-white text-sm mb-2" dangerouslySetInnerHTML={{ __html: post.hook || '' }} />
-                    <div className="text-sm text-locus-text mb-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: post.body || '' }} />
-                    <div className="text-sm text-locus-teal italic" dangerouslySetInnerHTML={{ __html: post.cta || '' }} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </Card>
 
-      {/* How It Works */}
-      <Card className="mt-8 animate-fade-in stagger-3 border-amber-500/15 bg-[rgba(245,158,11,0.02)]">
-        <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-          <TrendingUp size={18} className="text-amber-400" />
-          How to Maximize Your Results
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { step: '1', title: 'Generate', desc: 'Enter your promotional link and generate 10 unique Facebook posts with different hooks and angles.' },
-            { step: '2', title: 'Schedule', desc: 'Space the posts out over 1-2 weeks. Different angles hit different audiences at different times.' },
-            { step: '3', title: 'Engage', desc: 'Reply to comments on each post. The algorithm rewards engagement and pushes your posts to more people.' },
-          ].map((item) => (
-            <div key={item.step} className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-amber-500/15 text-amber-400 flex items-center justify-center text-sm font-bold shrink-0">
-                {item.step}
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-white mb-1">{item.title}</h4>
-                <p className="text-xs text-locus-muted leading-relaxed">{item.desc}</p>
-              </div>
+      {/* Generated Posts */}
+      {generatedPosts.length > 0 && (
+        <div className="mt-8 animate-fade-in">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <Sparkles size={18} className="text-amber-400" />
+              {generatedPosts.length} Facebook Posts Ready
+            </h3>
+            <button 
+              onClick={handleCopyAll}
+              className="flex items-center gap-2 text-sm font-medium text-locus-teal hover:text-white transition-colors px-4 py-2 rounded-xl border border-locus-border hover:border-locus-teal"
+            >
+              {copiedIndex === -1 ? <Check size={14} /> : <Copy size={14} />}
+              {copiedIndex === -1 ? 'All Copied!' : 'Copy All Posts'}
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            {generatedPosts.map((post, index) => (
+              <Card
+                key={index}
+                className="group hover:border-[rgba(59,130,246,0.3)] transition-all"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <span className="text-sm font-semibold text-white">Post {index + 1}</span>
+                      <span className="text-xs text-blue-400/70 ml-2">{post.angle}</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleCopy(index)}
+                    className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg transition-all border border-locus-border hover:border-locus-teal text-locus-muted hover:text-locus-teal"
+                  >
+                    {copiedIndex === index ? <Check size={13} /> : <Copy size={13} />}
+                    {copiedIndex === index ? 'Copied!' : 'Copy Post'}
+                  </button>
+                </div>
+
+                <div className="bg-[rgba(255,255,255,0.02)] rounded-xl p-5 border border-white/5">
+                  <p className="font-bold text-white text-[15px] mb-3 leading-relaxed whitespace-pre-wrap">{post.hook}</p>
+                  <p className="text-sm text-locus-text mb-3 leading-relaxed whitespace-pre-wrap">{post.body}</p>
+                  <p className="text-sm text-locus-teal leading-relaxed whitespace-pre-wrap">{post.cta}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Facebook Tips Box */}
+      <Card className="mt-8 animate-fade-in stagger-3 border-blue-500/20 bg-[rgba(59,130,246,0.03)]">
+        <div className="flex items-center gap-2 mb-5">
+          <Lightbulb size={18} className="text-blue-400" />
+          <h3 className="font-bold text-white">Pro Tips: How to Go Viral on Facebook</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+              <Users size={14} className="text-blue-400" />
+              Where to Share
+            </h4>
+            <ul className="space-y-2.5 text-sm text-locus-text">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400 mt-0.5">•</span>
+                <span><strong className="text-white">Niche Facebook Groups</strong> — Find groups with 10K–100K members related to your product. Avoid spammy mega-groups.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400 mt-0.5">•</span>
+                <span><strong className="text-white">Your Profile & Stories</strong> — Post on your personal profile too. Facebook's algorithm favors personal accounts.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400 mt-0.5">•</span>
+                <span><strong className="text-white">Facebook Pages You Manage</strong> — If you have a page, post there and boost the best-performing posts.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400 mt-0.5">•</span>
+                <span><strong className="text-white">Comment Sections</strong> — Reply to relevant viral posts with your take and a subtle link. High-traffic comments = free visibility.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+              <Clock size={14} className="text-amber-400" />
+              When & How to Post
+            </h4>
+            <ul className="space-y-2.5 text-sm text-locus-text">
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 mt-0.5">•</span>
+                <span><strong className="text-white">Best times:</strong> 9–11 AM and 7–9 PM in your audience's timezone. Tuesday–Thursday perform best.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 mt-0.5">•</span>
+                <span><strong className="text-white">Space them out:</strong> Post 1–2 per day across different groups. Never spam the same group twice in a day.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 mt-0.5">•</span>
+                <span><strong className="text-white">Engage immediately:</strong> Reply to every comment within the first hour. Facebook rewards fast engagement with more reach.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 mt-0.5">•</span>
+                <span><strong className="text-white">Use all 10 angles:</strong> Different posts resonate with different people. The curiosity angle might flop where storytelling goes viral.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-5 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+          <div className="flex items-start gap-3">
+            <MessageCircle size={16} className="text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-white mb-1">The Golden Rule of Facebook Groups</p>
+              <p className="text-xs text-locus-text leading-relaxed">
+                Contribute value to the group FIRST. Comment on other people's posts, answer questions, and be helpful for a few days before sharing your own link posts. Group admins are more likely to approve your posts, and members are more likely to engage with someone they recognize. A warm audience converts 5–10x better than cold posting.
+              </p>
             </div>
-          ))}
+          </div>
         </div>
       </Card>
 
