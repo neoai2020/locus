@@ -2,12 +2,13 @@
 
 interface BadgeProps {
   children: React.ReactNode
-  variant?: 'purple' | 'cyan' | 'success' | 'warning' | 'error'
+  variant?: 'default' | 'purple' | 'cyan' | 'success' | 'warning' | 'error'
   className?: string
 }
 
 export default function Badge({ children, variant = 'purple', className = '' }: BadgeProps) {
   const variants = {
+    default: 'bg-[rgba(255,255,255,0.08)] text-[var(--color-locus-text)] border-[rgba(255,255,255,0.15)]',
     purple: 'bg-[rgba(20,184,166,0.15)] text-[var(--color-locus-teal)] border-[rgba(20,184,166,0.3)]',
     cyan: 'bg-[rgba(6,182,212,0.15)] text-[var(--color-locus-cyan)] border-[rgba(6,182,212,0.3)]',
     success: 'bg-[rgba(16,185,129,0.15)] text-[var(--color-locus-success)] border-[rgba(16,185,129,0.3)]',
