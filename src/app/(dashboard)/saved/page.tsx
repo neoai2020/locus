@@ -74,6 +74,10 @@ export default function MyPortfolioPage() {
   const [editForm, setEditForm] = useState<{ link: string; label: string }>({ link: '', label: '' })
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null)
 
+  // New affiliate link creation state
+  const [showNewLinkForm, setShowNewLinkForm] = useState(false)
+  const [newLinkForm, setNewLinkForm] = useState<{ name: string; link: string }>({ name: '', link: '' })
+
   useEffect(() => {
     fetchArticles()
   }, [])
@@ -178,6 +182,21 @@ export default function MyPortfolioPage() {
 
   const handleDeleteLink = (id: string) => {
     useAppStore.getState().deleteAffiliateLink(id)
+  }
+
+  const handleCreateLink = () => {
+    if (!newLinkForm.name.trim() || !newLinkForm.link.trim()) return
+    const newLink: AffiliateLink = {
+      id: crypto.randomUUID(),
+      platform: 'digistore24',
+      link: newLinkForm.link.trim(),
+      label: newLinkForm.name.trim(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    useAppStore.getState().addAffiliateLink(newLink)
+    setNewLinkForm({ name: '', link: '' })
+    setShowNewLinkForm(false)
   }
 
   return (
@@ -395,11 +414,59 @@ export default function MyPortfolioPage() {
 
       {/* ─── Affiliate Links Tab ─── */}
       {activeTab === 'links' && (
-        <>
+        <div className="space-y-6 animate-fade-in">
+          {/* Add New Link Button / Form */}
+          {showNewLinkForm ? (
+            <Card className="border-locus-teal/30">
+              <h3 className="font-semibold text-white mb-4">Create New Affiliate Link</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-locus-muted mb-1 block">Name</label>
+                  <Input
+                    value={newLinkForm.name}
+                    onChange={(e) => setNewLinkForm((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g. My Fitness eBook, Keto Supplement, etc."
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-locus-muted mb-1 block">Affiliate Link</label>
+                  <Input
+                    value={newLinkForm.link}
+                    onChange={(e) => setNewLinkForm((prev) => ({ ...prev, link: e.target.value }))}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    size="sm"
+                    onClick={handleCreateLink}
+                    disabled={!newLinkForm.name.trim() || !newLinkForm.link.trim()}
+                  >
+                    <Save size={14} />
+                    <span>Save Link</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { setShowNewLinkForm(false); setNewLinkForm({ name: '', link: '' }) }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ) : (
+            <Button onClick={() => setShowNewLinkForm(true)}>
+              <LinkIcon size={16} />
+              <span>Create New Affiliate Link</span>
+            </Button>
+          )}
+
+          {/* Links List */}
           {affiliateLinks.length > 0 ? (
-            <div className="space-y-4 animate-fade-in">
+            <div className="space-y-4">
               {affiliateLinks.map((link, index) => {
-                const Icon = affiliatePlatformIcons[link.platform]
+                const Icon = affiliatePlatformIcons[link.platform] || LinkIcon
                 const isEditing = editingLinkId === link.id
 
                 return (
@@ -417,19 +484,7 @@ export default function MyPortfolioPage() {
                         {isEditing ? (
                           <div className="space-y-3">
                             <div>
-                              <label className="text-xs text-locus-muted mb-1 block">Link</label>
-                              <Input
-                                value={editForm.link}
-                                onChange={(e) =>
-                                  setEditForm((prev) => ({ ...prev, link: e.target.value }))
-                                }
-                                placeholder="https://..."
-                              />
-                            </div>
-                            <div>
-                              <label className="text-xs text-locus-muted mb-1 block">
-                                Label (optional)
-                              </label>
+                              <label className="text-xs text-locus-muted mb-1 block">Name</label>
                               <Input
                                 value={editForm.label}
                                 onChange={(e) =>
@@ -438,10 +493,20 @@ export default function MyPortfolioPage() {
                                 placeholder="e.g. My top product"
                               />
                             </div>
+                            <div>
+                              <label className="text-xs text-locus-muted mb-1 block">Affiliate Link</label>
+                              <Input
+                                value={editForm.link}
+                                onChange={(e) =>
+                                  setEditForm((prev) => ({ ...prev, link: e.target.value }))
+                                }
+                                placeholder="https://..."
+                              />
+                            </div>
                             <div className="flex gap-2">
                               <Button size="sm" onClick={saveEditingLink}>
-                                <Save size={14} className="mr-1" />
-                                Save
+                                <Save size={14} />
+                                <span>Save</span>
                               </Button>
                               <Button variant="ghost" size="sm" onClick={cancelEditingLink}>
                                 Cancel
@@ -452,16 +517,9 @@ export default function MyPortfolioPage() {
                           <>
                             <div className="flex items-start justify-between gap-4 mb-1">
                               <div className="min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold text-white">
-                                    {affiliatePlatformNames[link.platform]}
-                                  </h3>
-                                  {link.label && (
-                                    <Badge variant="cyan" className="text-xs">
-                                      {link.label}
-                                    </Badge>
-                                  )}
-                                </div>
+                                <h3 className="font-semibold text-white mb-0.5">
+                                  {link.label || affiliatePlatformNames[link.platform] || 'Affiliate Link'}
+                                </h3>
                                 <p className="text-sm text-locus-muted truncate max-w-md">
                                   {link.link}
                                 </p>
@@ -496,9 +554,16 @@ export default function MyPortfolioPage() {
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-2 text-xs text-locus-muted mt-2">
-                              <Clock size={12} />
-                              {formatDate(link.created_at)}
+                            <div className="flex items-center gap-3 text-xs text-locus-muted mt-2">
+                              <span className="flex items-center gap-1">
+                                <Clock size={12} />
+                                {formatDate(link.created_at)}
+                              </span>
+                              {link.platform && affiliatePlatformNames[link.platform] && (
+                                <Badge variant="cyan" className="text-[10px]">
+                                  {affiliatePlatformNames[link.platform]}
+                                </Badge>
+                              )}
                             </div>
                           </>
                         )}
@@ -508,22 +573,22 @@ export default function MyPortfolioPage() {
                 )
               })}
             </div>
-          ) : (
-            <Card className="animate-fade-in text-center py-16">
+          ) : !showNewLinkForm ? (
+            <Card className="text-center py-16">
               <div className="w-16 h-16 rounded-2xl bg-locus-border flex items-center justify-center mx-auto mb-4">
                 <LinkIcon className="text-locus-muted" size={28} />
               </div>
-              <p className="text-locus-muted mb-2">No affiliate links saved yet.</p>
+              <p className="text-locus-muted mb-2">No affiliate links saved yet</p>
               <p className="text-sm text-locus-muted opacity-75 mb-6">
-                Go to Create Article to add your first link.
+                Add your first affiliate link to start building your portfolio
               </p>
-              <Button onClick={() => router.push('/create')}>
-                <ExternalLink size={16} className="mr-2" />
-                Create Article
+              <Button onClick={() => setShowNewLinkForm(true)}>
+                <LinkIcon size={16} />
+                <span>Create New Affiliate Link</span>
               </Button>
             </Card>
-          )}
-        </>
+          ) : null}
+        </div>
       )}
     </div>
   )
