@@ -570,7 +570,54 @@ export default function CreateArticlePage() {
           {/* Part C: Link Input & Save */}
           {selectedAffiliatePlatform && (
             <Card>
-              <div className="space-y-4">
+              <div className="space-y-5">
+                {/* Saved links from portfolio */}
+                {(() => {
+                  const savedLinks = useAppStore.getState().affiliateLinks
+                  if (savedLinks.length === 0) return null
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-locus-text mb-2">
+                        Select from My Portfolio
+                      </label>
+                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        {savedLinks.map((sl) => {
+                          const isSelected = affiliateLink === sl.link
+                          return (
+                            <button
+                              key={sl.id}
+                              onClick={() => {
+                                setAffiliateLink(sl.link)
+                                setLinkSaved(true)
+                              }}
+                              className={`
+                                w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all duration-200
+                                ${isSelected
+                                  ? 'border-locus-teal bg-locus-teal/10'
+                                  : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-locus-teal/50'
+                                }
+                              `}
+                            >
+                              <LinkIcon size={16} className={isSelected ? 'text-locus-teal shrink-0' : 'text-locus-muted shrink-0'} />
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-locus-text'}`}>
+                                  {sl.label || 'Untitled Link'}
+                                </p>
+                                <p className="text-xs text-locus-muted truncate">{sl.link}</p>
+                              </div>
+                              {isSelected && <Check size={16} className="text-locus-teal shrink-0" />}
+                            </button>
+                          )
+                        })}
+                      </div>
+                      <div className="relative my-4">
+                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-locus-border" /></div>
+                        <div className="relative flex justify-center"><span className="bg-locus-card px-3 text-xs text-locus-muted">or enter manually</span></div>
+                      </div>
+                    </div>
+                  )
+                })()}
+
                 <Input
                   label="Your Affiliate Link"
                   placeholder="https://example.com/product?ref=your-id"
