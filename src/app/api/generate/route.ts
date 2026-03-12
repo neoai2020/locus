@@ -30,19 +30,26 @@ const PLATFORM_FORMATS: Record<string, string> = {
 - Include quotes, statistics, or examples
 - End with key takeaways and a CTA`,
   
-  substack: `Format for Substack newsletter:
-- Write an engaging email-friendly headline
-- Start with a personal greeting or hook
-- Use conversational tone throughout
-- Include actionable insights
-- End with a question or CTA to encourage replies`,
-  
-  general: `Format for general publication:
-- Professional headline with SEO keywords
-- Strong introduction with thesis statement
-- Well-structured body with clear sections
-- Include expert quotes or data
-- Professional conclusion with CTA`,
+  quora: `Format for Quora answer:
+- Open by directly answering the question in 1-2 sentences
+- Expand with detailed explanation and personal experience
+- Use bullet points and numbered lists for scannability
+- Include relevant data or examples
+- End with a brief summary and invite the reader to follow for more`,
+
+  reddit: `Format for Reddit post:
+- Write a clear, specific title — avoid clickbait
+- Open with a TL;DR or key takeaway
+- Use short paragraphs and line breaks
+- Be genuinely helpful and conversational — avoid marketing speak
+- End with a question to invite discussion`,
+
+  twitter: `Format for X/Twitter thread:
+- Tweet 1: Bold hook or controversial insight (under 280 chars)
+- Break key points into individual tweets, each standing alone
+- Use line breaks and short sentences for readability
+- Include 1-2 relevant stats or data points
+- Final tweet: CTA + 2-3 hashtags`,
 }
 
 async function callChatGPT(messages: { role: string; content: string }[]) {

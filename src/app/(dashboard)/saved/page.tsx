@@ -13,8 +13,9 @@ import {
   Clock,
   Check,
   Linkedin,
-  Mail,
-  Globe,
+  MessageSquare,
+  Hash,
+  Twitter,
   Loader2,
   Link as LinkIcon,
   ShoppingBag,
@@ -33,9 +34,10 @@ import { Article, Platform, AffiliateLink, AffiliatePlatform } from '@/types'
 
 const platformIcons: Record<string, typeof Linkedin> = {
   linkedin: Linkedin,
+  quora: MessageSquare,
   medium: FileText,
-  substack: Mail,
-  general: Globe,
+  reddit: Hash,
+  twitter: Twitter,
 }
 
 const affiliatePlatformIcons: Record<AffiliatePlatform, typeof ShoppingBag> = {

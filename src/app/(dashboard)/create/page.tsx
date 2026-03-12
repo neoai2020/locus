@@ -7,8 +7,9 @@ import {
   Sparkles, 
   Linkedin, 
   FileText, 
-  Mail, 
-  Globe,
+  MessageSquare,
+  Hash,
+  Twitter,
   Copy,
   Save,
   Check,
@@ -56,9 +57,10 @@ const nicheOptions = [
 
 const platformOptions = [
   { value: 'linkedin', label: 'LinkedIn', icon: Linkedin },
+  { value: 'quora', label: 'Quora', icon: MessageSquare },
   { value: 'medium', label: 'Medium', icon: FileText },
-  { value: 'substack', label: 'Substack', icon: Mail },
-  { value: 'general', label: 'General Publication', icon: Globe },
+  { value: 'reddit', label: 'Reddit', icon: Hash },
+  { value: 'twitter', label: 'X (Twitter)', icon: Twitter },
 ]
 
 const toneOptions = [

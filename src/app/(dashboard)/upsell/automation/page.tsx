@@ -7,8 +7,8 @@ import {
   Sparkles, 
   FileText,
   Linkedin,
-  Mail,
-  Globe,
+  MessageSquare,
+  Hash,
   Check,
   ArrowRight,
   Wand2
@@ -36,28 +36,28 @@ const templates = [
     icon: FileText
   },
   {
-    id: 'newsletter',
-    name: 'Newsletter Edition',
-    description: 'Engaging updates for your subscribers',
-    platform: 'substack',
-    structure: ['Personal intro', 'Main topic', 'Quick wins', 'Resource links', 'Sign-off'],
-    icon: Mail
+    id: 'quora-answer',
+    name: 'Quora Answer',
+    description: 'High-ranking answers that drive organic traffic',
+    platform: 'quora',
+    structure: ['Direct answer', 'Detailed explanation', 'Examples/data', 'Personal insight', 'Follow CTA'],
+    icon: MessageSquare
   },
   {
-    id: 'case-study',
-    name: 'Case Study',
-    description: 'Showcase results and success stories',
-    platform: 'general',
-    structure: ['Challenge', 'Solution', 'Results', 'Key takeaways', 'CTA'],
-    icon: Globe
+    id: 'reddit-post',
+    name: 'Reddit Post',
+    description: 'Community-first value posts for subreddit reach',
+    platform: 'reddit',
+    structure: ['TL;DR', 'Context', 'Detailed breakdown', 'Actionable tips', 'Discussion prompt'],
+    icon: Hash
   },
 ]
 
 const presets = [
   { id: 'linkedin-post', name: 'LinkedIn Post', wordCount: '300-500', tone: 'Conversational' },
   { id: 'medium-article', name: 'Medium Article', wordCount: '1000-1500', tone: 'Educational' },
-  { id: 'newsletter', name: 'Newsletter', wordCount: '500-800', tone: 'Personal' },
-  { id: 'guest-post', name: 'Guest Post', wordCount: '1500-2000', tone: 'Authoritative' },
+  { id: 'quora-answer', name: 'Quora Answer', wordCount: '400-800', tone: 'Authoritative' },
+  { id: 'reddit-post', name: 'Reddit Post', wordCount: '500-1000', tone: 'Conversational' },
 ]
 
 export default function AutomationPage() {
