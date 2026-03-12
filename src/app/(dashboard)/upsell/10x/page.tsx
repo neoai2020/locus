@@ -145,10 +145,6 @@ export default function TenXPage() {
         <div className="lg:col-span-2 space-y-8">
           {/* Facebook Post Generator */}
           <Card className="animate-fade-in stagger-1 relative overflow-hidden active-gradient border-orange-500/20">
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-              <Facebook size={120} />
-            </div>
-            
             <div className="relative">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 rounded-lg bg-linear-to-r from-blue-600 to-blue-400 flex items-center justify-center">
