@@ -36,7 +36,7 @@ function VerifyEmailContent() {
   const [verifying, setVerifying] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
-  // Send OTP email on mount
+  // Send OTP email on mount (never auto-redirect — always wait for timer)
   useEffect(() => {
     const sendEmail = async () => {
       try {
@@ -47,14 +47,8 @@ function VerifyEmailContent() {
         })
         const data = await res.json()
         setEmailSent(data.sent)
-
-        // Fail-safe bypass: if email failed, auto-enter after 3 seconds
-        if (!data.sent) {
-          setTimeout(() => router.push('/dashboard'), 3000)
-        }
       } catch {
         setEmailSent(false)
-        setTimeout(() => router.push('/dashboard'), 3000)
       }
     }
 
@@ -160,14 +154,7 @@ function VerifyEmailContent() {
             Verify Your Email
           </h1>
           <p className="text-locus-muted text-sm">
-            {emailSent === false ? (
-              <span className="text-yellow-400">
-                <AlertTriangle size={14} className="inline mr-1" />
-                Email could not be sent. Redirecting to dashboard...
-              </span>
-            ) : (
-              <>We sent a 6-digit code to <span className="text-locus-teal font-medium">{email || 'your email'}</span></>
-            )}
+              We sent a 6-digit code to <span className="text-locus-teal font-medium">{email || 'your email'}</span>. It may take up to 60 seconds to arrive.
           </p>
         </div>
 
