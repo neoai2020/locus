@@ -47,7 +47,7 @@ export default function SignupPage() {
       return
     }
 
-    router.push('/dashboard')
+    router.push(`/verify-email?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`)
   }
 
   return (
