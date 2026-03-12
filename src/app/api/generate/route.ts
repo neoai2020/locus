@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { topic, platform, platforms, tone, length, affiliateLink, niche } = body
+    const { topic, platform, platforms, tone, length, affiliateLink, niche, customPrompt } = body
     let { productInfo } = body
 
     // Auto-scrape if link provided but no info
@@ -242,9 +242,17 @@ Structure your response in this exact JSON format. The string values MUST contai
 
 Make the content compelling, valuable, and ready to publish immediately. Respond ONLY with the JSON object.`
 
+    const finalSystemPrompt = customPrompt
+      ? `You are an expert SEO content writer. Write complete, real articles with actual content — never use placeholder brackets or template text. Always format output as HTML (no markdown). Respond ONLY with valid JSON: {"hook": "...", "body": "...", "cta": "..."}`
+      : systemPrompt
+
+    const finalUserPrompt = customPrompt
+      ? `${customPrompt}\n\nRespond ONLY with this exact JSON format (use HTML formatting inside values):\n{"hook": "opening hook HTML", "body": "main article body HTML", "cta": "call-to-action HTML"}`
+      : userPrompt
+
     const result = await callChatGPT([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
+      { role: 'system', content: finalSystemPrompt },
+      { role: 'user', content: finalUserPrompt },
     ])
 
     // Parse the response

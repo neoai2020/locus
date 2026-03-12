@@ -5,14 +5,12 @@ import { useRouter } from 'next/navigation'
 import {
   Zap,
   Search,
-  Filter,
   ChevronRight,
   ArrowLeft,
   Image as ImageIcon,
   FileText,
   Link as LinkIcon,
   Send,
-  Eye,
   Copy,
   Check,
   Sparkles,
@@ -21,6 +19,8 @@ import {
   Globe,
   BookOpen,
   X,
+  Loader2,
+  Save,
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -41,21 +41,17 @@ const NICHES = [
   { id: 'home', label: 'Home & Garden', emoji: '🏡', count: 10 },
 ]
 
-interface PrewrittenArticle {
+interface ArticleBrief {
   id: string
   niche: string
   title: string
-  excerpt: string
-  wordCount: number
-  sections: string[]
   seoKeywords: string[]
   suggestedProducts: string[]
-  hasImages: boolean
-  content: string
+  sections: string[]
 }
 
-function generateArticlesForNiche(nicheId: string, nicheLabel: string): PrewrittenArticle[] {
-  const articleTemplates: Record<string, { titles: string[]; keywords: string[][]; products: string[][] }> = {
+function getArticleBriefs(): ArticleBrief[] {
+  const data: Record<string, { titles: string[]; keywords: string[][]; products: string[][] }> = {
     health: {
       titles: [
         'The Ultimate Guide to Immune-Boosting Supplements in 2025',
@@ -438,130 +434,65 @@ function generateArticlesForNiche(nicheId: string, nicheLabel: string): Prewritt
     },
   }
 
-  const templates = articleTemplates[nicheId] || articleTemplates.health
+  const sections = [
+    'Introduction & Hook',
+    'Why This Matters',
+    'Detailed Breakdown',
+    'Expert Analysis',
+    'Product Comparisons',
+    'Pros & Cons',
+    'Our Top Pick',
+    'Conclusion & CTA',
+  ]
 
-  return templates.titles.map((title, index) => {
-    const sections = [
-      'Introduction & Hook',
-      'Why This Matters',
-      'Detailed Breakdown',
-      'Expert Analysis',
-      'Product Comparisons',
-      'Pros & Cons',
-      'Our Top Pick',
-      'Conclusion & CTA',
-    ]
-
-    const content = `# ${title}
-
-${templates.keywords[index].map(k => `**Target Keyword:** ${k}`).join('\n')}
-
----
-
-## Introduction
-
-[Opening hook that grabs attention and establishes authority on the topic. This paragraph addresses the reader's pain point and promises a solution.]
-
-[Personal credibility statement and brief overview of what the article covers.]
-
----
-
-## Why This Matters in 2025
-
-[Current landscape analysis with relevant statistics and trends. Explains why the reader should care about this topic right now.]
-
-[Bridge to the main content — what the reader will learn and how it will benefit them.]
-
----
-
-## Detailed Breakdown
-
-[Comprehensive analysis of the topic with expert-level insights. Includes data points, research findings, and practical advice.]
-
-[Sub-sections for each key point, formatted for easy scanning with bullet points and bold highlights.]
-
-### Key Finding #1
-[Detailed explanation with supporting evidence]
-
-### Key Finding #2
-[Detailed explanation with supporting evidence]
-
-### Key Finding #3
-[Detailed explanation with supporting evidence]
-
----
-
-## Product Comparisons & Recommendations
-
-[**🔗 YOUR AFFILIATE LINK GOES HERE**]
-
-[Objective comparison of recommended products/services. Includes features, pricing, and honest pros/cons.]
-
-### Our Top Picks:
-
-${templates.products[index].map((p, i) => `${i + 1}. **${p}** — [Your affiliate link] — Brief description of why this product stands out.`).join('\n')}
-
----
-
-## Pros & Cons Summary
-
-| Pros | Cons |
-|------|------|
-| [Key benefit 1] | [Limitation 1] |
-| [Key benefit 2] | [Limitation 2] |
-| [Key benefit 3] | [Limitation 3] |
-
----
-
-## Our #1 Pick
-
-[Highlighted recommendation with clear reasoning. This is where the primary affiliate link converts best.]
-
-[**🔗 YOUR AFFILIATE LINK GOES HERE**]
-
----
-
-## Conclusion
-
-[Summary of key points. Reinforces the value of taking action. Final CTA directing reader to the recommended product/service with your affiliate link.]
-
-[Invitation to share, comment, or explore related content.]
-
----
-
-*Keywords: ${templates.keywords[index].join(', ')}*
-*Word Count: ~1,500 | Images: 3 (Header, Mid-Article, Conclusion)*
-*Suggested Products: ${templates.products[index].join(', ')}*`
-
-    return {
-      id: `${nicheId}-${index + 1}`,
-      niche: nicheId,
-      title,
-      excerpt: `A comprehensive, SEO-optimized authority article targeting "${templates.keywords[index][0]}" with strategic affiliate placement points for ${templates.products[index].join(', ')}.`,
-      wordCount: 1500,
-      sections,
-      seoKeywords: templates.keywords[index],
-      suggestedProducts: templates.products[index],
-      hasImages: true,
-      content,
-    }
-  })
+  const briefs: ArticleBrief[] = []
+  for (const [nicheId, templates] of Object.entries(data)) {
+    templates.titles.forEach((title, index) => {
+      briefs.push({
+        id: `${nicheId}-${index + 1}`,
+        niche: nicheId,
+        title,
+        seoKeywords: templates.keywords[index],
+        suggestedProducts: templates.products[index],
+        sections,
+      })
+    })
+  }
+  return briefs
 }
 
-const ALL_ARTICLES: PrewrittenArticle[] = NICHES.flatMap(n =>
-  generateArticlesForNiche(n.id, n.label)
-)
+const ALL_BRIEFS = getArticleBriefs()
+
+const LOADING_MESSAGES = [
+  'Researching top-ranking content for this topic...',
+  'Analyzing competitor articles and SEO gaps...',
+  'Crafting an attention-grabbing introduction...',
+  'Writing expert analysis with supporting data...',
+  'Building product comparison sections...',
+  'Optimizing for your target keywords...',
+  'Adding strategic link placement points...',
+  'Polishing the conclusion and call-to-action...',
+  'Running final SEO quality checks...',
+  'Almost done — finalizing your article...',
+]
 
 export default function InfinitePage() {
   const router = useRouter()
-  const { isUpsellUnlocked, setCurrentArticle, addArticle, articles } = useAppStore()
+  const { isUpsellUnlocked, setCurrentArticle, updateArticle, articles } = useAppStore()
 
   const [isChecking, setIsChecking] = useState(true)
   const [selectedNiche, setSelectedNiche] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [previewArticle, setPreviewArticle] = useState<PrewrittenArticle | null>(null)
+  const [selectedBrief, setSelectedBrief] = useState<ArticleBrief | null>(null)
   const [copied, setCopied] = useState(false)
   const [usedArticles, setUsedArticles] = useState<Set<string>>(new Set())
+
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedContent, setGeneratedContent] = useState('')
+  const [loadingMsgIndex, setLoadingMsgIndex] = useState(0)
+  const [generatingImages, setGeneratingImages] = useState(false)
+  const [generatedImages, setGeneratedImages] = useState<{ position: string; url: string }[]>([])
+  const [imageProgress, setImageProgress] = useState('')
 
   useEffect(() => {
     if (!isUpsellUnlocked('infinite')) {
@@ -571,68 +502,168 @@ export default function InfinitePage() {
     }
   }, [isUpsellUnlocked, router])
 
-  const filteredArticles = useMemo(() => {
-    let articles = ALL_ARTICLES
+  useEffect(() => {
+    if (!isGenerating) return
+    const interval = setInterval(() => {
+      setLoadingMsgIndex(prev => (prev + 1) % LOADING_MESSAGES.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [isGenerating])
+
+  const filteredBriefs = useMemo(() => {
+    let items = ALL_BRIEFS
     if (selectedNiche) {
-      articles = articles.filter(a => a.niche === selectedNiche)
+      items = items.filter(a => a.niche === selectedNiche)
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
-      articles = articles.filter(
+      items = items.filter(
         a =>
           a.title.toLowerCase().includes(q) ||
           a.seoKeywords.some(k => k.toLowerCase().includes(q))
       )
     }
-    return articles
+    return items
   }, [selectedNiche, searchQuery])
 
-  const handleUseArticle = (article: PrewrittenArticle) => {
+  const handleGenerateArticle = async (brief: ArticleBrief) => {
+    setIsGenerating(true)
+    setGeneratedContent('')
+    setLoadingMsgIndex(0)
+
+    try {
+      const nicheLabel = NICHES.find(n => n.id === brief.niche)?.label || brief.niche
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: brief.title,
+          platform: 'linkedin',
+          tone: 'authoritative',
+          length: 'long',
+          niche: nicheLabel,
+          affiliateLink: '',
+          seoKeywords: brief.seoKeywords,
+          suggestedProducts: brief.suggestedProducts,
+          customPrompt: `Write a complete, publish-ready 1500-word SEO authority article titled "${brief.title}".
+
+Niche: ${nicheLabel}
+Target SEO Keywords: ${brief.seoKeywords.join(', ')}
+Suggested Products to Mention: ${brief.suggestedProducts.join(', ')}
+
+Requirements:
+- Write REAL, complete paragraphs with actual content — NOT placeholders or brackets
+- Use the SEO keywords naturally throughout
+- Include an engaging introduction, detailed analysis sections, product comparisons mentioning the suggested products, a pros/cons section, a clear #1 recommendation, and a strong conclusion with CTA
+- Where product links would go, write: [YOUR LINK HERE] so the user can replace them
+- Make it informative, engaging, and ready to publish on LinkedIn, Medium, or a blog
+- Format with proper HTML: use <h2> for main sections, <h3> for sub-sections, <p> for paragraphs, <strong> for emphasis, <ul>/<li> for lists
+- Do NOT use markdown formatting — use HTML only
+- Do NOT include template placeholders in brackets like [Opening hook...] — write the actual content`
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate article')
+      }
+
+      const data = await response.json()
+      const content = [data.hook, data.body, data.cta]
+        .filter(Boolean)
+        .map(part => (typeof part === 'string' ? part : ''))
+        .join('\n\n')
+
+      setGeneratedContent(content)
+    } catch (err: any) {
+      console.error('Generation error:', err)
+      setGeneratedContent('')
+      alert(err.message || 'Failed to generate. Please try again.')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleGenerateImages = async () => {
+    if (!selectedBrief) return
+    setGeneratingImages(true)
+    setGeneratedImages([])
+
+    const positions = [
+      { position: 'top', label: 'Header Image', prompt: `Professional hero image for an article about "${selectedBrief.title}"` },
+      { position: 'middle', label: 'Mid-Article Image', prompt: `Informative visual or infographic related to "${selectedBrief.title}"` },
+      { position: 'bottom', label: 'Conclusion Image', prompt: `Engaging call-to-action visual for an article about "${selectedBrief.title}"` },
+    ]
+
+    const images: { position: string; url: string }[] = []
+
+    for (const pos of positions) {
+      setImageProgress(`Generating ${pos.label}...`)
+      try {
+        const fullPrompt = `Cinematic, highly detailed professional photography. Subject: ${pos.prompt}. Style: photorealistic, 8k, modern, clear, engaging. IMPORTANT: Do not include any text, letters, or words in the image.`
+        const resp = await fetch('/api/generate-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: fullPrompt }),
+        })
+        const data = await resp.json()
+        if (data.url) {
+          images.push({ position: pos.position, url: data.url })
+          setGeneratedImages([...images])
+        }
+      } catch (err) {
+        console.error(`Failed to generate ${pos.label}:`, err)
+      }
+    }
+
+    setImageProgress('')
+    setGeneratingImages(false)
+  }
+
+  const handleSaveArticle = (navigateTo: 'saved' | 'publish') => {
+    if (!selectedBrief || !generatedContent) return
+
+    const nicheLabel = NICHES.find(n => n.id === selectedBrief.niche)?.label || ''
+    const articleImages = generatedImages.map((img, i) => ({
+      id: `infinite-${selectedBrief.id}-${i}`,
+      url: img.url,
+      alt: img.position === 'top' ? 'Header Image' : img.position === 'middle' ? 'Mid-Article Image' : 'Conclusion Image',
+      section: img.position === 'top' ? 'Header Image' : img.position === 'middle' ? 'Mid-Article Image' : 'Conclusion Image',
+      position: img.position as 'top' | 'middle' | 'bottom',
+    }))
+
     const newArticle = {
       id: crypto.randomUUID(),
       user_id: '',
-      title: article.title,
-      content: article.content,
+      title: selectedBrief.title,
+      content: generatedContent,
       platform: 'linkedin' as const,
       tone: 'authoritative' as const,
       length: 'long' as const,
       status: 'draft' as const,
-      niche: NICHES.find(n => n.id === article.niche)?.label || '',
-      images: [],
+      niche: nicheLabel,
+      images: articleImages,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }
 
-    addArticle(newArticle)
+    useAppStore.getState().addArticle(newArticle)
     setCurrentArticle(newArticle)
-    setUsedArticles(prev => new Set(prev).add(article.id))
-    router.push('/saved')
+    setUsedArticles(prev => new Set(prev).add(selectedBrief.id))
+
+    try {
+      fetch('/api/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newArticle),
+      })
+    } catch {}
+
+    router.push(navigateTo === 'publish' ? '/publish' : '/saved')
   }
 
-  const handleUseAndPublish = (article: PrewrittenArticle) => {
-    const newArticle = {
-      id: crypto.randomUUID(),
-      user_id: '',
-      title: article.title,
-      content: article.content,
-      platform: 'linkedin' as const,
-      tone: 'authoritative' as const,
-      length: 'long' as const,
-      status: 'draft' as const,
-      niche: NICHES.find(n => n.id === article.niche)?.label || '',
-      images: [],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
-
-    addArticle(newArticle)
-    setCurrentArticle(newArticle)
-    setUsedArticles(prev => new Set(prev).add(article.id))
-    router.push('/publish')
-  }
-
-  const handleCopyContent = async (content: string) => {
-    await navigator.clipboard.writeText(content)
+  const handleCopyContent = async () => {
+    const text = generatedContent.replace(/<[^>]*>/g, '')
+    await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -645,12 +676,13 @@ export default function InfinitePage() {
     )
   }
 
-  if (previewArticle) {
-    const niche = NICHES.find(n => n.id === previewArticle.niche)
+  // ═══════════════ ARTICLE DETAIL VIEW ═══════════════
+  if (selectedBrief) {
+    const niche = NICHES.find(n => n.id === selectedBrief.niche)
     return (
       <div className="max-w-5xl mx-auto animate-fade-in">
         <button
-          onClick={() => setPreviewArticle(null)}
+          onClick={() => { setSelectedBrief(null); setGeneratedContent(''); setGeneratedImages([]) }}
           className="flex items-center gap-2 text-locus-muted hover:text-white transition-colors mb-6"
         >
           <ArrowLeft size={18} />
@@ -658,6 +690,7 @@ export default function InfinitePage() {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -665,20 +698,71 @@ export default function InfinitePage() {
                 <Badge variant="default">{niche?.emoji} {niche?.label}</Badge>
               </div>
               <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-                {previewArticle.title}
+                {selectedBrief.title}
               </h1>
               <p className="text-sm text-locus-muted">
-                {previewArticle.wordCount} words &bull; 3 images included &bull; SEO-optimized
+                ~1,500 words &bull; SEO-optimized &bull; Product placements included
               </p>
             </div>
 
-            <Card>
-              <div className="prose prose-invert max-w-none text-sm text-locus-text leading-relaxed whitespace-pre-wrap">
-                {previewArticle.content}
-              </div>
-            </Card>
+            {/* Article Content or Generate Button */}
+            {generatedContent ? (
+              <Card>
+                {/* Header image */}
+                {generatedImages.find(i => i.position === 'top') && (
+                  <div className="w-full aspect-video rounded-xl overflow-hidden mb-6 border border-locus-border">
+                    <img src={generatedImages.find(i => i.position === 'top')!.url} alt="Header" className="w-full h-full object-cover" />
+                  </div>
+                )}
+
+                <div
+                  className="prose prose-invert max-w-none text-sm text-locus-text leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: generatedContent }}
+                />
+
+                {/* Mid image */}
+                {generatedImages.find(i => i.position === 'middle') && (
+                  <div className="w-full aspect-video rounded-xl overflow-hidden my-6 border border-locus-border">
+                    <img src={generatedImages.find(i => i.position === 'middle')!.url} alt="Mid-Article" className="w-full h-full object-cover" />
+                  </div>
+                )}
+
+                {/* Bottom image */}
+                {generatedImages.find(i => i.position === 'bottom') && (
+                  <div className="w-full aspect-video rounded-xl overflow-hidden mt-6 border border-locus-border">
+                    <img src={generatedImages.find(i => i.position === 'bottom')!.url} alt="Conclusion" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </Card>
+            ) : isGenerating ? (
+              <Card className="py-16 text-center">
+                <Loader2 size={32} className="animate-spin text-locus-teal mx-auto mb-4" />
+                <p className="text-white font-medium mb-2">Writing your article...</p>
+                <p className="text-sm text-locus-muted animate-pulse">
+                  {LOADING_MESSAGES[loadingMsgIndex]}
+                </p>
+              </Card>
+            ) : (
+              <Card className="border-dashed border-locus-border text-center py-12">
+                <Sparkles size={32} className="text-amber-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">Ready to Generate</h3>
+                <p className="text-sm text-locus-muted mb-6 max-w-md mx-auto">
+                  Our AI will write a complete, publish-ready 1,500-word authority article
+                  optimized for the keywords and products listed on the right.
+                </p>
+                <Button
+                  onClick={() => handleGenerateArticle(selectedBrief)}
+                  size="lg"
+                  className="bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400"
+                >
+                  <Sparkles size={18} />
+                  <span>Generate Full Article</span>
+                </Button>
+              </Card>
+            )}
           </div>
 
+          {/* Sidebar */}
           <div className="space-y-6">
             <Card className="sticky top-8">
               <h3 className="font-semibold text-white mb-4">Article Details</h3>
@@ -687,7 +771,7 @@ export default function InfinitePage() {
                 <div>
                   <label className="text-xs text-locus-muted uppercase tracking-wider">SEO Keywords</label>
                   <div className="flex flex-wrap gap-1.5 mt-2">
-                    {previewArticle.seoKeywords.map(k => (
+                    {selectedBrief.seoKeywords.map(k => (
                       <span key={k} className="px-2 py-1 rounded-lg bg-[rgba(20,184,166,0.1)] text-locus-teal text-xs border border-[rgba(20,184,166,0.2)]">
                         {k}
                       </span>
@@ -696,9 +780,9 @@ export default function InfinitePage() {
                 </div>
 
                 <div>
-                  <label className="text-xs text-locus-muted uppercase tracking-wider">Suggested Affiliate Products</label>
+                  <label className="text-xs text-locus-muted uppercase tracking-wider">Suggested Products</label>
                   <div className="mt-2 space-y-2">
-                    {previewArticle.suggestedProducts.map(p => (
+                    {selectedBrief.suggestedProducts.map(p => (
                       <div key={p} className="flex items-center gap-2 text-sm">
                         <DollarSign size={14} className="text-amber-400 shrink-0" />
                         <span className="text-locus-text">{p}</span>
@@ -708,22 +792,9 @@ export default function InfinitePage() {
                 </div>
 
                 <div>
-                  <label className="text-xs text-locus-muted uppercase tracking-wider">Images</label>
-                  <div className="mt-2 space-y-2">
-                    {['Header Image', 'Mid-Article Image', 'Conclusion Image'].map(img => (
-                      <div key={img} className="flex items-center gap-2 text-sm">
-                        <ImageIcon size={14} className="text-emerald-400 shrink-0" />
-                        <span className="text-locus-text">{img}</span>
-                        <Check size={12} className="ml-auto text-emerald-400" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs text-locus-muted uppercase tracking-wider">Sections</label>
+                  <label className="text-xs text-locus-muted uppercase tracking-wider">Article Sections</label>
                   <div className="mt-2 space-y-1.5">
-                    {previewArticle.sections.map((s, i) => (
+                    {selectedBrief.sections.map((s, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm">
                         <span className="w-5 h-5 rounded-md bg-[rgba(255,255,255,0.05)] flex items-center justify-center text-[10px] text-locus-muted shrink-0">{i + 1}</span>
                         <span className="text-locus-text">{s}</span>
@@ -731,39 +802,58 @@ export default function InfinitePage() {
                     ))}
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-6 pt-6 border-t border-locus-border space-y-2">
-                <h4 className="text-xs text-locus-muted uppercase tracking-wider mb-3">What to do</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">1</span>
-                    <span className="text-locus-text">Find matching products on Digistore24, Amazon, Etsy, or eBay</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">2</span>
-                    <span className="text-locus-text">Replace affiliate link placeholders with your links</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">3</span>
-                    <span className="text-locus-text">Publish to your chosen platform and start earning</span>
+                {/* Images Section */}
+                <div>
+                  <label className="text-xs text-locus-muted uppercase tracking-wider">Images</label>
+                  <div className="mt-2 space-y-2">
+                    {['Header Image', 'Mid-Article Image', 'Conclusion Image'].map((img, i) => {
+                      const positions = ['top', 'middle', 'bottom']
+                      const generated = generatedImages.find(gi => gi.position === positions[i])
+                      return (
+                        <div key={img} className="flex items-center gap-2 text-sm">
+                          <ImageIcon size={14} className={generated ? 'text-emerald-400' : 'text-locus-muted'} />
+                          <span className="text-locus-text flex-1">{img}</span>
+                          {generated ? (
+                            <Check size={12} className="text-emerald-400" />
+                          ) : (
+                            <span className="text-[10px] text-locus-muted">Pending</span>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 space-y-2">
-                <Button onClick={() => handleCopyContent(previewArticle.content)} className="w-full">
-                  {copied ? <Check size={16} /> : <Copy size={16} />}
-                  <span>{copied ? 'Copied!' : 'Copy Article'}</span>
-                </Button>
-                <Button onClick={() => handleUseArticle(previewArticle)} variant="secondary" className="w-full">
-                  <FileText size={16} />
-                  <span>Save to My Portfolio</span>
-                </Button>
-                <Button onClick={() => handleUseAndPublish(previewArticle)} variant="secondary" className="w-full">
-                  <Send size={16} />
-                  <span>Save & Publish</span>
-                </Button>
+              {/* Action Buttons */}
+              <div className="mt-6 pt-6 border-t border-locus-border space-y-2">
+                {generatedContent && !generatedImages.length && (
+                  <Button
+                    onClick={handleGenerateImages}
+                    className="w-full bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400"
+                    loading={generatingImages}
+                  >
+                    <ImageIcon size={16} />
+                    <span>{generatingImages ? imageProgress || 'Generating...' : 'Generate 3 Images'}</span>
+                  </Button>
+                )}
+                {generatedContent && (
+                  <>
+                    <Button onClick={handleCopyContent} variant="secondary" className="w-full">
+                      {copied ? <Check size={16} /> : <Copy size={16} />}
+                      <span>{copied ? 'Copied!' : 'Copy Article'}</span>
+                    </Button>
+                    <Button onClick={() => handleSaveArticle('saved')} variant="secondary" className="w-full">
+                      <Save size={16} />
+                      <span>Save to My Portfolio</span>
+                    </Button>
+                    <Button onClick={() => handleSaveArticle('publish')} className="w-full">
+                      <Send size={16} />
+                      <span>Save & Publish</span>
+                    </Button>
+                  </>
+                )}
               </div>
             </Card>
           </div>
@@ -772,6 +862,7 @@ export default function InfinitePage() {
     )
   }
 
+  // ═══════════════ LIBRARY BROWSING VIEW ═══════════════
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8 animate-fade-in">
@@ -782,19 +873,20 @@ export default function InfinitePage() {
           <Badge variant="cyan">Infinite Mode</Badge>
         </div>
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-          100 Ready-to-Publish Authority Articles
+          100 Ready-to-Generate Authority Articles
         </h1>
         <p className="text-locus-muted max-w-2xl">
-          SEO-optimized articles across 10 profitable niches — each structured to rank on Google
-          and strategically place your affiliate links for passive commissions. Images included.
+          SEO-researched article topics across 10 profitable niches. Pick one, and our AI writes a full
+          1,500-word article with images — ready to add your links and publish.
         </p>
       </div>
 
+      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 animate-fade-in stagger-1">
         {[
-          { label: 'Total Articles', value: '100', icon: FileText, color: 'text-locus-teal' },
+          { label: 'Article Topics', value: '100', icon: FileText, color: 'text-locus-teal' },
           { label: 'Niches Covered', value: '10', icon: Globe, color: 'text-amber-400' },
-          { label: 'Images Included', value: '300', icon: ImageIcon, color: 'text-emerald-400' },
+          { label: 'AI-Written', value: '1,500w', icon: Sparkles, color: 'text-emerald-400' },
           { label: 'SEO-Optimized', value: '100%', icon: TrendingUp, color: 'text-cyan-400' },
         ].map((stat, i) => (
           <Card key={i} className="text-center py-4">
@@ -805,16 +897,18 @@ export default function InfinitePage() {
         ))}
       </div>
 
+      {/* How It Works */}
       <Card className="mb-8 animate-fade-in stagger-2 border-[rgba(34,211,238,0.2)] bg-[rgba(34,211,238,0.03)]">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles size={18} className="text-cyan-400" />
-          <h3 className="font-semibold text-white">How It Works — 3 Simple Steps</h3>
+          <h3 className="font-semibold text-white">How It Works</h3>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
           {[
-            { step: '1', title: 'Pick an Article', desc: 'Browse 100 pre-written articles across 10 niches. Every article is SEO-optimized with images ready to go.', icon: BookOpen },
-            { step: '2', title: 'Add Your Links', desc: 'Find matching products on Digistore24, Amazon, Etsy, or eBay. Replace the affiliate placeholders with your links.', icon: LinkIcon },
-            { step: '3', title: 'Publish & Earn', desc: 'Post on LinkedIn, Medium, Quora, Reddit, or X. Start earning passive commissions from day one.', icon: DollarSign },
+            { step: '1', title: 'Pick a Topic', desc: 'Browse 100 SEO-researched topics across 10 niches.', icon: BookOpen },
+            { step: '2', title: 'Generate Article', desc: 'AI writes a complete 1,500-word authority article.', icon: Sparkles },
+            { step: '3', title: 'Generate Images', desc: 'AI creates 3 professional images for your article.', icon: ImageIcon },
+            { step: '4', title: 'Add Links & Publish', desc: 'Replace link placeholders, publish, and earn.', icon: DollarSign },
           ].map(item => (
             <div key={item.step} className="flex gap-3">
               <div className="w-8 h-8 rounded-lg bg-cyan-400/15 flex items-center justify-center shrink-0">
@@ -829,12 +923,13 @@ export default function InfinitePage() {
         </div>
       </Card>
 
+      {/* Search + Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6 animate-fade-in stagger-3">
         <div className="flex-1 relative">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-locus-muted" />
           <input
             type="text"
-            placeholder="Search articles by title or keyword..."
+            placeholder="Search by title or keyword..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-3 rounded-xl bg-[rgba(255,255,255,0.05)] border border-locus-border text-white placeholder-locus-muted text-sm focus:outline-none focus:border-locus-teal transition-colors"
@@ -851,6 +946,7 @@ export default function InfinitePage() {
         )}
       </div>
 
+      {/* Niche Pills */}
       <div className="flex flex-wrap gap-2 mb-8 animate-fade-in stagger-3">
         <button
           onClick={() => setSelectedNiche(null)}
@@ -877,16 +973,17 @@ export default function InfinitePage() {
         ))}
       </div>
 
+      {/* Article Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredArticles.map((article, index) => {
-          const niche = NICHES.find(n => n.id === article.niche)
-          const isUsed = usedArticles.has(article.id)
+        {filteredBriefs.map((brief, index) => {
+          const niche = NICHES.find(n => n.id === brief.niche)
+          const isUsed = usedArticles.has(brief.id)
           return (
             <Card
-              key={article.id}
+              key={brief.id}
               className={`animate-fade-in cursor-pointer group hover:border-[rgba(20,184,166,0.3)] transition-all ${isUsed ? 'opacity-60' : ''}`}
               style={{ animationDelay: `${Math.min(index * 0.05, 0.5)}s` }}
-              onClick={() => setPreviewArticle(article)}
+              onClick={() => setSelectedBrief(brief)}
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-linear-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shrink-0 text-lg border border-cyan-400/20">
@@ -895,24 +992,17 @@ export default function InfinitePage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/70">{niche?.label}</span>
-                    {isUsed && <Badge variant="success" className="text-[9px]">Used</Badge>}
+                    {isUsed && <Badge variant="success" className="text-[9px]">Generated</Badge>}
                   </div>
                   <h3 className="font-semibold text-white text-sm mb-2 line-clamp-2 group-hover:text-locus-teal transition-colors">
-                    {article.title}
+                    {brief.title}
                   </h3>
-                  <div className="flex items-center gap-3 text-xs text-locus-muted">
-                    <span className="flex items-center gap-1">
-                      <FileText size={11} />
-                      {article.wordCount} words
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <ImageIcon size={11} />
-                      3 images
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <TrendingUp size={11} />
-                      SEO
-                    </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {brief.seoKeywords.map(k => (
+                      <span key={k} className="text-[10px] px-1.5 py-0.5 rounded bg-[rgba(255,255,255,0.05)] text-locus-muted">
+                        {k}
+                      </span>
+                    ))}
                   </div>
                 </div>
                 <ChevronRight size={16} className="text-locus-muted group-hover:text-locus-teal transition-colors shrink-0 mt-1" />
@@ -922,7 +1012,7 @@ export default function InfinitePage() {
         })}
       </div>
 
-      {filteredArticles.length === 0 && (
+      {filteredBriefs.length === 0 && (
         <Card className="text-center py-12">
           <Search size={28} className="text-locus-muted mx-auto mb-3" />
           <p className="text-locus-muted">No articles match your search</p>
