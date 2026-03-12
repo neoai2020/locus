@@ -68,7 +68,7 @@ export default function ArticlePage() {
       </div>
 
       {/* Tabs */}
-      <div className="px-4 md:px-0 flex items-center gap-2 border-b border-white/5 pb-0">
+      <div className="px-4 md:px-0 flex items-center justify-center gap-2 border-b border-white/5 pb-0">
         {tabs.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-5 py-3.5 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${
@@ -87,7 +87,7 @@ export default function ArticlePage() {
       {/* Content Area */}
       <div className="px-4 md:px-0">
         {activeTab === 'content' && (
-          <div className="max-w-4xl space-y-6">
+          <div className="max-w-4xl mx-auto space-y-6">
             <Card className="bg-white/2 border-white/5 p-8 md:p-12 rounded-2xl relative">
               <button onClick={() => handleCopy(article.content, 999)}
                 className={`absolute top-6 right-6 p-2.5 rounded-xl transition-all ${copiedIndex === 999 ? 'bg-blue-600 text-white' : 'bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white'}`}
@@ -102,7 +102,7 @@ export default function ArticlePage() {
         )}
 
         {activeTab === 'social' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-5xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-5xl mx-auto">
             {article.socialPosts.map((post, i) => (
               <Card key={i} className="bg-white/2 border-white/5 p-5 rounded-2xl space-y-3 hover:border-blue-500/20 transition-all">
                 <div className="flex items-center justify-between">
@@ -120,7 +120,7 @@ export default function ArticlePage() {
         )}
 
         {activeTab === 'share' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {article.shareDirectory.map((dir, i) => (
               <Card key={i} className="bg-white/2 border-white/5 p-6 rounded-2xl space-y-4 hover:bg-white/5 transition-all text-center">
                 <div className="w-14 h-14 rounded-xl bg-blue-600/15 text-blue-500 flex items-center justify-center mx-auto">

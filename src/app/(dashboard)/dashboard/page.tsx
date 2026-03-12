@@ -100,31 +100,24 @@ export default function DashboardPage() {
       </div>
 
       {/* 2. Training Section */}
-      <Card className="mb-10 animate-fade-in stagger-1 p-0 overflow-hidden">
+      <Card className="mb-10 animate-fade-in stagger-1 p-0 overflow-hidden rounded-3xl">
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="relative aspect-video md:aspect-auto bg-linear-to-br from-locus-darker to-locus-dark">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center mx-auto mb-4 cursor-pointer hover:scale-110 transition-transform group">
-                  <Play size={32} className="text-white ml-1 group-hover:scale-110 transition-transform" />
-                </div>
-                <p className="text-sm text-locus-muted">Watch: 3 min</p>
-              </div>
-            </div>
-            <div className="absolute top-4 left-4">
-              <Badge variant="purple">
-                <GraduationCap size={12} className="mr-1" />
-                Training
-              </Badge>
-            </div>
-            <div className="absolute inset-0 bg-linear-to-t from-locus-dark via-transparent to-transparent opacity-50" />
+          <div className="relative aspect-video md:aspect-auto md:min-h-[320px] bg-locus-darker overflow-hidden">
+            <iframe
+              src="https://player.vimeo.com/video/1172911144?badge=0&autopause=0&player_id=0&app_id=58479"
+              className="absolute inset-0 w-full h-full"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+              allowFullScreen
+              title="Quick Start Training"
+            />
           </div>
           
-          <div className="p-6 flex flex-col justify-center">
-            <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+          <div className="p-8 md:p-12 flex flex-col justify-center">
+            <h2 className="text-2xl font-bold text-white mb-3" style={{ fontFamily: 'var(--font-display)' }}>
               Quick Start: Create Your First Viral Article
             </h2>
-            <p className="text-locus-muted mb-4">
+            <p className="text-locus-muted mb-6">
               Learn how to generate authority-building content in under 3 minutes. 
               This video walks you through the entire process from topic to publish.
             </p>
