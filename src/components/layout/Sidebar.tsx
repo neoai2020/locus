@@ -39,7 +39,7 @@ const mainNavItems = [
 const premiumNavItems = [
   { href: '/upsell/10x', icon: Zap, label: '10X Mode', type: '10x' as const, gradient: 'from-yellow-500 to-orange-500' },
   { href: '/upsell/infinite', icon: Infinity, label: 'Infinite', type: 'infinite' as const, gradient: 'from-blue-500 to-cyan-500' },
-  { href: '/upsell/automation', icon: Bot, label: 'Automation', type: 'automation' as const, gradient: 'from-purple-500 to-pink-500' },
+  { href: '/automation', icon: Bot, label: 'Automation', type: 'automation' as const, gradient: 'from-purple-500 to-pink-500' },
   { href: '/upsell/dfy', icon: Package, label: 'Done-For-You', type: 'dfy' as const, gradient: 'from-emerald-500 to-teal-500' },
 ]
 
@@ -110,9 +110,7 @@ export default function Sidebar() {
             </div>
           )}
           {!sidebarOpen && (
-            <div className="flex justify-center mb-3">
-              <div className="w-8 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
-            </div>
+              <div className="w-8 h-px bg-linear-to-r from-transparent via-amber-400/40 to-transparent" />
           )}
           <div className="space-y-1">
             {premiumNavItems.map((item) => {
