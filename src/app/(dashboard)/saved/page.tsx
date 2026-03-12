@@ -145,7 +145,7 @@ export default function MyPortfolioPage() {
 
   const getPlatformIcon = (platform: Platform | string[]) => {
     const firstPlatform = Array.isArray(platform) ? platform[0] : platform
-    return platformIcons[firstPlatform] || Globe
+    return platformIcons[firstPlatform] || FileText
   }
 
   // Affiliate link handlers
