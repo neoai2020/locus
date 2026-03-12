@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Send,
   Copy,
@@ -10,7 +10,6 @@ import {
   FileText,
   Hash,
   MessageSquare,
-  Lightbulb,
   AlertTriangle,
   Loader2,
   Wand2,
@@ -22,12 +21,14 @@ import {
   Sparkles,
   Download,
   Image as ImageIcon,
+  Clock,
+  Search,
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { useAppStore } from '@/store'
-import { PLATFORM_INFO, Platform } from '@/types'
+import { PLATFORM_INFO, Platform, Article } from '@/types'
 
 const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   Linkedin,
@@ -43,36 +44,11 @@ const platformCards: {
   gradient: string
   tagline: string
 }[] = [
-  {
-    id: 'linkedin',
-    name: 'LinkedIn',
-    gradient: 'from-blue-600 to-blue-700',
-    tagline: 'B2B, thought leadership & professional authority',
-  },
-  {
-    id: 'quora',
-    name: 'Quora',
-    gradient: 'from-red-600 to-red-700',
-    tagline: 'Answer-based SEO & evergreen Google traffic',
-  },
-  {
-    id: 'medium',
-    name: 'Medium',
-    gradient: 'from-gray-700 to-gray-800',
-    tagline: 'Long-form content, tutorials & publication reach',
-  },
-  {
-    id: 'reddit',
-    name: 'Reddit',
-    gradient: 'from-orange-500 to-orange-600',
-    tagline: 'Community-driven traffic & niche subreddit reach',
-  },
-  {
-    id: 'twitter',
-    name: 'X (Twitter)',
-    gradient: 'from-sky-500 to-sky-600',
-    tagline: 'Viral threads, hot takes & real-time engagement',
-  },
+  { id: 'linkedin', name: 'LinkedIn', gradient: 'from-blue-600 to-blue-700', tagline: 'B2B, thought leadership & professional authority' },
+  { id: 'quora', name: 'Quora', gradient: 'from-red-600 to-red-700', tagline: 'Answer-based SEO & evergreen Google traffic' },
+  { id: 'medium', name: 'Medium', gradient: 'from-gray-700 to-gray-800', tagline: 'Long-form content, tutorials & publication reach' },
+  { id: 'reddit', name: 'Reddit', gradient: 'from-orange-500 to-orange-600', tagline: 'Community-driven traffic & niche subreddit reach' },
+  { id: 'twitter', name: 'X (Twitter)', gradient: 'from-sky-500 to-sky-600', tagline: 'Viral threads, hot takes & real-time engagement' },
 ]
 
 interface SuggestedTag {
@@ -81,13 +57,48 @@ interface SuggestedTag {
 }
 
 export default function PublishPage() {
-  const { currentArticle, updateArticle } = useAppStore()
+  const { currentArticle, setCurrentArticle, updateArticle, articles } = useAppStore()
+
+  // If an article was pre-selected (e.g. from Save & Publish), start at step 2
+  const [step, setStep] = useState<1 | 2 | 3>(currentArticle ? 2 : 1)
+  const [searchQuery, setSearchQuery] = useState('')
   const [copied, setCopied] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null)
   const [activeTab, setActiveTab] = useState<'instructions' | 'seo' | 'tags'>('instructions')
   const [suggestedTags, setSuggestedTags] = useState<SuggestedTag[]>([])
   const [isLoadingTags, setIsLoadingTags] = useState(false)
   const [copiedTag, setCopiedTag] = useState<string | null>(null)
+  const [isLoadingArticles, setIsLoadingArticles] = useState(false)
+
+  useEffect(() => {
+    if (articles.length === 0) {
+      setIsLoadingArticles(true)
+      fetch('/api/articles')
+        .then(r => r.ok ? r.json() : { articles: [] })
+        .then(data => {
+          useAppStore.getState().setArticles(data.articles || [])
+        })
+        .catch(() => {})
+        .finally(() => setIsLoadingArticles(false))
+    }
+  }, [articles.length])
+
+  const filteredArticles = articles.filter(a =>
+    !searchQuery.trim() ||
+    a.title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const handleSelectArticle = (article: Article) => {
+    setCurrentArticle(article)
+    setStep(2)
+  }
+
+  const handleSelectPlatform = (id: Platform) => {
+    setSelectedPlatform(id)
+    setStep(3)
+    setActiveTab('instructions')
+    setSuggestedTags([])
+  }
 
   const handleCopy = async () => {
     if (currentArticle) {
@@ -118,7 +129,6 @@ export default function PublishPage() {
 
   const handleDownloadImages = async () => {
     if (!currentArticle?.images || currentArticle.images.length === 0) return
-
     for (const img of currentArticle.images) {
       try {
         const response = await fetch(img.url)
@@ -137,17 +147,10 @@ export default function PublishPage() {
     }
   }
 
-  const handleSelectPlatform = (id: Platform) => {
-    setSelectedPlatform(id)
-    setActiveTab('instructions')
-    setSuggestedTags([])
-  }
-
   const handleSuggestTags = async () => {
     if (!selectedPlatform || !currentArticle) return
     setIsLoadingTags(true)
     setSuggestedTags([])
-
     try {
       const res = await fetch('/api/suggest-tags', {
         method: 'POST',
@@ -159,11 +162,8 @@ export default function PublishPage() {
           niche: currentArticle.niche || '',
         }),
       })
-
       const data = await res.json()
-      if (data.tags && data.tags.length > 0) {
-        setSuggestedTags(data.tags)
-      }
+      if (data.tags && data.tags.length > 0) setSuggestedTags(data.tags)
     } catch (err) {
       console.error('Failed to suggest tags:', err)
     } finally {
@@ -175,6 +175,11 @@ export default function PublishPage() {
   const PlatformIcon = selectedPlatform ? iconMap[PLATFORM_INFO[selectedPlatform].icon] : null
   const selectedCard = platformCards.find(p => p.id === selectedPlatform)
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header */}
@@ -183,8 +188,49 @@ export default function PublishPage() {
           Publish & Distribute
         </h1>
         <p className="text-locus-muted">
-          Choose a platform, follow the step-by-step guide, and let AI suggest the best tags to maximize reach
+          Select your article, choose a platform, and follow the guide to publish
         </p>
+      </div>
+
+      {/* Step Indicators */}
+      <div className="flex items-center gap-3 mb-8 animate-fade-in stagger-1">
+        {[
+          { num: 1, label: 'Select Article' },
+          { num: 2, label: 'Choose Platform' },
+          { num: 3, label: 'Publish' },
+        ].map((s, i) => {
+          const isActive = step === s.num
+          const isDone = step > s.num
+          return (
+            <div key={s.num} className="flex items-center gap-3 flex-1">
+              <button
+                onClick={() => {
+                  if (s.num === 1) { setStep(1); setSelectedPlatform(null) }
+                  else if (s.num === 2 && currentArticle) { setStep(2); setSelectedPlatform(null) }
+                }}
+                className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all w-full ${
+                  isActive
+                    ? 'bg-[rgba(20,184,166,0.15)] text-locus-teal border border-[rgba(20,184,166,0.3)]'
+                    : isDone
+                      ? 'bg-[rgba(20,184,166,0.08)] text-locus-teal/70 border border-transparent cursor-pointer'
+                      : 'bg-[rgba(255,255,255,0.03)] text-locus-muted border border-transparent'
+                }`}
+              >
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                  isDone
+                    ? 'bg-locus-teal text-white'
+                    : isActive
+                      ? 'bg-locus-teal/20 text-locus-teal'
+                      : 'bg-[rgba(255,255,255,0.08)] text-locus-muted'
+                }`}>
+                  {isDone ? <Check size={12} /> : s.num}
+                </div>
+                <span className="hidden sm:inline">{s.label}</span>
+              </button>
+              {i < 2 && <ChevronRight size={16} className="text-locus-muted/40 shrink-0" />}
+            </div>
+          )
+        })}
       </div>
 
       {/* Manual Posting Notice */}
@@ -197,17 +243,136 @@ export default function PublishPage() {
             <h3 className="font-semibold text-white mb-1">Manual Posting Required</h3>
             <p className="text-sm text-locus-muted">
               Locus generates content but does <strong className="text-white">not auto-post</strong> to any platform.
-              Copy your article below and paste it on your chosen platform following the instructions.
+              Copy your article and paste it on your chosen platform following the instructions.
             </p>
           </div>
         </div>
       </Card>
 
-      {/* Platform Selection Row */}
-      {!selectedPlatform && (
-        <div className="space-y-6 animate-fade-in stagger-2">
+      {/* ─── Step 1: Select Article ─── */}
+      {step === 1 && (
+        <div className="space-y-6 animate-fade-in">
           <h2 className="text-lg font-semibold text-white" style={{ fontFamily: 'var(--font-display)' }}>
-            Choose Your Platform
+            Step 1: Select Your Article
+          </h2>
+
+          <div className="relative">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-locus-muted" />
+            <input
+              type="text"
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-[rgba(255,255,255,0.05)] border border-locus-border text-white placeholder-locus-muted text-sm focus:outline-none focus:border-locus-teal transition-colors"
+            />
+          </div>
+
+          {isLoadingArticles ? (
+            <div className="flex flex-col items-center py-16">
+              <Loader2 size={32} className="animate-spin text-locus-teal mb-4" />
+              <p className="text-locus-muted">Loading your articles...</p>
+            </div>
+          ) : filteredArticles.length > 0 ? (
+            <div className="space-y-3">
+              {filteredArticles.map((article, index) => {
+                const isSelected = currentArticle?.id === article.id
+                return (
+                  <Card
+                    key={article.id}
+                    className={`animate-fade-in cursor-pointer group transition-all ${
+                      isSelected
+                        ? 'border-locus-teal ring-2 ring-[rgba(20,184,166,0.2)]'
+                        : 'hover:border-locus-teal/50'
+                    }`}
+                    style={{ animationDelay: `${Math.min(index * 0.04, 0.4)}s` }}
+                    onClick={() => handleSelectArticle(article)}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-locus-border flex items-center justify-center shrink-0">
+                        <FileText size={20} className="text-locus-muted" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-white text-sm mb-1 line-clamp-1 group-hover:text-locus-teal transition-colors">
+                          {article.title}
+                        </h3>
+                        <p className="text-xs text-locus-muted line-clamp-1 mb-2">
+                          {article.content.substring(0, 120)}...
+                        </p>
+                        <div className="flex items-center gap-3 text-xs text-locus-muted">
+                          <span className="flex items-center gap-1">
+                            <Clock size={11} />
+                            {formatDate(article.created_at)}
+                          </span>
+                          <Badge variant={article.status === 'published' ? 'success' : 'purple'} className="text-[10px]">
+                            {article.status}
+                          </Badge>
+                          {article.images && article.images.length > 0 && (
+                            <span className="flex items-center gap-1 text-emerald-400">
+                              <ImageIcon size={11} />
+                              {article.images.length} images
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <ChevronRight size={16} className="text-locus-muted group-hover:text-locus-teal transition-colors shrink-0 mt-1" />
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          ) : (
+            <Card className="text-center py-16">
+              <div className="w-16 h-16 rounded-2xl bg-locus-border flex items-center justify-center mx-auto mb-4">
+                <FileText className="text-locus-muted" size={28} />
+              </div>
+              <p className="text-locus-muted mb-2">
+                {searchQuery ? 'No articles match your search' : 'No articles yet'}
+              </p>
+              <p className="text-sm text-locus-muted opacity-75">
+                {searchQuery ? 'Try a different search term' : 'Create an article first, then come back to publish'}
+              </p>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* ─── Step 2: Choose Platform ─── */}
+      {step === 2 && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Selected article summary */}
+          {currentArticle && (
+            <Card className="border-locus-teal/30 bg-[rgba(20,184,166,0.03)]">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-locus-teal/15 flex items-center justify-center shrink-0">
+                  <Check size={18} className="text-locus-teal" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-locus-teal font-medium uppercase tracking-wider mb-1">Selected Article</p>
+                  <h3 className="font-semibold text-white text-sm line-clamp-1">{currentArticle.title}</h3>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-locus-muted">
+                    <Badge variant={currentArticle.status === 'published' ? 'success' : 'purple'} className="text-[10px]">
+                      {currentArticle.status}
+                    </Badge>
+                    {currentArticle.images && currentArticle.images.length > 0 && (
+                      <span className="flex items-center gap-1 text-emerald-400">
+                        <ImageIcon size={11} />
+                        {currentArticle.images.length} images
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setStep(1)}
+                  className="text-xs text-locus-muted hover:text-white transition-colors underline underline-offset-2"
+                >
+                  Change
+                </button>
+              </div>
+            </Card>
+          )}
+
+          <h2 className="text-lg font-semibold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+            Step 2: Choose Your Platform
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -217,7 +382,7 @@ export default function PublishPage() {
                 <Card
                   key={platform.id}
                   className="animate-fade-in cursor-pointer group hover:border-locus-teal transition-all"
-                  style={{ animationDelay: `${(index + 2) * 0.1}s` }}
+                  style={{ animationDelay: `${index * 0.08}s` }}
                   onClick={() => handleSelectPlatform(platform.id)}
                 >
                   <div className="flex items-start gap-4">
@@ -234,68 +399,16 @@ export default function PublishPage() {
               )
             })}
           </div>
-
-          {/* Article Preview (no platform selected) */}
-          {currentArticle ? (
-            <Card className="animate-fade-in" style={{ animationDelay: '0.7s' }}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-white">Your Article</h3>
-                <Badge variant={currentArticle.status === 'published' ? 'success' : 'purple'}>
-                  {currentArticle.status}
-                </Badge>
-              </div>
-              <div className="bg-[rgba(255,255,255,0.02)] border border-locus-border rounded-xl p-4 mb-4">
-                <h4 className="font-medium text-white mb-2">{currentArticle.title}</h4>
-                <p className="text-sm text-locus-muted line-clamp-3">
-                  {currentArticle.content.substring(0, 200)}...
-                </p>
-              </div>
-              {currentArticle.images && currentArticle.images.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-xs text-locus-muted mb-2">{currentArticle.images.length} image{currentArticle.images.length !== 1 ? 's' : ''} attached</p>
-                  <div className="flex gap-2">
-                    {currentArticle.images.map((img, i) => (
-                      <div key={i} className="w-14 h-14 rounded-lg bg-[rgba(255,255,255,0.05)] border border-locus-border overflow-hidden">
-                        <img src={img.url} alt={img.alt || 'Article image'} className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={handleCopy}>
-                  {copied ? <Check size={18} /> : <Copy size={18} />}
-                  <span>{copied ? 'Copied!' : 'Copy Article'}</span>
-                </Button>
-                {currentArticle.images && currentArticle.images.length > 0 && (
-                  <Button variant="secondary" onClick={handleDownloadImages}>
-                    <Download size={18} />
-                    <span>Download Images</span>
-                  </Button>
-                )}
-              </div>
-            </Card>
-          ) : (
-            <Card className="animate-fade-in text-center py-12" style={{ animationDelay: '0.7s' }}>
-              <div className="w-16 h-16 rounded-2xl bg-locus-border flex items-center justify-center mx-auto mb-4">
-                <Send className="text-locus-muted" size={28} />
-              </div>
-              <p className="text-locus-muted mb-2">No article selected</p>
-              <p className="text-sm text-locus-muted opacity-75">
-                Create or select an article from your portfolio to publish
-              </p>
-            </Card>
-          )}
         </div>
       )}
 
-      {/* Selected Platform Detail View */}
-      {selectedPlatform && platformInfo && (
+      {/* ─── Step 3: Publish (Instructions / Tips / Tags) ─── */}
+      {step === 3 && selectedPlatform && platformInfo && (
         <div className="space-y-6 animate-fade-in">
           {/* Back + Platform Header */}
           <div className="flex items-center gap-4">
             <button
-              onClick={() => { setSelectedPlatform(null); setSuggestedTags([]) }}
+              onClick={() => { setStep(2); setSelectedPlatform(null); setSuggestedTags([]) }}
               className="w-10 h-10 rounded-xl bg-[rgba(255,255,255,0.05)] border border-locus-border flex items-center justify-center hover:bg-[rgba(255,255,255,0.1)] transition-colors"
             >
               <ArrowLeft size={18} className="text-locus-muted" />
@@ -353,16 +466,15 @@ export default function PublishPage() {
                     <h3 className="font-semibold text-white">Step-by-Step: Post on {platformInfo.name}</h3>
                   </div>
                   <div className="space-y-4">
-                    {platformInfo.instructions.map((step, index) => (
+                    {platformInfo.instructions.map((s, index) => (
                       <div key={index} className="flex gap-4">
                         <div className="w-8 h-8 rounded-lg bg-[rgba(20,184,166,0.15)] flex items-center justify-center shrink-0 text-sm font-bold text-locus-teal">
                           {index + 1}
                         </div>
-                        <p className="text-sm text-locus-text leading-relaxed pt-1">{step}</p>
+                        <p className="text-sm text-locus-text leading-relaxed pt-1">{s}</p>
                       </div>
                     ))}
                   </div>
-
                   <div className="mt-6 pt-6 border-t border-locus-border">
                     <a
                       href={platformInfo.url}
@@ -460,7 +572,6 @@ export default function PublishPage() {
                           </button>
                         </div>
                       ))}
-
                       <div className="pt-4 flex gap-3">
                         <Button onClick={handleSuggestTags} variant="secondary" className="flex-1">
                           <Wand2 size={16} />
@@ -479,8 +590,7 @@ export default function PublishPage() {
 
             {/* Right Sidebar */}
             <div className="space-y-6">
-              {/* Article Card */}
-              {currentArticle ? (
+              {currentArticle && (
                 <Card className="sticky top-8">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-white text-sm">Your Article</h3>
@@ -496,7 +606,6 @@ export default function PublishPage() {
                     </p>
                   </div>
 
-                  {/* Images preview */}
                   {currentArticle.images && currentArticle.images.length > 0 && (
                     <div className="mb-4">
                       <p className="text-xs text-locus-muted mb-2">{currentArticle.images.length} image{currentArticle.images.length !== 1 ? 's' : ''} attached</p>
@@ -531,9 +640,9 @@ export default function PublishPage() {
                     )}
                   </div>
 
-                  {/* Quick Links */}
+                  {/* Platform Switcher */}
                   <div className="mt-6 pt-4 border-t border-locus-border">
-                    <h4 className="text-xs font-medium text-locus-muted uppercase tracking-wider mb-3">All Platforms</h4>
+                    <h4 className="text-xs font-medium text-locus-muted uppercase tracking-wider mb-3">Switch Platform</h4>
                     <div className="space-y-1.5">
                       {platformCards.map(p => {
                         const PIcon = iconMap[PLATFORM_INFO[p.id].icon]
@@ -555,16 +664,6 @@ export default function PublishPage() {
                       })}
                     </div>
                   </div>
-                </Card>
-              ) : (
-                <Card className="text-center py-8">
-                  <div className="w-12 h-12 rounded-2xl bg-locus-border flex items-center justify-center mx-auto mb-3">
-                    <Send className="text-locus-muted" size={20} />
-                  </div>
-                  <p className="text-sm text-locus-muted mb-1">No article selected</p>
-                  <p className="text-xs text-locus-muted opacity-75">
-                    Create or select an article first
-                  </p>
                 </Card>
               )}
             </div>
