@@ -287,6 +287,10 @@ export default function InfinitePage() {
   const [previewArticle, setPreviewArticle] = useState<PrewrittenArticle | null>(null)
   const [copied, setCopied] = useState(false)
   const [usedArticles, setUsedArticles] = useState<Set<string>>(new Set())
+  const [promoLink, setPromoLink] = useState('')
+  const [showPortfolioLinks, setShowPortfolioLinks] = useState(false)
+  const [linkApplied, setLinkApplied] = useState(false)
+  const affiliateLinks = useAppStore(s => s.affiliateLinks)
 
   useEffect(() => {
     if (!isUpsellUnlocked('infinite')) {
@@ -295,6 +299,15 @@ export default function InfinitePage() {
       setIsChecking(false)
     }
   }, [isUpsellUnlocked, router])
+
+  const displayContent = useMemo(() => {
+    if (!previewArticle) return ''
+    if (!promoLink.trim()) return previewArticle.content
+    const url = promoLink.trim()
+    return previewArticle.content
+      .replace(/href='#'/g, `href='${url}' target='_blank' rel='noopener noreferrer'`)
+      .replace(/\[YOUR LINK HERE\]/g, 'Your Promotional Link ✓')
+  }, [previewArticle, promoLink])
 
   const filteredArticles = useMemo(() => {
     let items = ALL_ARTICLES
@@ -314,7 +327,7 @@ export default function InfinitePage() {
       id: crypto.randomUUID(),
       user_id: '',
       title: previewArticle.title,
-      content: previewArticle.content,
+      content: displayContent,
       platform: 'linkedin' as const,
       tone: 'authoritative' as const,
       length: 'long' as const,
@@ -348,7 +361,7 @@ export default function InfinitePage() {
 
   const handleCopyContent = async () => {
     if (!previewArticle) return
-    const text = previewArticle.content.replace(/<[^>]*>/g, '')
+    const text = displayContent.replace(/<[^>]*>/g, '')
     await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -368,7 +381,7 @@ export default function InfinitePage() {
     return (
       <div className="max-w-5xl mx-auto animate-fade-in">
         <button
-          onClick={() => setPreviewArticle(null)}
+          onClick={() => { setPreviewArticle(null); setPromoLink(''); setLinkApplied(false); setShowPortfolioLinks(false) }}
           className="flex items-center gap-2 text-locus-muted hover:text-white transition-colors mb-6"
         >
           <ArrowLeft size={18} />
@@ -391,13 +404,68 @@ export default function InfinitePage() {
             <Card>
               <div
                 className="prose prose-invert max-w-none text-sm text-locus-text leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: previewArticle.content }}
+                dangerouslySetInnerHTML={{ __html: displayContent }}
               />
             </Card>
           </div>
 
           <div className="space-y-6">
-            <Card className="sticky top-8">
+            <Card className="sticky top-8 border-amber-400/30 bg-[rgba(245,158,11,0.03)]">
+              <div className="flex items-center gap-2 mb-3">
+                <LinkIcon size={16} className="text-amber-400" />
+                <h3 className="font-semibold text-white">Your Promotional Link</h3>
+              </div>
+              <p className="text-xs text-locus-muted mb-3">
+                Paste your link below — it will replace all link placeholders in the article automatically.
+              </p>
+              <input
+                type="url"
+                placeholder="https://your-link.com/ref=..."
+                value={promoLink}
+                onChange={e => {
+                  setPromoLink(e.target.value)
+                  setLinkApplied(!!e.target.value.trim())
+                }}
+                className="w-full px-3 py-2.5 rounded-xl bg-[rgba(255,255,255,0.05)] border border-locus-border text-white placeholder-locus-muted text-sm focus:outline-none focus:border-amber-400 transition-colors mb-3"
+              />
+              {linkApplied && (
+                <div className="flex items-center gap-2 text-xs text-emerald-400 mb-3">
+                  <Check size={14} />
+                  <span>Link applied to all placeholders in the article</span>
+                </div>
+              )}
+              {affiliateLinks.length > 0 && (
+                <div>
+                  <button
+                    onClick={() => setShowPortfolioLinks(!showPortfolioLinks)}
+                    className="text-xs text-locus-teal hover:text-white transition-colors flex items-center gap-1"
+                  >
+                    <ChevronRight size={12} className={`transition-transform ${showPortfolioLinks ? 'rotate-90' : ''}`} />
+                    Choose from My Portfolio ({affiliateLinks.length})
+                  </button>
+                  {showPortfolioLinks && (
+                    <div className="mt-2 space-y-1.5 max-h-40 overflow-y-auto">
+                      {affiliateLinks.map(link => (
+                        <button
+                          key={link.id}
+                          onClick={() => {
+                            setPromoLink(link.link)
+                            setLinkApplied(true)
+                            setShowPortfolioLinks(false)
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors ${promoLink === link.link ? 'bg-amber-400/15 border border-amber-400/30 text-amber-400' : 'bg-[rgba(255,255,255,0.03)] border border-locus-border text-locus-text hover:border-locus-teal'}`}
+                        >
+                          <span className="font-medium block truncate">{link.label || link.link}</span>
+                          <span className="text-locus-muted truncate block">{link.link}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </Card>
+
+            <Card>
               <h3 className="font-semibold text-white mb-4">Article Details</h3>
               <div className="space-y-4">
                 <div>
@@ -420,15 +488,15 @@ export default function InfinitePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-locus-muted uppercase tracking-wider">What To Do</label>
+                  <label className="text-xs text-locus-muted uppercase tracking-wider">Quick Steps</label>
                   <div className="mt-2 space-y-2 text-sm">
                     <div className="flex items-start gap-2">
-                      <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">1</span>
-                      <span className="text-locus-text">Replace [YOUR LINK HERE] with your promotional links</span>
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${linkApplied ? 'bg-emerald-400/20 text-emerald-400' : 'bg-amber-400/15 text-amber-400'}`}>{linkApplied ? '✓' : '1'}</span>
+                      <span className="text-locus-text">{linkApplied ? 'Promotional link added!' : 'Add your promotional link above'}</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">2</span>
-                      <span className="text-locus-text">Generate images for the article</span>
+                      <span className="text-locus-text">Save & generate images</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">3</span>
