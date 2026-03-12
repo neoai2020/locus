@@ -249,9 +249,9 @@ export default function ImagesPage() {
         <Card className="animate-fade-in stagger-1 p-0 overflow-hidden">
           {/* Header Image */}
           {headerImg && (
-            <div className="w-full aspect-[21/9] relative">
+            <div className="w-full aspect-21/9 relative">
               <img src={headerImg.url} alt={headerImg.alt} className="w-full h-full object-cover" />
-              <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[var(--color-locus-card)] to-transparent" />
+              <div className="absolute bottom-0 inset-x-0 h-24 bg-linear-to-t from-locus-card to-transparent" />
             </div>
           )}
 
