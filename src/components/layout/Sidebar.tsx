@@ -40,7 +40,7 @@ const premiumNavItems = [
   { href: '/upsell/10x', icon: Zap, label: '10X Mode', type: '10x' as const, gradient: 'from-yellow-500 to-orange-500' },
   { href: '/upsell/infinite', icon: Infinity, label: 'Infinite', type: 'infinite' as const, gradient: 'from-blue-500 to-cyan-500' },
   { href: '/automation', icon: Bot, label: 'Automation', type: 'automation' as const, gradient: 'from-purple-500 to-pink-500' },
-  { href: '/upsell/dfy', icon: Package, label: 'Done-For-You', type: 'dfy' as const, gradient: 'from-emerald-500 to-teal-500' },
+  { href: '/done-for-you', icon: Package, label: 'Done-For-You', type: 'dfy' as const, gradient: 'from-emerald-500 to-teal-500' },
 ]
 
 export default function Sidebar() {
