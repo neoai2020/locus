@@ -37,7 +37,7 @@ const quickActions = [
     href: '/saved', 
     icon: FileText, 
     label: 'My Portfolio', 
-    description: 'View articles and affiliate links',
+    description: 'View articles and promotional links',
     gradient: 'from-locus-cyan to-locus-blue'
   },
   { 

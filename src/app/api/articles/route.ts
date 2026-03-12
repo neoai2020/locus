@@ -135,23 +135,26 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, content, affiliate_link, niche, platform, tone, length, status, hook, cta } = body
+    const { title, content, affiliate_link, niche, platform, tone, length, status, hook, cta, images } = body
+
+    const updateData: Record<string, any> = {
+      updated_at: new Date().toISOString(),
+    }
+    if (title !== undefined) updateData.title = title
+    if (content !== undefined) updateData.content = content
+    if (affiliate_link !== undefined) updateData.affiliate_link = affiliate_link
+    if (niche !== undefined) updateData.niche = niche
+    if (platform !== undefined) updateData.platform = platform
+    if (tone !== undefined) updateData.tone = tone
+    if (length !== undefined) updateData.length = length
+    if (status !== undefined) updateData.status = status
+    if (hook !== undefined) updateData.hook = hook
+    if (cta !== undefined) updateData.cta = cta
+    if (images !== undefined) updateData.images = images
 
     const { data: article, error } = await supabase
       .from('articles')
-      .update({
-        title,
-        content,
-        affiliate_link,
-        niche,
-        platform,
-        tone,
-        length,
-        status,
-        hook,
-        cta,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', id)
       .eq('user_id', user.id)
       .select()

@@ -188,7 +188,6 @@ export default function MyPortfolioPage() {
     if (!newLinkForm.name.trim() || !newLinkForm.link.trim()) return
     const newLink: AffiliateLink = {
       id: crypto.randomUUID(),
-      platform: 'digistore24',
       link: newLinkForm.link.trim(),
       label: newLinkForm.name.trim(),
       created_at: new Date().toISOString(),
@@ -209,7 +208,7 @@ export default function MyPortfolioPage() {
         >
           My Portfolio
         </h1>
-        <p className="text-locus-muted">Manage your articles and affiliate links</p>
+        <p className="text-locus-muted">Manage your articles and promotional links</p>
       </div>
 
       {/* Tab Bar */}
@@ -240,7 +239,7 @@ export default function MyPortfolioPage() {
           `}
         >
           <LinkIcon size={16} />
-          Affiliate Links
+          Promotional Links
         </button>
       </div>
 
@@ -412,13 +411,13 @@ export default function MyPortfolioPage() {
         </>
       )}
 
-      {/* ─── Affiliate Links Tab ─── */}
+      {/* ─── Promotional Links Tab ─── */}
       {activeTab === 'links' && (
         <div className="space-y-6 animate-fade-in">
           {/* Add New Link Button / Form */}
           {showNewLinkForm ? (
             <Card className="border-locus-teal/30">
-              <h3 className="font-semibold text-white mb-4">Create New Affiliate Link</h3>
+              <h3 className="font-semibold text-white mb-4">Create New Promotional Link</h3>
               <div className="space-y-3">
                 <div>
                   <label className="text-xs text-locus-muted mb-1 block">Name</label>
@@ -429,7 +428,7 @@ export default function MyPortfolioPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-locus-muted mb-1 block">Affiliate Link</label>
+                  <label className="text-xs text-locus-muted mb-1 block">URL</label>
                   <Input
                     value={newLinkForm.link}
                     onChange={(e) => setNewLinkForm((prev) => ({ ...prev, link: e.target.value }))}
@@ -458,7 +457,7 @@ export default function MyPortfolioPage() {
           ) : (
             <Button onClick={() => setShowNewLinkForm(true)}>
               <LinkIcon size={16} />
-              <span>Create New Affiliate Link</span>
+              <span>Create New Promotional Link</span>
             </Button>
           )}
 
@@ -466,7 +465,7 @@ export default function MyPortfolioPage() {
           {affiliateLinks.length > 0 ? (
             <div className="space-y-4">
               {affiliateLinks.map((link, index) => {
-                const Icon = affiliatePlatformIcons[link.platform] || LinkIcon
+                const Icon = LinkIcon
                 const isEditing = editingLinkId === link.id
 
                 return (
@@ -494,7 +493,7 @@ export default function MyPortfolioPage() {
                               />
                             </div>
                             <div>
-                              <label className="text-xs text-locus-muted mb-1 block">Affiliate Link</label>
+                              <label className="text-xs text-locus-muted mb-1 block">URL</label>
                               <Input
                                 value={editForm.link}
                                 onChange={(e) =>
@@ -518,7 +517,7 @@ export default function MyPortfolioPage() {
                             <div className="flex items-start justify-between gap-4 mb-1">
                               <div className="min-w-0">
                                 <h3 className="font-semibold text-white mb-0.5">
-                                  {link.label || affiliatePlatformNames[link.platform] || 'Affiliate Link'}
+                                  {link.label || 'Promotional Link'}
                                 </h3>
                                 <p className="text-sm text-locus-muted truncate max-w-md">
                                   {link.link}
@@ -559,11 +558,6 @@ export default function MyPortfolioPage() {
                                 <Clock size={12} />
                                 {formatDate(link.created_at)}
                               </span>
-                              {link.platform && affiliatePlatformNames[link.platform] && (
-                                <Badge variant="cyan" className="text-[10px]">
-                                  {affiliatePlatformNames[link.platform]}
-                                </Badge>
-                              )}
                             </div>
                           </>
                         )}
@@ -578,13 +572,13 @@ export default function MyPortfolioPage() {
               <div className="w-16 h-16 rounded-2xl bg-locus-border flex items-center justify-center mx-auto mb-4">
                 <LinkIcon className="text-locus-muted" size={28} />
               </div>
-              <p className="text-locus-muted mb-2">No affiliate links saved yet</p>
+              <p className="text-locus-muted mb-2">No promotional links saved yet</p>
               <p className="text-sm text-locus-muted opacity-75 mb-6">
-                Add your first affiliate link to start building your portfolio
+                Add your first promotional link to start building your portfolio
               </p>
               <Button onClick={() => setShowNewLinkForm(true)}>
                 <LinkIcon size={16} />
-                <span>Create New Affiliate Link</span>
+                <span>Create New Promotional Link</span>
               </Button>
             </Card>
           ) : null}

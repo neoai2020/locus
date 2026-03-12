@@ -70,7 +70,7 @@ const toneOptions = [
 ]
 
 const steps = [
-  { number: 1, title: 'Link & Niche', description: 'Set your affiliate link and niche' },
+  { number: 1, title: 'Link & Niche', description: 'Set your promotional link and niche' },
   { number: 2, title: 'Topic & Settings', description: 'Choose your headline and preferences' },
   { number: 3, title: 'Generated Article', description: 'Review and save your article' },
 ]
@@ -144,6 +144,7 @@ export default function CreateArticlePage() {
   const [selectedAffiliatePlatform, setSelectedAffiliatePlatform] = useState<AffiliatePlatform | null>(null)
   const [showInstructions, setShowInstructions] = useState(true)
   const [linkSaved, setLinkSaved] = useState(false)
+  const [linkLabel, setLinkLabel] = useState('')
   
   // Step 2 — Topic & Settings
   const [topic, setTopic] = useState('')
@@ -483,7 +484,7 @@ export default function CreateArticlePage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-locus-text mb-3">
-                  Choose Your Affiliate Platform
+                  Need help finding a link? Choose a platform for instructions
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   {affiliatePlatforms.map((platform) => {
@@ -530,7 +531,7 @@ export default function CreateArticlePage() {
               >
                 <h3 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2">
                   <Lightbulb size={16} className="text-locus-teal" />
-                  How to Get Your Affiliate Link
+                  How to Get Your Promotional Link
                 </h3>
                 {showInstructions ? (
                   <ChevronUp size={18} className="text-locus-muted" />
@@ -568,98 +569,109 @@ export default function CreateArticlePage() {
           )}
 
           {/* Part C: Link Input & Save */}
-          {selectedAffiliatePlatform && (
-            <Card>
-              <div className="space-y-5">
-                {/* Saved links from portfolio */}
-                {(() => {
-                  const savedLinks = useAppStore.getState().affiliateLinks
-                  if (savedLinks.length === 0) return null
-                  return (
-                    <div>
-                      <label className="block text-sm font-medium text-locus-text mb-2">
-                        Select from My Portfolio
-                      </label>
-                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        {savedLinks.map((sl) => {
-                          const isSelected = affiliateLink === sl.link
-                          return (
-                            <button
-                              key={sl.id}
-                              onClick={() => {
-                                setAffiliateLink(sl.link)
-                                setLinkSaved(true)
-                              }}
-                              className={`
-                                w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all duration-200
-                                ${isSelected
-                                  ? 'border-locus-teal bg-locus-teal/10'
-                                  : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-locus-teal/50'
-                                }
-                              `}
-                            >
-                              <LinkIcon size={16} className={isSelected ? 'text-locus-teal shrink-0' : 'text-locus-muted shrink-0'} />
-                              <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-locus-text'}`}>
-                                  {sl.label || 'Untitled Link'}
-                                </p>
-                                <p className="text-xs text-locus-muted truncate">{sl.link}</p>
-                              </div>
-                              {isSelected && <Check size={16} className="text-locus-teal shrink-0" />}
-                            </button>
-                          )
-                        })}
-                      </div>
-                      <div className="relative my-4">
-                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-locus-border" /></div>
-                        <div className="relative flex justify-center"><span className="bg-locus-card px-3 text-xs text-locus-muted">or enter manually</span></div>
-                      </div>
+          <Card>
+            <h2 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+              <LinkIcon size={20} className="text-locus-teal" />
+              Your Promotional Link
+            </h2>
+            <div className="space-y-5">
+              {(() => {
+                const savedLinks = useAppStore.getState().affiliateLinks
+                if (savedLinks.length === 0) return null
+                return (
+                  <div>
+                    <label className="block text-sm font-medium text-locus-text mb-2">
+                      Select from My Portfolio
+                    </label>
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                      {savedLinks.map((sl) => {
+                        const isSelected = affiliateLink === sl.link
+                        return (
+                          <button
+                            key={sl.id}
+                            onClick={() => {
+                              setAffiliateLink(sl.link)
+                              setLinkLabel(sl.label || '')
+                              setLinkSaved(true)
+                            }}
+                            className={`
+                              w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all duration-200
+                              ${isSelected
+                                ? 'border-locus-teal bg-locus-teal/10'
+                                : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-locus-teal/50'
+                              }
+                            `}
+                          >
+                            <LinkIcon size={16} className={isSelected ? 'text-locus-teal shrink-0' : 'text-locus-muted shrink-0'} />
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-locus-text'}`}>
+                                {sl.label || 'Untitled Link'}
+                              </p>
+                              <p className="text-xs text-locus-muted truncate">{sl.link}</p>
+                            </div>
+                            {isSelected && <Check size={16} className="text-locus-teal shrink-0" />}
+                          </button>
+                        )
+                      })}
                     </div>
-                  )
-                })()}
+                    <div className="relative my-4">
+                      <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-locus-border" /></div>
+                      <div className="relative flex justify-center"><span className="bg-locus-card px-3 text-xs text-locus-muted">or enter manually</span></div>
+                    </div>
+                  </div>
+                )
+              })()}
 
-                <Input
-                  label="Your Affiliate Link"
-                  placeholder="https://example.com/product?ref=your-id"
-                  value={affiliateLink}
-                  onChange={(e) => {
-                    setAffiliateLink(e.target.value)
-                    setLinkSaved(false)
+              <Input
+                label="Link Name"
+                placeholder="e.g. My Fitness eBook, Keto Supplement, etc."
+                value={linkLabel}
+                onChange={(e) => {
+                  setLinkLabel(e.target.value)
+                  setLinkSaved(false)
+                }}
+              />
+
+              <Input
+                label="URL"
+                placeholder="https://example.com/product?ref=your-id"
+                value={affiliateLink}
+                onChange={(e) => {
+                  setAffiliateLink(e.target.value)
+                  setLinkSaved(false)
+                }}
+              />
+
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() => {
+                    if (!affiliateLink.trim()) return
+                    const newLink: AffiliateLinkType = {
+                      id: crypto.randomUUID(),
+                      link: affiliateLink.trim(),
+                      label: linkLabel.trim() || undefined,
+                      created_at: new Date().toISOString(),
+                      updated_at: new Date().toISOString(),
+                    }
+                    useAppStore.getState().addAffiliateLink(newLink)
+                    setLinkSaved(true)
                   }}
-                />
+                  disabled={!affiliateLink.trim()}
+                  variant={linkSaved ? 'secondary' : 'primary'}
+                >
+                  {linkSaved ? <Check size={18} /> : <Save size={18} />}
+                  <span>{linkSaved ? 'Link Saved' : 'Save to Portfolio'}</span>
+                </Button>
 
-                <div className="flex items-center gap-3">
-                  <Button
-                    onClick={() => {
-                      if (!affiliateLink.trim()) return
-                      const newLink: AffiliateLinkType = {
-                        id: crypto.randomUUID(),
-                        platform: selectedAffiliatePlatform,
-                        link: affiliateLink.trim(),
-                        label: affiliatePlatforms.find(p => p.value === selectedAffiliatePlatform)?.label,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
-                      }
-                      useAppStore.getState().addAffiliateLink(newLink)
-                      setLinkSaved(true)
-                    }}
-                    disabled={!affiliateLink.trim()}
-                    variant={linkSaved ? 'secondary' : 'primary'}
-                  >
-                    {linkSaved ? <Check size={18} /> : <Save size={18} />}
-                    <span>{linkSaved ? 'Link Saved' : 'Save Link'}</span>
-                  </Button>
-
-                  {linkSaved && (
-                    <span className="text-sm text-locus-teal flex items-center gap-1.5">
-                      <CheckCircle2 size={15} />
-                      Affiliate link saved successfully
-                    </span>
-                  )}
-                </div>
+                {linkSaved && (
+                  <span className="text-sm text-locus-teal flex items-center gap-1.5">
+                    <CheckCircle2 size={15} />
+                    Promotional link saved successfully
+                  </span>
+                )}
               </div>
-            </Card>
-          )}
+            </div>
+          </Card>
 
           {/* Part D: Niche Selection */}
           <Card>

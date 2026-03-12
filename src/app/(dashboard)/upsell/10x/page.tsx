@@ -156,7 +156,7 @@ export default function TenXPage() {
 
               <form onSubmit={handleGenerateFacebookPost} className="space-y-4">
                 <Input
-                  label="Product Affiliate Link"
+                  label="Product Promotional Link"
                   placeholder="Paste your link here (e.g., Digistore24, Amazon...)"
                   value={affiliateLink}
                   onChange={(e) => setAffiliateLink(e.target.value)}

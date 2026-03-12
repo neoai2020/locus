@@ -172,33 +172,27 @@ export default function ImagesPage() {
 
     try {
       const images = getSelectedImages()
-      
-      const response = await fetch(`/api/articles?id=${currentArticle.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: currentArticle.title,
-          content: currentArticle.content,
-          affiliate_link: currentArticle.affiliate_link,
-          niche: currentArticle.niche,
-          platform: currentArticle.platform,
-          tone: currentArticle.tone,
-          length: currentArticle.length,
-          hook: currentArticle.hook,
-          cta: currentArticle.cta,
-          images,
-        }),
-      })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.details || errorData.error || 'Failed to save')
-      }
+      const updatedArticle = { ...currentArticle, images: images as any }
+      updateArticle(currentArticle.id, updatedArticle)
+      setCurrentArticle(updatedArticle)
 
-      const data = await response.json()
-      if (data.article) {
-        updateArticle(data.article.id, data.article)
-        setCurrentArticle(data.article)
+      try {
+        const response = await fetch(`/api/articles?id=${currentArticle.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ images }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.article) {
+            updateArticle(data.article.id, data.article)
+            setCurrentArticle(data.article)
+          }
+        }
+      } catch (apiErr) {
+        console.warn('API save failed, images saved locally:', apiErr)
       }
 
       if (navigateToPublish) {

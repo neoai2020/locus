@@ -36,7 +36,7 @@ export type AffiliatePlatform = 'digistore24' | 'etsy' | 'amazon' | 'ebay'
 
 export interface AffiliateLink {
   id: string
-  platform: AffiliatePlatform
+  platform?: AffiliatePlatform
   link: string
   label?: string
   created_at: string
@@ -109,7 +109,7 @@ export const UPSELL_CONFIGS: Record<UpsellType, UpsellConfig> = {
     features: [
       '100 SEO-optimized articles across 10 niches',
       'Images already generated for every article',
-      'Strategic affiliate link placement built in',
+      'Strategic promotional link placement built in',
       'Just add your links and publish for commissions'
     ],
     icon: 'Zap'
