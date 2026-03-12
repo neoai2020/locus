@@ -91,13 +91,13 @@ export const UPSELL_CONFIGS: Record<UpsellType, UpsellConfig> = {
   '10x': {
     type: '10x',
     name: '10X Mode',
-    description: 'Generate 10 variations instantly',
-    headline: 'Multiply Your Content Output by 10X',
+    description: '100 pre-written SEO authority articles',
+    headline: '100 Ready-to-Publish Authority Articles',
     features: [
-      '10 article variations per topic',
-      'Multiple hook styles',
-      'Batch generation',
-      'A/B test your content'
+      '100 SEO-optimized articles across 10 niches',
+      'Images already generated for every article',
+      'Strategic affiliate link placement built in',
+      'Just add your links and publish for commissions'
     ],
     icon: 'Zap'
   },
