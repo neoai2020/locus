@@ -50,6 +50,14 @@ const PLATFORM_FORMATS: Record<string, string> = {
 - Use line breaks and short sentences for readability
 - Include 1-2 relevant stats or data points
 - Final tweet: CTA + 2-3 hashtags`,
+  
+  facebook: `Format for Facebook post:
+- Start with an attention-grabbing first sentence or question
+- Use emojis to make the post visually engaging
+- Break text into short, readable paragraphs
+- Include clear benefits of the product/link being shared
+- End with a strong, direct call-to-action
+- Suggest 2-3 relevant hashtags`,
 }
 
 async function callChatGPT(messages: { role: string; content: string }[]) {
@@ -76,6 +84,64 @@ async function callChatGPT(messages: { role: string; content: string }[]) {
   return data.result || data.message || data.choices?.[0]?.message?.content || JSON.stringify(data)
 }
 
+async function scrapeProductInfo(url: string) {
+  const scraperApiKey = process.env.SCRAPER_API_KEY
+  if (!scraperApiKey) return null
+
+  try {
+    const scraperUrl = `https://api.scraperapi.com?api_key=${scraperApiKey}&url=${encodeURIComponent(url)}&render=true`
+    const response = await fetch(scraperUrl, {
+      method: 'GET',
+      signal: AbortSignal.timeout(30000),
+    })
+
+    if (!response.ok) return null
+
+    const html = await response.text()
+
+    const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/is)
+    const title = titleMatch ? titleMatch[1].replace(/\s+/g, ' ').trim() : ''
+
+    const metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["'](.*?)["']/is)
+    const metaDescription = metaDescMatch ? metaDescMatch[1].replace(/\s+/g, ' ').trim() : ''
+
+    const ogTitleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["'](.*?)["']/is)
+    const ogTitle = ogTitleMatch ? ogTitleMatch[1].replace(/\s+/g, ' ').trim() : ''
+
+    const ogDescMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["'](.*?)["']/is)
+    const ogDesc = ogDescMatch ? ogDescMatch[1].replace(/\s+/g, ' ').trim() : ''
+
+    const priceMatch = html.match(/(?:price|سعر)[^<]*?(\d+[\.,]?\d*)/is)
+    const price = priceMatch ? priceMatch[1] : ''
+
+    const h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/is)
+    const h1Text = h1Match ? h1Match[1].replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() : ''
+
+    const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/is)
+    let bodyText = ''
+    if (bodyMatch) {
+      bodyText = bodyMatch[1]
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .substring(0, 2000)
+    }
+
+    return {
+      title: ogTitle || title || h1Text || '',
+      description: ogDesc || metaDescription || '',
+      h1: h1Text,
+      price,
+      bodySnippet: bodyText.substring(0, 500),
+    }
+  } catch (err) {
+    console.error('Scrape error in generate route:', err)
+    return null
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -98,6 +164,12 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { topic, platform, platforms, tone, length, affiliateLink, niche } = body
+    let { productInfo } = body
+
+    // Auto-scrape if link provided but no info
+    if (affiliateLink && !productInfo) {
+      productInfo = await scrapeProductInfo(affiliateLink)
+    }
 
     // Support both single platform and multiple platforms
     const targetPlatforms: string[] = platforms || (platform ? [platform] : [])
@@ -116,32 +188,46 @@ export async function POST(request: NextRequest) {
     const affiliateInstruction = affiliateLink
       ? `\n\nIMPORTANT: Naturally weave in a reference to this product/service link: ${affiliateLink}. 
       Do NOT just paste the raw URL. Instead, integrate it as an HTML link with descriptive text (like the product name). 
-      Format: <a href='${affiliateLink}' target='_blank' class='text-locus-teal font-bold underline decoration-2 underline-offset-4 hover:text-locus-cyan transition-all'>Product Name or Descriptive Text</a>. 
+      Format: <a href='${affiliateLink}' target='_blank' class='text-locus-teal font-bold underline decoration-2 underline-offset-4 hover:text-locus-cyan transition-all'>Product Name</a>. 
       NOTE: Use single quotes (') for HTML attributes inside the JSON string to avoid breaking the JSON format! 
-      Make it feel organic and helpful, not like a hard sell.`
+      Make it feel organic and helpful.`
       : ''
 
     const nicheContext = niche
-      ? `\nThe article is in the ${niche} niche. Make sure the content is highly relevant and uses industry-specific language.`
+      ? `\nThe context is ${niche}.`
       : ''
 
-    const systemPrompt = `You are an expert content strategist and copywriter who specializes in creating authority-building content for professionals. Your content helps establish thought leadership and drives engagement on high-trust platforms.
+    const productContext = productInfo 
+      ? `\n\nACTUAL PRODUCT DATA (Source of Truth):
+- Title: ${productInfo.title || 'Unknown'}
+- Description: ${productInfo.description || ''}
+- Found on Page: ${productInfo.h1 || ''}
+- Price Info: ${productInfo.price || ''}
+- Snippet: ${productInfo.bodySnippet || ''}
+
+CRITICAL REQUIREMENT: You MUST base the content ENTIRELY on the actual product features above. 
+If it is a physical item (like a lantern, decor, or gadget), write about its physical benefits, price, and how it looks. 
+Do NOT talk about 'Digital Storefronts', 'E-commerce algorithms', or 'Marketing Strategy' unless the product is specifically a marketing tool. 
+Base your 'Hook', 'Body', and 'CTA' on the REAL product provided.`
+      : ''
+
+    const systemPrompt = `You are an expert copywriter and sales strategist. Your goal is to write highly relevant, specific, and engaging social media content.
 
 ${TONE_PROMPTS[tone] || TONE_PROMPTS.authoritative}
 
 ${platformFormatText}
+${productContext}
 ${nicheContext}
 ${affiliateInstruction}
 
 Important guidelines:
-- Create original, valuable content that positions the author as an expert
-- Avoid generic advice - be specific and actionable
-- Use power words and emotional triggers appropriately
-- Ensure the content is publication-ready
-- Do NOT include any disclaimers about AI-generated content
+- Be extremely specific about the product features and benefits mentioned in the data.
+- Avoid generic "business coach" or "marketing guru" language unless it fits the product perfectly.
+- If the item is a festive or cultural product (Ramadan, Christmas, etc.), use a warm, celebratory, and welcoming tone.
+- Do NOT include any disclaimers about AI-generated content.
 - DO NOT use Markdown formatting (*, #, etc). YOU MUST USE ONLY HTML TAGS (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <em>, <br>).
-- CRITICAL: When writing HTML inside the JSON string, you MUST use SINGLE QUOTES inside HTML tags (e.g., <div class='my-class'>) so you don't break the JSON format.
-- EXTREMELY IMPORTANT: The entire article MUST be written in English ONLY. Do not use Arabic or any other language.`
+- CRITICAL: When writing HTML inside the JSON string, you MUST use SINGLE QUOTES inside HTML tags.
+- LANGUAGE: The primary output must be English, but you MUST preserve the original product name/title if it's in another language.`
 
     const userPrompt = `Create a ${length} (approximately ${LENGTH_TOKENS[length] || 1000} words) article about: "${topic}"
 

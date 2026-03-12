@@ -1,0 +1,49 @@
+
+> locus@0.1.0 build
+> next build
+
+▲ Next.js 16.1.4 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1208.1ms
+  Running TypeScript ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/19) ...
+  Generating static pages using 9 workers (4/19) 
+  Generating static pages using 9 workers (9/19) 
+  Generating static pages using 9 workers (14/19) 
+✓ Generating static pages using 9 workers (19/19) in 141.4ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/articles
+├ ƒ /api/generate
+├ ƒ /api/migrate
+├ ƒ /api/scrape-link
+├ ƒ /api/suggest-headlines
+├ ○ /create
+├ ○ /dashboard
+├ ○ /forgot-password
+├ ○ /images
+├ ○ /login
+├ ○ /publish
+├ ○ /saved
+├ ○ /signup
+├ ○ /signup-pro
+├ ○ /support
+├ ○ /training
+├ ƒ /unlock/[type]
+├ ○ /upsell/10x
+├ ○ /upsell/automation
+├ ○ /upsell/dfy
+└ ○ /upsell/infinite
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -552,9 +552,9 @@ const ALL_ARTICLES: PrewrittenArticle[] = NICHES.flatMap(n =>
   generateArticlesForNiche(n.id, n.label)
 )
 
-export default function InfinitePage() {
+export default function TenXPage() {
   const router = useRouter()
-  const { isUpsellUnlocked, setCurrentArticle, addArticle, articles } = useAppStore()
+  const { isUpsellUnlocked, setCurrentArticle, addArticle } = useAppStore()
 
   const [isChecking, setIsChecking] = useState(true)
   const [selectedNiche, setSelectedNiche] = useState<string | null>(null)
@@ -564,8 +564,8 @@ export default function InfinitePage() {
   const [usedArticles, setUsedArticles] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    if (!isUpsellUnlocked('infinite')) {
-      router.push('/unlock/infinite')
+    if (!isUpsellUnlocked('10x')) {
+      router.push('/unlock/10x')
     } else {
       setIsChecking(false)
     }
@@ -640,7 +640,7 @@ export default function InfinitePage() {
   if (isChecking) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-2xl bg-locus-border animate-pulse" />
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-locus-border)] animate-pulse" />
       </div>
     )
   }
@@ -649,6 +649,7 @@ export default function InfinitePage() {
     const niche = NICHES.find(n => n.id === previewArticle.niche)
     return (
       <div className="max-w-5xl mx-auto animate-fade-in">
+        {/* Back */}
         <button
           onClick={() => setPreviewArticle(null)}
           className="flex items-center gap-2 text-locus-muted hover:text-white transition-colors mb-6"
@@ -658,10 +659,11 @@ export default function InfinitePage() {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Article Content */}
           <div className="lg:col-span-2 space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Badge variant="warning">Infinite Mode</Badge>
+                <Badge variant="warning">10X Library</Badge>
                 <Badge variant="default">{niche?.emoji} {niche?.label}</Badge>
               </div>
               <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
@@ -679,6 +681,7 @@ export default function InfinitePage() {
             </Card>
           </div>
 
+          {/* Sidebar */}
           <div className="space-y-6">
             <Card className="sticky top-8">
               <h3 className="font-semibold text-white mb-4">Article Details</h3>
@@ -774,12 +777,13 @@ export default function InfinitePage() {
 
   return (
     <div className="max-w-6xl mx-auto">
+      {/* Header */}
       <div className="mb-8 animate-fade-in">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center">
             <Zap size={20} className="text-white" />
           </div>
-          <Badge variant="cyan">Infinite Mode</Badge>
+          <Badge variant="warning">10X Mode</Badge>
         </div>
         <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           100 Ready-to-Publish Authority Articles
@@ -790,6 +794,7 @@ export default function InfinitePage() {
         </p>
       </div>
 
+      {/* Stats Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 animate-fade-in stagger-1">
         {[
           { label: 'Total Articles', value: '100', icon: FileText, color: 'text-locus-teal' },
@@ -805,9 +810,10 @@ export default function InfinitePage() {
         ))}
       </div>
 
-      <Card className="mb-8 animate-fade-in stagger-2 border-[rgba(34,211,238,0.2)] bg-[rgba(34,211,238,0.03)]">
+      {/* How It Works */}
+      <Card className="mb-8 animate-fade-in stagger-2 border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.03)]">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles size={18} className="text-cyan-400" />
+          <Sparkles size={18} className="text-amber-400" />
           <h3 className="font-semibold text-white">How It Works — 3 Simple Steps</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -817,8 +823,8 @@ export default function InfinitePage() {
             { step: '3', title: 'Publish & Earn', desc: 'Post on LinkedIn, Medium, Quora, Reddit, or X. Start earning passive commissions from day one.', icon: DollarSign },
           ].map(item => (
             <div key={item.step} className="flex gap-3">
-              <div className="w-8 h-8 rounded-lg bg-cyan-400/15 flex items-center justify-center shrink-0">
-                <span className="text-sm font-bold text-cyan-400">{item.step}</span>
+              <div className="w-8 h-8 rounded-lg bg-amber-400/15 flex items-center justify-center shrink-0">
+                <span className="text-sm font-bold text-amber-400">{item.step}</span>
               </div>
               <div>
                 <h4 className="font-medium text-white text-sm mb-1">{item.title}</h4>
@@ -829,6 +835,7 @@ export default function InfinitePage() {
         </div>
       </Card>
 
+      {/* Search + Filter */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6 animate-fade-in stagger-3">
         <div className="flex-1 relative">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-locus-muted" />
@@ -851,6 +858,7 @@ export default function InfinitePage() {
         )}
       </div>
 
+      {/* Niche Filter Pills */}
       <div className="flex flex-wrap gap-2 mb-8 animate-fade-in stagger-3">
         <button
           onClick={() => setSelectedNiche(null)}
@@ -877,6 +885,7 @@ export default function InfinitePage() {
         ))}
       </div>
 
+      {/* Article Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredArticles.map((article, index) => {
           const niche = NICHES.find(n => n.id === article.niche)
@@ -889,12 +898,12 @@ export default function InfinitePage() {
               onClick={() => setPreviewArticle(article)}
             >
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shrink-0 text-lg border border-cyan-400/20">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center shrink-0 text-lg border border-amber-400/20">
                   {niche?.emoji}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/70">{niche?.label}</span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-amber-400/70">{niche?.label}</span>
                     {isUsed && <Badge variant="success" className="text-[9px]">Used</Badge>}
                   </div>
                   <h3 className="font-semibold text-white text-sm mb-2 line-clamp-2 group-hover:text-locus-teal transition-colors">

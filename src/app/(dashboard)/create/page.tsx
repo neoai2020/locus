@@ -775,10 +775,21 @@ export default function CreateArticlePage() {
                   {isSuggestingTone ? 'Analyzing...' : 'Suggest Best Tone (AI)'}
                 </button>
                 {suggestedTone && (
-                  <p className="mt-2 text-xs text-locus-teal flex items-center gap-1.5">
-                    <CheckCircle2 size={13} />
-                    AI recommends: <strong>{suggestedTone.charAt(0).toUpperCase() + suggestedTone.slice(1)}</strong> — {suggestedToneReason}
-                  </p>
+                  <div className="mt-3 p-3 rounded-xl bg-locus-teal/5 border border-locus-teal/20 animate-fade-in">
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-locus-teal/20 flex items-center justify-center shrink-0">
+                        <Sparkles size={14} className="text-locus-teal" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-white font-semibold mb-0.5">
+                          AI Tip: {suggestedTone.charAt(0).toUpperCase() + suggestedTone.slice(1)} Tone
+                        </p>
+                        <p className="text-[11px] text-locus-text leading-relaxed">
+                          {suggestedToneReason}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 

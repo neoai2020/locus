@@ -1,0 +1,24 @@
+
+> locus@0.1.0 build
+> next build
+
+▲ Next.js 16.1.4 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1143.3ms
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/(dashboard)/publish/page.tsx:61:5
+Type error: Argument of type 'string[] | Platform | null' is not assignable to parameter of type 'Platform | (() => Platform | null) | null'.
+  Type 'string[]' is not assignable to type 'Platform | (() => Platform | null) | null'.
+
+[0m [90m 59 |[39m   [36mconst[39m [copied[33m,[39m setCopied] [33m=[39m useState([36mfalse[39m)
+ [90m 60 |[39m   [36mconst[39m [selectedPlatform[33m,[39m setSelectedPlatform] [33m=[39m useState[33m<[39m[33mPlatform[39m [33m|[39m [36mnull[39m[33m>[39m(
+[31m[1m>[22m[39m[90m 61 |[39m     currentArticle[33m?[39m[33m.[39mplatform [33m||[39m [36mnull[39m
+ [90m    |[39m     [31m[1m^[22m[39m
+ [90m 62 |[39m   )
+ [90m 63 |[39m
+ [90m 64 |[39m   [36mconst[39m handleCopy [33m=[39m [36masync[39m () [33m=>[39m {[0m
+Next.js build worker exited with code: 1 and signal: null

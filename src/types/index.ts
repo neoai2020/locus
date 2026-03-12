@@ -1,4 +1,4 @@
-export type Platform = 'linkedin' | 'medium' | 'quora' | 'reddit' | 'twitter'
+export type Platform = 'linkedin' | 'medium' | 'quora' | 'reddit' | 'twitter' | 'facebook'
 
 export type ArticleTone = 'authoritative' | 'conversational' | 'bold'
 
@@ -91,19 +91,6 @@ export const UPSELL_CONFIGS: Record<UpsellType, UpsellConfig> = {
   '10x': {
     type: '10x',
     name: '10X Mode',
-    description: '100 pre-written SEO authority articles',
-    headline: '100 Ready-to-Publish Authority Articles',
-    features: [
-      '100 SEO-optimized articles across 10 niches',
-      'Images already generated for every article',
-      'Strategic affiliate link placement built in',
-      'Just add your links and publish for commissions'
-    ],
-    icon: 'Zap'
-  },
-  'infinite': {
-    type: 'infinite',
-    name: 'Infinite Mode',
     description: 'Remove all limits',
     headline: 'Unlimited Everything. No Restrictions.',
     features: [
@@ -113,6 +100,19 @@ export const UPSELL_CONFIGS: Record<UpsellType, UpsellConfig> = {
       'Priority processing'
     ],
     icon: 'Infinity'
+  },
+  'infinite': {
+    type: 'infinite',
+    name: 'Infinite Mode',
+    description: '100 pre-written SEO authority articles',
+    headline: '100 Ready-to-Publish Authority Articles',
+    features: [
+      '100 SEO-optimized articles across 10 niches',
+      'Images already generated for every article',
+      'Strategic affiliate link placement built in',
+      'Just add your links and publish for commissions'
+    ],
+    icon: 'Zap'
   },
   'automation': {
     type: 'automation',
@@ -248,6 +248,24 @@ export const PLATFORM_INFO: Record<Platform, {
       'Quote-tweet your own thread with a one-line summary or hot take to re-surface it in the feed.',
       'Use 1-3 hashtags max. X\'s algorithm deprioritizes tweets with more than 3 hashtags.',
       'Engage with replies quickly — threads with active comment sections get boosted by the algorithm.',
+    ],
+  },
+  facebook: {
+    name: 'Facebook',
+    url: 'https://www.facebook.com/',
+    icon: 'Facebook',
+    tagLabel: 'Hashtags',
+    instructions: [
+      'Go to facebook.com and click "What\'s on your mind?".',
+      'Paste the generated post content.',
+      'Add a relevant image or the product preview if available.',
+      'Click "Post" to share with your audience or in relevant groups.',
+    ],
+    seoTips: [
+      'The first sentence is crucial for stopping the scroll.',
+      'Use emojis to break up text and add personality.',
+      'Post in relevant groups to reach a targeted audience.',
+      'Engage with comments to boost the post in the Facebook algorithm.',
     ],
   },
 }

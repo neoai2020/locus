@@ -144,7 +144,7 @@ ${affiliateLink ? `Product Link: ${affiliateLink}` : ''}
 
 Available tones: authoritative, conversational, bold
 
-Respond ONLY with JSON: {"tone": "chosen_tone", "reason": "one short sentence why"}`
+Respond ONLY with JSON: {"tone": "chosen_tone", "reason": "one very short, friendly, and simple sentence explaining why this is the best fit for the reader (user-facing)"}`
 
         const toneResult = await callChatGPT([{ role: 'user', content: tonePrompt }])
         try {
