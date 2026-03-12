@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { 
@@ -8,24 +8,20 @@ import {
   FileText, 
   Send, 
   TrendingUp, 
-  Zap, 
-  Infinity, 
-  Bot, 
-  Package,
   ArrowRight,
   Sparkles,
   Play,
   GraduationCap,
   DollarSign,
   Users,
-  Star
+  Star,
+  Headphones,
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { useAppStore } from '@/store'
 import { createClient } from '@/lib/supabase/client'
-import { UPSELL_CONFIGS, UpsellType } from '@/types'
 
 const earningsMembers = [
   { name: 'Ashley D.', initial: 'A', color: 'bg-rose-500', amount: 2150, timeframe: 'past 3 weeks', badge: 'consistent daily posting' },
@@ -69,16 +65,9 @@ const quickActions = [
   },
 ]
 
-const upsellPreviews = [
-  { type: '10x' as UpsellType, icon: Zap, gradient: 'from-yellow-500 to-orange-500' },
-  { type: 'infinite' as UpsellType, icon: Infinity, gradient: 'from-blue-500 to-cyan-500' },
-  { type: 'automation' as UpsellType, icon: Bot, gradient: 'from-green-500 to-emerald-500' },
-  { type: 'dfy' as UpsellType, icon: Package, gradient: 'from-purple-500 to-pink-500' },
-]
-
 export default function DashboardPage() {
   const router = useRouter()
-  const { articles, unlockedUpsells } = useAppStore()
+  const { articles } = useAppStore()
   const [userName, setUserName] = useState('there')
 
   useEffect(() => {
@@ -106,17 +95,33 @@ export default function DashboardPage() {
     fetchArticles()
   }, [])
 
+  // Member earnings carousel with slide animation
   const [activeMemberIndex, setActiveMemberIndex] = useState(0)
+  const [isSliding, setIsSliding] = useState(false)
+  const [slideDirection, setSlideDirection] = useState<'up' | 'down'>('up')
+  const [communityTotal, setCommunityTotal] = useState(847000)
+  const [activeEarners, setActiveEarners] = useState(1847)
+  const [avgPerMember, setAvgPerMember] = useState(459)
 
   useEffect(() => {
     const scheduleNext = () => {
-      const delay = Math.floor(Math.random() * 5000) + 3000
+      const delay = Math.floor(Math.random() * 3000) + 2000
       return setTimeout(() => {
-        setActiveMemberIndex(prev => {
-          let next: number
-          do { next = Math.floor(Math.random() * earningsMembers.length) } while (next === prev)
-          return next
-        })
+        setSlideDirection(Math.random() > 0.5 ? 'up' : 'down')
+        setIsSliding(true)
+
+        setTimeout(() => {
+          setActiveMemberIndex(prev => {
+            let next: number
+            do { next = Math.floor(Math.random() * earningsMembers.length) } while (next === prev)
+            return next
+          })
+          setCommunityTotal(prev => prev + Math.floor(Math.random() * 800) + 200)
+          setActiveEarners(prev => prev + (Math.random() > 0.6 ? 1 : 0))
+          setAvgPerMember(prev => prev + Math.floor(Math.random() * 5) - 2)
+          setIsSliding(false)
+        }, 300)
+
         timerId = scheduleNext()
       }, delay)
     }
@@ -134,7 +139,7 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Welcome Section */}
+      {/* 1. Welcome Section */}
       <div className="mb-10 animate-fade-in">
         <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Welcome back, <span className="gradient-text">{userName}</span>
@@ -144,149 +149,9 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <Card className="animate-fade-in stagger-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-locus-muted text-sm mb-1">Articles Generated</p>
-              <p className="text-3xl font-bold text-white">{stats.articlesGenerated}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-teal to-locus-indigo flex items-center justify-center">
-              <TrendingUp className="text-white" size={24} />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="animate-fade-in stagger-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-locus-muted text-sm mb-1">Saved Drafts</p>
-              <p className="text-3xl font-bold text-white">{stats.savedDrafts}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-cyan to-locus-blue flex items-center justify-center">
-              <FileText className="text-white" size={24} />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="animate-fade-in stagger-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-locus-muted text-sm mb-1">Published</p>
-              <p className="text-3xl font-bold text-white">{stats.publishedArticles}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-success to-locus-cyan flex items-center justify-center">
-              <Send className="text-white" size={24} />
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Member Earnings Dashboard */}
-      <Card className="mb-10 animate-fade-in border border-amber-500/30 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
-        <div className="relative">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
-              <DollarSign className="text-amber-400" size={24} />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
-                Member Earnings Dashboard
-              </h2>
-              <p className="text-locus-muted text-sm">Real results from Locus members</p>
-            </div>
-          </div>
-
-          {/* Featured Member Spotlight */}
-          <div className="bg-locus-darker/60 rounded-xl p-5 mb-6 border border-white/5 transition-all duration-500">
-            <div className="flex items-center gap-4">
-              <div className={`w-14 h-14 rounded-full ${activeMember.color} flex items-center justify-center text-white text-xl font-bold shrink-0 transition-all duration-500`}>
-                {activeMember.initial}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <span className="font-semibold text-white text-lg">{activeMember.name}</span>
-                  <Star className="text-amber-400 fill-amber-400" size={16} />
-                  <Badge variant="success" className="text-[10px] uppercase tracking-wider">Verified Member</Badge>
-                </div>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-3xl font-bold text-amber-400 tabular-nums transition-all duration-500">
-                    ${activeMember.amount.toLocaleString()}
-                  </span>
-                  <span className="text-locus-muted text-sm">Earned in {activeMember.timeframe}</span>
-                </div>
-                <Badge variant="default" className="text-xs">
-                  {activeMember.badge}
-                </Badge>
-              </div>
-            </div>
-          </div>
-
-          {/* Community Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
-              <DollarSign className="text-amber-400 mx-auto mb-1" size={20} />
-              <p className="text-2xl font-bold text-white">$847K+</p>
-              <p className="text-locus-muted text-xs">Community Total</p>
-            </div>
-            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
-              <Users className="text-amber-400 mx-auto mb-1" size={20} />
-              <p className="text-2xl font-bold text-white">1,847</p>
-              <p className="text-locus-muted text-xs">Active Earners</p>
-            </div>
-            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
-              <TrendingUp className="text-amber-400 mx-auto mb-1" size={20} />
-              <p className="text-2xl font-bold text-white">$459</p>
-              <p className="text-locus-muted text-xs">Avg/Member</p>
-            </div>
-          </div>
-
-          {/* Disclaimer */}
-          <p className="text-[11px] text-locus-muted/60 leading-relaxed">
-            Results shown are from select members and not typical. Your results will vary. No earnings are guaranteed. Past performance does not indicate future results.
-          </p>
-        </div>
-      </Card>
-
-      {/* Primary CTA */}
-      <Card className="mb-10 animate-fade-in stagger-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-r from-[rgba(20,184,166,0.1)] to-[rgba(6,182,212,0.1)]" />
-        <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 p-2">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center animate-pulse-glow">
-              <Sparkles className="text-white" size={28} />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'var(--font-display)' }}>
-                Create Your Next Authority Article
-              </h2>
-              <p className="text-locus-muted">
-                Generate publication-ready content in seconds with AI
-              </p>
-            </div>
-          </div>
-          <div 
-            className="cursor-pointer"
-            onClick={() => {
-              useAppStore.getState().setCurrentArticle(null)
-              router.push('/create')
-            }}
-          >
-            <Button size="lg" className="whitespace-nowrap">
-              <PenTool size={18} />
-              <span>Start Creating</span>
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      {/* Video Training Card */}
-      <Card className="mb-10 animate-fade-in stagger-5 p-0 overflow-hidden">
+      {/* 2. Training Section */}
+      <Card className="mb-10 animate-fade-in stagger-1 p-0 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* Video Thumbnail */}
           <div className="relative aspect-video md:aspect-auto bg-linear-to-br from-locus-darker to-locus-dark">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
@@ -296,7 +161,6 @@ export default function DashboardPage() {
                 <p className="text-sm text-locus-muted">Watch: 3 min</p>
               </div>
             </div>
-            {/* Decorative Elements */}
             <div className="absolute top-4 left-4">
               <Badge variant="purple">
                 <GraduationCap size={12} className="mr-1" />
@@ -306,7 +170,6 @@ export default function DashboardPage() {
             <div className="absolute inset-0 bg-linear-to-t from-locus-dark via-transparent to-transparent opacity-50" />
           </div>
           
-          {/* Content */}
           <div className="p-6 flex flex-col justify-center">
             <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
               Quick Start: Create Your First Viral Article
@@ -333,7 +196,135 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      {/* Quick Actions */}
+      {/* 3. Member Earnings Dashboard — with slide animations */}
+      <Card className="mb-10 animate-fade-in stagger-2 border border-amber-500/30 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+        <div className="relative">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+                <DollarSign className="text-amber-400" size={24} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+                  Member Earnings Dashboard
+                </h2>
+                <p className="text-locus-muted text-sm">Real results from Locus members</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+              </span>
+              <span className="text-xs text-emerald-400 font-medium">Live</span>
+            </div>
+          </div>
+
+          {/* Featured Member — animated slide on change */}
+          <div className="bg-locus-darker/60 rounded-xl p-5 mb-6 border border-white/5 overflow-hidden">
+            <div
+              className={`flex items-center gap-4 transition-all duration-300 ${
+                isSliding
+                  ? slideDirection === 'up'
+                    ? 'opacity-0 -translate-y-4'
+                    : 'opacity-0 translate-y-4'
+                  : 'opacity-100 translate-y-0'
+              }`}
+            >
+              <div className={`w-14 h-14 rounded-full ${activeMember.color} flex items-center justify-center text-white text-xl font-bold shrink-0`}>
+                {activeMember.initial}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <span className="font-semibold text-white text-lg">{activeMember.name}</span>
+                  <Star className="text-amber-400 fill-amber-400" size={16} />
+                  <Badge variant="success" className="text-[10px] uppercase tracking-wider">Verified Member</Badge>
+                </div>
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-3xl font-bold text-amber-400 tabular-nums">
+                    ${activeMember.amount.toLocaleString()}
+                  </span>
+                  <span className="text-locus-muted text-sm">Earned in {activeMember.timeframe}</span>
+                </div>
+                <Badge variant="default" className="text-xs">
+                  {activeMember.badge}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Community Stats — values tick up live */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
+              <DollarSign className="text-amber-400 mx-auto mb-1" size={20} />
+              <p className="text-2xl font-bold text-white tabular-nums transition-all duration-700">
+                ${(communityTotal / 1000).toFixed(0)}K+
+              </p>
+              <p className="text-locus-muted text-xs">Community Total</p>
+            </div>
+            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
+              <Users className="text-amber-400 mx-auto mb-1" size={20} />
+              <p className="text-2xl font-bold text-white tabular-nums transition-all duration-700">
+                {activeEarners.toLocaleString()}
+              </p>
+              <p className="text-locus-muted text-xs">Active Earners</p>
+            </div>
+            <div className="bg-locus-darker/60 rounded-xl p-4 border border-amber-500/20 text-center">
+              <TrendingUp className="text-amber-400 mx-auto mb-1" size={20} />
+              <p className="text-2xl font-bold text-white tabular-nums transition-all duration-700">
+                ${avgPerMember}
+              </p>
+              <p className="text-locus-muted text-xs">Avg/Member</p>
+            </div>
+          </div>
+
+          <p className="text-[11px] text-locus-muted/60 leading-relaxed">
+            Results shown are from select members and not typical. Your results will vary. No earnings are guaranteed. Past performance does not indicate future results.
+          </p>
+        </div>
+      </Card>
+
+      {/* 4. Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <Card className="animate-fade-in stagger-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-locus-muted text-sm mb-1">Articles Generated</p>
+              <p className="text-3xl font-bold text-white">{stats.articlesGenerated}</p>
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-teal to-locus-indigo flex items-center justify-center">
+              <TrendingUp className="text-white" size={24} />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="animate-fade-in stagger-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-locus-muted text-sm mb-1">Saved Drafts</p>
+              <p className="text-3xl font-bold text-white">{stats.savedDrafts}</p>
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-cyan to-locus-blue flex items-center justify-center">
+              <FileText className="text-white" size={24} />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="animate-fade-in stagger-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-locus-muted text-sm mb-1">Published</p>
+              <p className="text-3xl font-bold text-white">{stats.publishedArticles}</p>
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-linear-to-r from-locus-success to-locus-cyan flex items-center justify-center">
+              <Send className="text-white" size={24} />
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* 5. Quick Actions */}
       <div className="mb-10">
         <h2 className="text-lg font-semibold text-white mb-4" style={{ fontFamily: 'var(--font-display)' }}>
           Quick Actions
@@ -350,8 +341,8 @@ export default function DashboardPage() {
               }}
             >
               <Card 
-                className={`animate-fade-in cursor-pointer group`}
-                style={{ animationDelay: `${(index + 5) * 0.1}s` }}
+                className="animate-fade-in cursor-pointer group"
+                style={{ animationDelay: `${(index + 6) * 0.1}s` }}
               >
                 <div className="flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-xl bg-linear-to-r ${action.gradient} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
@@ -373,41 +364,25 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Upsell Teasers */}
-      <div>
-        <h2 className="text-lg font-semibold text-white mb-4" style={{ fontFamily: 'var(--font-display)' }}>
-          Unlock Premium Features
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {upsellPreviews.map((upsell, index) => {
-            const config = UPSELL_CONFIGS[upsell.type]
-            const isUnlocked = unlockedUpsells.includes(upsell.type)
-            
-            return (
-              <Link 
-                key={upsell.type} 
-                href={isUnlocked ? `/upsell/${upsell.type}` : `/unlock/${upsell.type}`}
-              >
-                <Card 
-                  className={`animate-fade-in cursor-pointer group relative overflow-hidden h-full`}
-                  style={{ animationDelay: `${(index + 8) * 0.1}s` }}
-                >
-                  {!isUnlocked && (
-                    <div className="absolute inset-0 bg-locus-dark bg-opacity-60 backdrop-blur-sm z-10 flex items-center justify-center">
-                      <Badge variant="purple">Locked</Badge>
-                    </div>
-                  )}
-                  <div className={`w-10 h-10 rounded-xl bg-linear-to-r ${upsell.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <upsell.icon className="text-white" size={20} />
-                  </div>
-                  <h3 className="font-semibold text-white mb-1">{config.name}</h3>
-                  <p className="text-sm text-locus-muted">{config.description}</p>
-                </Card>
-              </Link>
-            )
-          })}
+      {/* 6. Support Bar */}
+      <Card className="animate-fade-in border border-[rgba(20,184,166,0.2)] bg-[rgba(20,184,166,0.03)]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-[rgba(20,184,166,0.15)] border border-[rgba(20,184,166,0.3)] flex items-center justify-center shrink-0">
+              <Headphones className="text-locus-teal" size={22} />
+            </div>
+            <div>
+              <h3 className="font-semibold text-white">Need Help?</h3>
+              <p className="text-sm text-locus-muted">Our support team is here to assist you 24/7</p>
+            </div>
+          </div>
+          <Link href="/support">
+            <Button size="sm">
+              Contact Support
+            </Button>
+          </Link>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }
