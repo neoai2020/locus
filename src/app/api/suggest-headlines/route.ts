@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { affiliateLink, niche, previousHeadlines = [], productInfo } = body
+    const { affiliateLink, niche, previousHeadlines = [], productInfo, suggestTone, topic } = body
 
     if (!niche) {
       return NextResponse.json({ error: 'Niche is required' }, { status: 400 })
@@ -131,8 +131,40 @@ Respond ONLY with a JSON array of exactly 5 strings, like:
       .map((h: string) => h.replace(/^\d+[\.\)]\s*/, '').trim())
       .slice(0, 5)
 
+    // If tone suggestion requested, do a second call
+    let suggestedToneResult = null
+    let toneReason = ''
+    if (suggestTone) {
+      try {
+        const tonePrompt = `You are a content strategy expert. Based on the following, recommend the single best tone for an article:
 
-    return NextResponse.json({ headlines })
+Niche: ${niche}
+${topic ? `Topic: ${topic}` : ''}
+${affiliateLink ? `Product Link: ${affiliateLink}` : ''}
+
+Available tones: authoritative, conversational, bold
+
+Respond ONLY with JSON: {"tone": "chosen_tone", "reason": "one short sentence why"}`
+
+        const toneResult = await callChatGPT([{ role: 'user', content: tonePrompt }])
+        try {
+          const parsed = JSON.parse(toneResult)
+          suggestedToneResult = parsed.tone
+          toneReason = parsed.reason
+        } catch {
+          const match = toneResult.match(/\{[\s\S]*?\}/)
+          if (match) {
+            const parsed = JSON.parse(match[0])
+            suggestedToneResult = parsed.tone
+            toneReason = parsed.reason
+          }
+        }
+      } catch (err) {
+        console.error('Tone suggestion failed:', err)
+      }
+    }
+
+    return NextResponse.json({ headlines, suggestedTone: suggestedToneResult, toneReason })
 
   } catch (error: any) {
     console.error('Suggest headlines error:', error)

@@ -20,6 +20,7 @@ import {
   Loader2,
   CheckCircle2,
   Eye,
+  Image,
   ChevronUp,
   ChevronDown,
   ExternalLink,
@@ -33,7 +34,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { useAppStore } from '@/store'
-import { Platform, ArticleTone, ArticleLength, GeneratedArticle, AffiliateLink as AffiliateLinkType, AffiliatePlatform } from '@/types'
+import { Platform, ArticleTone, GeneratedArticle, AffiliateLink as AffiliateLinkType, AffiliatePlatform } from '@/types'
 
 const nicheOptions = [
   { value: 'health', label: 'Health & Wellness' },
@@ -64,12 +65,6 @@ const toneOptions = [
   { value: 'authoritative', label: 'Authoritative' },
   { value: 'conversational', label: 'Conversational' },
   { value: 'bold', label: 'Bold' },
-]
-
-const lengthOptions = [
-  { value: 'short', label: 'Short (~500 words)' },
-  { value: 'medium', label: 'Medium (~1000 words)' },
-  { value: 'long', label: 'Long (~1500 words)' },
 ]
 
 const steps = [
@@ -152,10 +147,12 @@ export default function CreateArticlePage() {
   const [topic, setTopic] = useState('')
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['linkedin'])
   const [tone, setTone] = useState<ArticleTone>('authoritative')
-  const [length, setLength] = useState<ArticleLength>('medium')
   const [suggestedHeadlines, setSuggestedHeadlines] = useState<string[]>([])
   const [previousHeadlines, setPreviousHeadlines] = useState<string[]>([])
   const [isSuggesting, setIsSuggesting] = useState(false)
+  const [isSuggestingTone, setIsSuggestingTone] = useState(false)
+  const [suggestedTone, setSuggestedTone] = useState<string | null>(null)
+  const [suggestedToneReason, setSuggestedToneReason] = useState('')
   
   // Step 3 — Generated Article
   const [generatedArticle, setGeneratedArticle] = useState<GeneratedArticle | null>(null)
@@ -164,6 +161,31 @@ export default function CreateArticlePage() {
   const [saved, setSaved] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0)
+
+  const loadingMessages = [
+    'Searching for best ranking keywords...',
+    'Analyzing top-performing content in your niche...',
+    'Crafting an attention-grabbing hook...',
+    'Optimizing for engagement and shareability...',
+    'Building authority-driven structure...',
+    'Weaving in persuasive copy patterns...',
+    'Adding high-converting call-to-action...',
+    'Polishing for readability and flow...',
+    'Running final quality checks...',
+    'Almost there — packaging your article...',
+  ]
+
+  useEffect(() => {
+    if (!isGenerating) {
+      setLoadingMessageIndex(0)
+      return
+    }
+    const interval = setInterval(() => {
+      setLoadingMessageIndex(prev => (prev + 1) % loadingMessages.length)
+    }, 2800)
+    return () => clearInterval(interval)
+  }, [isGenerating])
 
   // Load current article if it exists
   useEffect(() => {
@@ -175,7 +197,6 @@ export default function CreateArticlePage() {
       setNiche(currentArticle.niche || '')
       setSelectedPlatforms(Array.isArray(currentArticle.platform) ? currentArticle.platform : [currentArticle.platform as string])
       setTone(currentArticle.tone)
-      setLength(currentArticle.length)
       setGeneratedArticle({
         hook: currentArticle.hook || '',
         body: '',
@@ -267,6 +288,41 @@ export default function CreateArticlePage() {
     }
   }
 
+  // Suggest Tone (AI)
+  const handleSuggestTone = async () => {
+    setIsSuggestingTone(true)
+    try {
+      const nicheLabel = nicheOptions.find(n => n.value === niche)?.label || niche
+      const response = await fetch('/api/suggest-headlines', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          affiliateLink,
+          niche: nicheLabel,
+          previousHeadlines: [],
+          productInfo,
+          suggestTone: true,
+          topic,
+        }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        if (data.suggestedTone) {
+          const toneLower = data.suggestedTone.toLowerCase() as ArticleTone
+          if (['authoritative', 'conversational', 'bold'].includes(toneLower)) {
+            setTone(toneLower)
+            setSuggestedTone(toneLower)
+            setSuggestedToneReason(data.toneReason || 'Best fit for your niche and topic')
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Tone suggestion failed:', err)
+    } finally {
+      setIsSuggestingTone(false)
+    }
+  }
+
   // Generate Article
   const handleGenerate = async () => {
     if (!topic.trim()) {
@@ -287,7 +343,7 @@ export default function CreateArticlePage() {
           topic,
           platforms: selectedPlatforms,
           tone,
-          length,
+          length: 'long',
           affiliateLink,
           niche: nicheOptions.find(n => n.value === niche)?.label || niche,
         }),
@@ -334,7 +390,7 @@ export default function CreateArticlePage() {
           niche,
           platform: selectedPlatforms,
           tone,
-          length,
+          length: 'long',
           hook: generatedArticle?.hook || currentArticle?.hook,
           cta: generatedArticle?.cta || currentArticle?.cta,
         }),
@@ -649,53 +705,33 @@ export default function CreateArticlePage() {
                 )}
               </div>
 
-              {/* Platform Selection (Multi-select) */}
+              {/* Tone with AI Suggest */}
               <div>
-                <label className="block text-sm font-medium text-locus-text mb-3">
-                  Target Platform(s)
-                  <span className="text-locus-muted text-xs ml-2">(select one or more)</span>
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {platformOptions.map((option) => {
-                    const isSelected = selectedPlatforms.includes(option.value)
-                    return (
-                      <button
-                        key={option.value}
-                        onClick={() => togglePlatform(option.value)}
-                        className={`
-                          flex items-center gap-3 p-4 rounded-xl border transition-all duration-200
-                          ${isSelected 
-                            ? 'border-locus-teal bg-locus-teal/10' 
-                            : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-locus-teal/50'
-                          }
-                        `}
-                      >
-                        <option.icon size={20} className={isSelected ? 'text-locus-teal' : 'text-locus-muted'} />
-                        <span className={isSelected ? 'text-white' : 'text-locus-muted'}>
-                          {option.label}
-                        </span>
-                        {isSelected && <Check size={16} className="ml-auto text-locus-teal" />}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Tone */}
               <Select
                 label="Tone"
                 options={toneOptions}
                 value={tone}
                 onChange={(e) => setTone(e.target.value as ArticleTone)}
               />
-
-              {/* Length */}
-              <Select
-                label="Length"
-                options={lengthOptions}
-                value={length}
-                onChange={(e) => setLength(e.target.value as ArticleLength)}
-              />
+                <button
+                  onClick={handleSuggestTone}
+                  disabled={isSuggestingTone}
+                  className="mt-2 flex items-center gap-2 px-3 py-2 rounded-xl border border-locus-teal/30 text-locus-teal text-xs font-medium hover:bg-locus-teal/10 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSuggestingTone ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={14} />
+                  )}
+                  {isSuggestingTone ? 'Analyzing...' : 'Suggest Best Tone (AI)'}
+                </button>
+                {suggestedTone && (
+                  <p className="mt-2 text-xs text-locus-teal flex items-center gap-1.5">
+                    <CheckCircle2 size={13} />
+                    AI recommends: <strong>{suggestedTone.charAt(0).toUpperCase() + suggestedTone.slice(1)}</strong> — {suggestedToneReason}
+                  </p>
+                )}
+              </div>
 
               {error && (
                 <div className="p-3 rounded-xl bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-locus-error text-sm">
@@ -733,8 +769,14 @@ export default function CreateArticlePage() {
                 <div className="w-20 h-20 rounded-2xl bg-linear-to-r from-locus-teal to-locus-cyan flex items-center justify-center mb-6 animate-pulse">
                   <Sparkles className="text-white animate-spin" size={32} />
                 </div>
-                <p className="text-white font-medium mb-2">Creating your authority article...</p>
-                <p className="text-locus-muted text-sm">This may take a moment</p>
+                <p className="text-white font-medium mb-2 transition-all duration-500" key={loadingMessageIndex}>
+                  {loadingMessages[loadingMessageIndex]}
+                </p>
+                <div className="flex items-center gap-1.5 mt-3">
+                  {loadingMessages.map((_, i) => (
+                    <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === loadingMessageIndex ? 'bg-locus-teal scale-125' : 'bg-locus-border'}`} />
+                  ))}
+                </div>
               </div>
             ) : generatedArticle ? (
               <>
@@ -802,12 +844,25 @@ export default function CreateArticlePage() {
                     <span>{saved ? 'Saved!' : isSaving ? 'Saving...' : 'Save Article'}</span>
                   </Button>
 
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      if (generatedArticle && !currentArticle) {
+                        handleSave()
+                      }
+                      router.push('/images')
+                    }}
+                  >
+                    <Image size={18} />
+                    <span>Generate Images</span>
+                  </Button>
+
                   {currentArticle && (
                     <Button 
                       variant="ghost" 
                       onClick={() => {
                         useAppStore.getState().setCurrentArticle(null);
-                        window.location.reload(); // Refresh to clear all local states
+                        window.location.reload();
                       }}
                     >
                       <PenTool size={18} />
