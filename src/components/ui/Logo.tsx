@@ -10,66 +10,91 @@ function LocusIcon({ size }: { size: number }) {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 48 48"
+      viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Outer rounded square */}
-      <rect x="2" y="2" width="44" height="44" rx="10" fill="none" stroke="white" strokeWidth="2.5" />
+      <defs>
+        <linearGradient id="bodyGrad" x1="16" y1="18" x2="48" y2="58" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#2dd4bf" />
+          <stop offset="50%" stopColor="#14b8a6" />
+          <stop offset="100%" stopColor="#0d9488" />
+        </linearGradient>
+        <linearGradient id="shadowGrad" x1="24" y1="30" x2="42" y2="58" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#0f766e" />
+          <stop offset="100%" stopColor="#115e59" />
+        </linearGradient>
+        <linearGradient id="dollarGrad" x1="28" y1="4" x2="36" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#34d399" />
+          <stop offset="100%" stopColor="#10b981" />
+        </linearGradient>
+      </defs>
 
-      {/* Inner circle */}
-      <circle cx="24" cy="24" r="14" fill="none" stroke="white" strokeWidth="2" opacity="0.6" />
-
-      {/* Upward arrow — growth / money */}
+      {/* Main 3D geometric shape — back face (darker) */}
       <path
-        d="M24 34V16"
-        stroke="white"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <path
-        d="M17 22L24 15L31 22"
-        stroke="white"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M32 28L48 58H32L16 58Z"
+        fill="url(#shadowGrad)"
       />
 
-      {/* Speed lines */}
-      <line x1="12" y1="30" x2="18" y2="30" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
-      <line x1="10" y1="35" x2="17" y2="35" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.35" />
-      <line x1="13" y1="25" x2="17" y2="25" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+      {/* Main 3D geometric shape — front face (lighter teal) */}
+      <path
+        d="M32 22L48 56H16Z"
+        fill="url(#bodyGrad)"
+      />
+
+      {/* Highlight fold on the left face for 3D depth */}
+      <path
+        d="M32 22L16 56H28L32 38Z"
+        fill="url(#shadowGrad)"
+        opacity="0.45"
+      />
+
+      {/* Inner lighter triangle detail */}
+      <path
+        d="M32 34L40 50H24Z"
+        fill="white"
+        opacity="0.12"
+      />
+
+      {/* Dollar sign */}
+      <text
+        x="32"
+        y="20"
+        textAnchor="middle"
+        dominantBaseline="auto"
+        fontFamily="system-ui, -apple-system, sans-serif"
+        fontWeight="800"
+        fontSize="20"
+        fill="url(#dollarGrad)"
+      >
+        $
+      </text>
     </svg>
   )
 }
 
 export default function Logo({ size = 'md', showText = true }: LogoProps) {
   const sizes = {
-    sm: { icon: 28, text: 'text-lg', pad: 'p-1.5' },
-    md: { icon: 36, text: 'text-2xl', pad: 'p-1.5' },
-    lg: { icon: 48, text: 'text-4xl', pad: 'p-2' },
+    sm: { icon: 32, text: 'text-lg', gap: 'gap-2' },
+    md: { icon: 40, text: 'text-2xl', gap: 'gap-2.5' },
+    lg: { icon: 52, text: 'text-4xl', gap: 'gap-3' },
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] blur-lg opacity-50" />
-        <div className={`relative bg-gradient-to-r from-[var(--color-locus-teal)] to-[var(--color-locus-cyan)] ${sizes[size].pad} rounded-xl`}>
-          <LocusIcon size={sizes[size].icon} />
-        </div>
-      </div>
+    <div className={`flex items-center ${sizes[size].gap}`}>
+      <LocusIcon size={sizes[size].icon} />
       {showText && (
         <span
           className={`font-extrabold ${sizes[size].text} tracking-tight`}
           style={{
             fontFamily: 'var(--font-display)',
-            background: 'linear-gradient(135deg, var(--color-locus-teal), var(--color-locus-cyan), var(--color-locus-emerald))',
+            background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
           }}
         >
-          LOCUS
+          Locus
         </span>
       )}
     </div>
