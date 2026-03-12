@@ -89,8 +89,24 @@ export default function MyPortfolioPage() {
       if (response.ok) {
         const data = await response.json()
         const fetchedArticles = data.articles || []
-        setArticles(fetchedArticles)
-        useAppStore.getState().setArticles(fetchedArticles)
+
+        const localArticles = useAppStore.getState().articles
+        const localImageMap = new Map<string, any[]>()
+        localArticles.forEach(a => {
+          if (a.images && a.images.length > 0) {
+            localImageMap.set(a.id, a.images)
+          }
+        })
+
+        const merged = fetchedArticles.map((a: Article) => {
+          if ((!a.images || a.images.length === 0) && localImageMap.has(a.id)) {
+            return { ...a, images: localImageMap.get(a.id) }
+          }
+          return a
+        })
+
+        setArticles(merged)
+        useAppStore.getState().setArticles(merged)
       }
     } catch (error) {
       console.error('Failed to fetch articles:', error)

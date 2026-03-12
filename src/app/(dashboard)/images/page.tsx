@@ -66,7 +66,24 @@ export default function ImagesPage() {
       const response = await fetch('/api/articles')
       if (response.ok) {
         const data = await response.json()
-        setArticles(data.articles || [])
+        const fetchedArticles = data.articles || []
+
+        const localArticles = useAppStore.getState().articles
+        const localImageMap = new Map<string, any[]>()
+        localArticles.forEach((a: any) => {
+          if (a.images && a.images.length > 0) {
+            localImageMap.set(a.id, a.images)
+          }
+        })
+
+        const merged = fetchedArticles.map((a: any) => {
+          if ((!a.images || a.images.length === 0) && localImageMap.has(a.id)) {
+            return { ...a, images: localImageMap.get(a.id) }
+          }
+          return a
+        })
+
+        setArticles(merged)
       }
     } catch (error) {
       console.error('Failed to fetch articles:', error)

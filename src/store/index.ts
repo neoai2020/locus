@@ -103,6 +103,7 @@ export const useAppStore = create<AppState>()(
       name: 'locus-storage',
       partialize: (state) => ({
         articles: state.articles,
+        currentArticle: state.currentArticle,
         affiliateLinks: state.affiliateLinks,
         unlockedUpsells: state.unlockedUpsells,
       }),

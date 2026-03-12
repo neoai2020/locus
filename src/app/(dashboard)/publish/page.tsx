@@ -76,7 +76,19 @@ export default function PublishPage() {
       fetch('/api/articles')
         .then(r => r.ok ? r.json() : { articles: [] })
         .then(data => {
-          useAppStore.getState().setArticles(data.articles || [])
+          const fetched = data.articles || []
+          const local = useAppStore.getState().articles
+          const localImageMap = new Map<string, any[]>()
+          local.forEach((a: any) => {
+            if (a.images && a.images.length > 0) localImageMap.set(a.id, a.images)
+          })
+          const merged = fetched.map((a: any) => {
+            if ((!a.images || a.images.length === 0) && localImageMap.has(a.id)) {
+              return { ...a, images: localImageMap.get(a.id) }
+            }
+            return a
+          })
+          useAppStore.getState().setArticles(merged)
         })
         .catch(() => {})
         .finally(() => setIsLoadingArticles(false))

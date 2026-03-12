@@ -42,27 +42,30 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, content, affiliate_link, niche, platform, tone, length, hook, cta } = body
+    const { title, content, affiliate_link, niche, platform, tone, length, hook, cta, images } = body
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
     }
 
+    const insertData: Record<string, any> = {
+      user_id: user.id,
+      title,
+      content,
+      affiliate_link: affiliate_link || null,
+      niche: niche || null,
+      platform: platform || [],
+      tone: tone || 'authoritative',
+      length: length || 'medium',
+      status: 'draft',
+      hook: hook || null,
+      cta: cta || null,
+    }
+    if (images !== undefined) insertData.images = images
+
     const { data: article, error } = await supabase
       .from('articles')
-      .insert({
-        user_id: user.id,
-        title,
-        content,
-        affiliate_link: affiliate_link || null,
-        niche: niche || null,
-        platform: platform || [],
-        tone: tone || 'authoritative',
-        length: length || 'medium',
-        status: 'draft',
-        hook: hook || null,
-        cta: cta || null,
-      })
+      .insert(insertData)
       .select()
       .single()
 
