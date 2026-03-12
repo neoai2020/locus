@@ -116,7 +116,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="relative aspect-video md:aspect-auto md:min-h-[320px] bg-locus-darker overflow-hidden">
             <iframe
-              src="https://player.vimeo.com/video/1172911144?badge=0&autopause=0&player_id=0&app_id=58479"
+              src="https://player.vimeo.com/video/1173102148?badge=0&autopause=0&player_id=0&app_id=58479"
               className="absolute inset-0 w-full h-full"
               frameBorder="0"
               allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"

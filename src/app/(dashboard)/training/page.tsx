@@ -27,7 +27,7 @@ const trainingVideos = [
     id: 'intro',
     title: 'Intro — Welcome to Locus',
     description: 'A quick introduction to Locus and what you can achieve with the platform.',
-    vimeoId: '1172911144',
+    vimeoId: '1173102148',
     duration: '3 min',
   },
   {
