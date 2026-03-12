@@ -20,6 +20,8 @@ import {
   ArrowLeft,
   Twitter,
   Sparkles,
+  Download,
+  Image as ImageIcon,
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -111,6 +113,27 @@ export default function PublishPage() {
   const handleMarkPublished = () => {
     if (currentArticle) {
       updateArticle(currentArticle.id, { status: 'published' })
+    }
+  }
+
+  const handleDownloadImages = async () => {
+    if (!currentArticle?.images || currentArticle.images.length === 0) return
+
+    for (const img of currentArticle.images) {
+      try {
+        const response = await fetch(img.url)
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${currentArticle.title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40)}_${img.section || img.position}.${blob.type.split('/')[1] || 'png'}`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
+      } catch (err) {
+        console.error('Failed to download image:', err)
+      }
     }
   }
 
@@ -227,10 +250,30 @@ export default function PublishPage() {
                   {currentArticle.content.substring(0, 200)}...
                 </p>
               </div>
-              <Button onClick={handleCopy}>
-                {copied ? <Check size={18} /> : <Copy size={18} />}
-                <span>{copied ? 'Copied!' : 'Copy Article'}</span>
-              </Button>
+              {currentArticle.images && currentArticle.images.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs text-locus-muted mb-2">{currentArticle.images.length} image{currentArticle.images.length !== 1 ? 's' : ''} attached</p>
+                  <div className="flex gap-2">
+                    {currentArticle.images.map((img, i) => (
+                      <div key={i} className="w-14 h-14 rounded-lg bg-[rgba(255,255,255,0.05)] border border-locus-border overflow-hidden">
+                        <img src={img.url} alt={img.alt || 'Article image'} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-3">
+                <Button onClick={handleCopy}>
+                  {copied ? <Check size={18} /> : <Copy size={18} />}
+                  <span>{copied ? 'Copied!' : 'Copy Article'}</span>
+                </Button>
+                {currentArticle.images && currentArticle.images.length > 0 && (
+                  <Button variant="secondary" onClick={handleDownloadImages}>
+                    <Download size={18} />
+                    <span>Download Images</span>
+                  </Button>
+                )}
+              </div>
             </Card>
           ) : (
             <Card className="animate-fade-in text-center py-12" style={{ animationDelay: '0.7s' }}>
@@ -453,11 +496,32 @@ export default function PublishPage() {
                     </p>
                   </div>
 
+                  {/* Images preview */}
+                  {currentArticle.images && currentArticle.images.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-xs text-locus-muted mb-2">{currentArticle.images.length} image{currentArticle.images.length !== 1 ? 's' : ''} attached</p>
+                      <div className="flex gap-2">
+                        {currentArticle.images.map((img, i) => (
+                          <div key={i} className="w-14 h-14 rounded-lg bg-[rgba(255,255,255,0.05)] border border-locus-border overflow-hidden">
+                            <img src={img.url} alt={img.alt || 'Article image'} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <Button onClick={handleCopy} className="w-full">
                       {copied ? <Check size={16} /> : <Copy size={16} />}
                       <span>{copied ? 'Copied!' : 'Copy Article'}</span>
                     </Button>
+
+                    {currentArticle.images && currentArticle.images.length > 0 && (
+                      <Button variant="secondary" onClick={handleDownloadImages} className="w-full">
+                        <Download size={16} />
+                        <span>Download Images</span>
+                      </Button>
+                    )}
 
                     {currentArticle.status !== 'published' && (
                       <Button variant="secondary" onClick={handleMarkPublished} className="w-full">
