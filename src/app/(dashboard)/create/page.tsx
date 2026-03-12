@@ -142,7 +142,7 @@ export default function CreateArticlePage() {
   const [productInfo, setProductInfo] = useState<Record<string, string> | null>(null)
   const [isScraping, setIsScraping] = useState(false)
   const [selectedAffiliatePlatform, setSelectedAffiliatePlatform] = useState<AffiliatePlatform | null>(null)
-  const [showInstructions, setShowInstructions] = useState(true)
+  const [showInstructions, setShowInstructions] = useState(false)
   const [linkSaved, setLinkSaved] = useState(false)
   const [linkLabel, setLinkLabel] = useState('')
   
@@ -474,106 +474,16 @@ export default function CreateArticlePage() {
       {/* ═══════════════ STEP 1: Link & Niche ═══════════════ */}
       {currentStep === 1 && (
         <div className="animate-fade-in space-y-6">
-          {/* Part A: Platform Selection */}
+          {/* Part A: Link Input & Save */}
           <Card>
-            <h2 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
               <LinkIcon size={20} className="text-locus-teal" />
               Step 1: Link & Niche
             </h2>
+            <p className="text-sm text-locus-muted mb-6">
+              Add any promotional or affiliate link you'd like placed in your article.
+            </p>
 
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-locus-text mb-3">
-                  Need help finding a link? Choose a platform for instructions
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {affiliatePlatforms.map((platform) => {
-                    const isSelected = selectedAffiliatePlatform === platform.value
-                    return (
-                      <button
-                        key={platform.value}
-                        onClick={() => {
-                          setSelectedAffiliatePlatform(platform.value)
-                          setLinkSaved(false)
-                        }}
-                        className={`
-                          flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left
-                          ${isSelected
-                            ? 'border-locus-teal bg-locus-teal/10 shadow-[0_0_15px_rgba(20,184,166,0.15)]'
-                            : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-locus-teal/50 hover:bg-[rgba(255,255,255,0.04)]'
-                          }
-                        `}
-                      >
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-locus-teal/20' : 'bg-locus-border'}`}>
-                          <platform.icon size={20} className={isSelected ? 'text-locus-teal' : 'text-locus-muted'} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-locus-text'}`}>
-                            {platform.label}
-                          </p>
-                          <p className="text-xs text-locus-muted truncate">{platform.description}</p>
-                        </div>
-                        {isSelected && <Check size={16} className="ml-auto text-locus-teal shrink-0" />}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Part B: Collapsible Instructions */}
-          {selectedAffiliatePlatform && (
-            <Card>
-              <button
-                onClick={() => setShowInstructions(!showInstructions)}
-                className="w-full flex items-center justify-between text-left"
-              >
-                <h3 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-                  <Lightbulb size={16} className="text-locus-teal" />
-                  How to Get Your Promotional Link
-                </h3>
-                {showInstructions ? (
-                  <ChevronUp size={18} className="text-locus-muted" />
-                ) : (
-                  <ChevronDown size={18} className="text-locus-muted" />
-                )}
-              </button>
-
-              {showInstructions && (
-                <div className="mt-5 space-y-3">
-                  {platformInstructions[selectedAffiliatePlatform].steps.map((step, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="w-7 h-7 rounded-full bg-locus-teal/20 text-locus-teal flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                        {i + 1}
-                      </div>
-                      <div className="text-sm text-locus-text pt-1">
-                        {step}
-                        {i === 0 && (
-                          <a
-                            href={platformInstructions[selectedAffiliatePlatform].linkUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 ml-2 text-locus-teal hover:underline font-medium"
-                          >
-                            {platformInstructions[selectedAffiliatePlatform].linkLabel}
-                            <ExternalLink size={13} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Card>
-          )}
-
-          {/* Part C: Link Input & Save */}
-          <Card>
-            <h2 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
-              <LinkIcon size={20} className="text-locus-teal" />
-              Your Promotional Link
-            </h2>
             <div className="space-y-5">
               {(() => {
                 const savedLinks = useAppStore.getState().affiliateLinks
@@ -666,11 +576,102 @@ export default function CreateArticlePage() {
                 {linkSaved && (
                   <span className="text-sm text-locus-teal flex items-center gap-1.5">
                     <CheckCircle2 size={15} />
-                    Promotional link saved successfully
+                    Link saved to your portfolio
                   </span>
                 )}
               </div>
             </div>
+          </Card>
+
+          {/* Part B: Affiliate Network Tips (collapsible) */}
+          <Card className="border-amber-500/20 bg-[rgba(245,158,11,0.02)]">
+            <button
+              onClick={() => setShowInstructions(!showInstructions)}
+              className="w-full flex items-center justify-between text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0">
+                  <Lightbulb size={18} className="text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-white">
+                    Want to use an affiliate link?
+                  </h3>
+                  <p className="text-xs text-locus-muted">
+                    Pick a network below to see how to get your affiliate link
+                  </p>
+                </div>
+              </div>
+              {showInstructions ? (
+                <ChevronUp size={18} className="text-locus-muted shrink-0" />
+              ) : (
+                <ChevronDown size={18} className="text-locus-muted shrink-0" />
+              )}
+            </button>
+
+            {showInstructions && (
+              <div className="mt-5 space-y-5">
+                <div className="grid grid-cols-2 gap-3">
+                  {affiliatePlatforms.map((platform) => {
+                    const isSelected = selectedAffiliatePlatform === platform.value
+                    return (
+                      <button
+                        key={platform.value}
+                        onClick={() => setSelectedAffiliatePlatform(
+                          selectedAffiliatePlatform === platform.value ? null : platform.value
+                        )}
+                        className={`
+                          flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 text-left
+                          ${isSelected
+                            ? 'border-amber-500/40 bg-amber-500/10'
+                            : 'border-locus-border bg-[rgba(255,255,255,0.02)] hover:border-amber-500/30 hover:bg-[rgba(255,255,255,0.04)]'
+                          }
+                        `}
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-amber-500/20' : 'bg-locus-border'}`}>
+                          <platform.icon size={18} className={isSelected ? 'text-amber-400' : 'text-locus-muted'} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-locus-text'}`}>
+                            {platform.label}
+                          </p>
+                          <p className="text-xs text-locus-muted truncate">{platform.description}</p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {selectedAffiliatePlatform && (
+                  <div className="bg-locus-darker/40 rounded-xl p-4 border border-locus-border space-y-3">
+                    <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                      How to get your {affiliatePlatforms.find(p => p.value === selectedAffiliatePlatform)?.label} link
+                    </h4>
+                    {platformInstructions[selectedAffiliatePlatform].steps.map((step, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-amber-500/15 text-amber-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                          {i + 1}
+                        </div>
+                        <div className="text-sm text-locus-text pt-0.5">
+                          {step}
+                          {i === 0 && (
+                            <a
+                              href={platformInstructions[selectedAffiliatePlatform].linkUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 ml-2 text-amber-400 hover:underline font-medium"
+                            >
+                              {platformInstructions[selectedAffiliatePlatform].linkLabel}
+                              <ExternalLink size={13} />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </Card>
 
           {/* Part D: Niche Selection */}
