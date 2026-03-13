@@ -39,7 +39,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in max-w-md mx-auto">
       <div className="flex justify-center mb-8">
         <Logo size="lg" />
       </div>
