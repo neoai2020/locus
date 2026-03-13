@@ -319,7 +319,7 @@ export default function InfinitePage() {
     return items
   }, [selectedNiche, searchQuery])
 
-  const handleSaveArticle = (navigateTo: 'saved' | 'publish' | 'images') => {
+  const handleSaveArticle = async (navigateTo: 'saved' | 'publish' | 'images') => {
     if (!previewArticle) return
     const nicheLabel = NICHES.find(n => n.id === previewArticle.niche)?.label || ''
 
@@ -343,11 +343,18 @@ export default function InfinitePage() {
     setUsedArticles(prev => new Set(prev).add(previewArticle.id))
 
     try {
-      fetch('/api/articles', {
+      const resp = await fetch('/api/articles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newArticle),
       })
+      if (resp.ok) {
+        const data = await resp.json()
+        if (data.article) {
+          useAppStore.getState().updateArticle(newArticle.id, data.article)
+          setCurrentArticle(data.article)
+        }
+      }
     } catch {}
 
     if (navigateTo === 'images') {

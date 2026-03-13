@@ -88,28 +88,38 @@ export default function MyPortfolioPage() {
       const response = await fetch('/api/articles')
       if (response.ok) {
         const data = await response.json()
-        const fetchedArticles = data.articles || []
-
+        const fetchedArticles: Article[] = data.articles || []
         const localArticles = useAppStore.getState().articles
-        const localImageMap = new Map<string, any[]>()
-        localArticles.forEach(a => {
-          if (a.images && a.images.length > 0) {
-            localImageMap.set(a.id, a.images)
-          }
-        })
 
+        const localMap = new Map<string, Article>()
+        localArticles.forEach(a => localMap.set(a.id, a))
+
+        const fetchedIds = new Set<string>()
         const merged = fetchedArticles.map((a: Article) => {
-          if ((!a.images || a.images.length === 0) && localImageMap.has(a.id)) {
-            return { ...a, images: localImageMap.get(a.id) }
+          fetchedIds.add(a.id)
+          const local = localMap.get(a.id)
+          if (local && local.images && local.images.length > 0 && (!a.images || a.images.length === 0)) {
+            return { ...a, images: local.images }
           }
           return a
         })
 
+        localArticles.forEach(a => {
+          if (!fetchedIds.has(a.id)) {
+            merged.push(a)
+          }
+        })
+
         setArticles(merged)
         useAppStore.getState().setArticles(merged)
+      } else {
+        const localArticles = useAppStore.getState().articles
+        setArticles(localArticles)
       }
     } catch (error) {
       console.error('Failed to fetch articles:', error)
+      const localArticles = useAppStore.getState().articles
+      setArticles(localArticles)
     } finally {
       setIsLoading(false)
     }

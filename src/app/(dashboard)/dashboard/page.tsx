@@ -70,16 +70,19 @@ export default function DashboardPage() {
           const data = await response.json()
           const fetched = data.articles || []
           const local = useAppStore.getState().articles
-          const localImageMap = new Map<string, any[]>()
-          local.forEach((a: any) => {
-            if (a.images && a.images.length > 0) localImageMap.set(a.id, a.images)
-          })
+          const localMap = new Map<string, any>()
+          local.forEach((a: any) => localMap.set(a.id, a))
+
+          const fetchedIds = new Set<string>()
           const merged = fetched.map((a: any) => {
-            if ((!a.images || a.images.length === 0) && localImageMap.has(a.id)) {
-              return { ...a, images: localImageMap.get(a.id) }
+            fetchedIds.add(a.id)
+            const loc = localMap.get(a.id)
+            if (loc?.images?.length > 0 && (!a.images || a.images.length === 0)) {
+              return { ...a, images: loc.images }
             }
             return a
           })
+          local.forEach((a: any) => { if (!fetchedIds.has(a.id)) merged.push(a) })
           useAppStore.getState().setArticles(merged)
         }
       } catch (error) {

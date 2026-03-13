@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, content, affiliate_link, niche, platform, tone, length, hook, cta, images } = body
+    const { id: clientId, title, content, affiliate_link, niche, platform, tone, length, hook, cta, images } = body
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
       hook: hook || null,
       cta: cta || null,
     }
+    if (clientId) insertData.id = clientId
     if (images !== undefined) insertData.images = images
 
     const { data: article, error } = await supabase

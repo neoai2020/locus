@@ -66,23 +66,21 @@ export default function ImagesPage() {
       const response = await fetch('/api/articles')
       if (response.ok) {
         const data = await response.json()
-        const fetchedArticles = data.articles || []
+        const fetched = data.articles || []
+        const local = useAppStore.getState().articles
+        const localMap = new Map<string, any>()
+        local.forEach((a: any) => localMap.set(a.id, a))
 
-        const localArticles = useAppStore.getState().articles
-        const localImageMap = new Map<string, any[]>()
-        localArticles.forEach((a: any) => {
-          if (a.images && a.images.length > 0) {
-            localImageMap.set(a.id, a.images)
-          }
-        })
-
-        const merged = fetchedArticles.map((a: any) => {
-          if ((!a.images || a.images.length === 0) && localImageMap.has(a.id)) {
-            return { ...a, images: localImageMap.get(a.id) }
+        const fetchedIds = new Set<string>()
+        const merged = fetched.map((a: any) => {
+          fetchedIds.add(a.id)
+          const loc = localMap.get(a.id)
+          if (loc?.images?.length > 0 && (!a.images || a.images.length === 0)) {
+            return { ...a, images: loc.images }
           }
           return a
         })
-
+        local.forEach((a: any) => { if (!fetchedIds.has(a.id)) merged.push(a) })
         setArticles(merged)
       }
     } catch (error) {
@@ -189,8 +187,8 @@ export default function ImagesPage() {
 
     try {
       const images = getSelectedImages()
-
       const updatedArticle = { ...currentArticle, images: images as any }
+
       updateArticle(currentArticle.id, updatedArticle)
       setCurrentArticle(updatedArticle)
 
@@ -204,8 +202,9 @@ export default function ImagesPage() {
         if (response.ok) {
           const data = await response.json()
           if (data.article) {
-            updateArticle(data.article.id, data.article)
-            setCurrentArticle(data.article)
+            const merged = { ...data.article, images: images as any }
+            updateArticle(data.article.id, merged)
+            setCurrentArticle(merged)
           }
         }
       } catch (apiErr) {
