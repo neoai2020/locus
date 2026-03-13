@@ -10,6 +10,7 @@ import {
   HelpCircle,
   Video,
   MessageCircle,
+  Crown,
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
@@ -21,6 +22,7 @@ const trainingVideos = [
     description: 'A quick introduction to Locus and what you can achieve with the platform.',
     vimeoId: '1173102148',
     duration: '3 min',
+    premium: false,
   },
   {
     id: 'create-article',
@@ -28,6 +30,7 @@ const trainingVideos = [
     description: 'Step-by-step walkthrough of creating your first authority article with AI.',
     vimeoId: '1173095230',
     duration: '5 min',
+    premium: false,
   },
   {
     id: 'publish-earn',
@@ -35,6 +38,7 @@ const trainingVideos = [
     description: 'Learn how to publish your articles and start earning with promotional links.',
     vimeoId: '1173095468',
     duration: '5 min',
+    premium: false,
   },
   {
     id: '10x-mode',
@@ -42,6 +46,7 @@ const trainingVideos = [
     description: 'Learn how to use 10X Mode to generate 10 high-converting Facebook posts from a single link.',
     vimeoId: '1173173582',
     duration: '4 min',
+    premium: true,
   },
 ]
 
@@ -231,7 +236,14 @@ export default function TrainingPage() {
               />
             </div>
             <div className="p-6">
-              <h2 className="text-xl font-bold text-white mb-1">{activeVideo.title}</h2>
+              <div className="flex items-center gap-3 mb-1">
+                <h2 className="text-xl font-bold text-white">{activeVideo.title}</h2>
+                {activeVideo.premium && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-400/15 to-amber-600/15 border border-amber-400/30 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
+                    <Crown size={11} /> Premium Feature
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-locus-muted">{activeVideo.description}</p>
             </div>
           </Card>
@@ -243,19 +255,40 @@ export default function TrainingPage() {
               return (
                 <Card
                   key={video.id}
-                  className={`cursor-pointer transition-all hover:border-locus-teal/50 ${
-                    isActive ? 'border-locus-teal ring-2 ring-locus-teal/20' : ''
+                  className={`cursor-pointer transition-all relative overflow-hidden ${
+                    isActive
+                      ? video.premium
+                        ? 'border-amber-400 ring-2 ring-amber-400/25'
+                        : 'border-locus-teal ring-2 ring-locus-teal/20'
+                      : video.premium
+                        ? 'border-amber-400/40 hover:border-amber-400/70'
+                        : 'hover:border-locus-teal/50'
                   }`}
                   onClick={() => setActiveVideoId(video.id)}
                 >
+                  {video.premium && (
+                    <div className="absolute top-0 right-0 w-20 h-20 pointer-events-none">
+                      <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-amber-400/10 to-transparent" />
+                    </div>
+                  )}
                   <div className="flex items-start gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                      isActive ? 'bg-locus-teal' : 'bg-locus-border'
+                      video.premium
+                        ? isActive ? 'bg-gradient-to-br from-amber-400 to-amber-600' : 'bg-gradient-to-br from-amber-400/20 to-amber-600/20 border border-amber-400/30'
+                        : isActive ? 'bg-locus-teal' : 'bg-locus-border'
                     }`}>
-                      <Play size={18} className="text-white ml-0.5" />
+                      {video.premium
+                        ? <Crown size={18} className={isActive ? 'text-white' : 'text-amber-400'} />
+                        : <Play size={18} className="text-white ml-0.5" />
+                      }
                     </div>
                     <div className="min-w-0">
-                      <h3 className={`font-semibold text-sm mb-1 ${isActive ? 'text-white' : 'text-locus-text'}`}>
+                      {video.premium && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-400/15 to-amber-600/15 border border-amber-400/30 text-amber-400 text-[9px] font-bold uppercase tracking-wider mb-1.5">
+                          <Crown size={9} /> Premium
+                        </span>
+                      )}
+                      <h3 className={`font-semibold text-sm mb-1 ${isActive ? 'text-white' : video.premium ? 'text-amber-50' : 'text-locus-text'}`}>
                         {video.title}
                       </h3>
                       <p className="text-xs text-locus-muted line-clamp-2">{video.description}</p>
