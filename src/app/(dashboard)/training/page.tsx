@@ -56,40 +56,44 @@ const faqItems = [
     questions: [
       {
         q: 'What is Locus?',
-        a: 'Locus is an AI-powered content platform that helps you create SEO-optimized authority articles, generate professional images, and publish across multiple platforms — all designed to drive traffic and earn commissions through your promotional links.',
+        a: 'Locus is an AI-powered content platform that helps you create SEO-optimized authority articles (approx. 1,500 words each), generate professional images, and publish across LinkedIn, Medium, Quora, Reddit, and X (Twitter) — all designed to drive traffic and earn commissions through your promotional links.',
       },
       {
         q: 'How do I create my first article?',
-        a: 'Go to "Create Article" from the sidebar. In Step 1, add your promotional link and select a niche. In Step 2, choose a topic and tone. In Step 3, the AI writes a complete 1,500-word article. You can then save it, generate images, and publish.',
+        a: 'Go to "Create Article" from the sidebar. In Step 1, add your promotional link (or pick one from My Portfolio) and select a niche. In Step 2, choose a topic and tone — you can also use "Suggest Best Tone (AI)" for an AI recommendation. In Step 3, the AI writes a complete 1,500-word article. Save it, generate images, and publish.',
       },
       {
-        q: 'Do I need any writing experience?',
-        a: 'No. Locus handles all the writing for you. The AI generates complete, publish-ready articles optimized for SEO and engagement. You just need to provide a topic and your promotional link.',
+        q: 'Do I need any writing or SEO experience?',
+        a: 'No. Locus handles all the writing and SEO optimization for you. The AI generates complete, publish-ready articles. You just provide a topic and optionally a promotional link.',
       },
       {
         q: 'What platforms can I publish to?',
-        a: 'Locus supports publishing to LinkedIn, Medium, Quora, Reddit, and X (Twitter). Each platform comes with detailed instructions, SEO tips, and AI-suggested tags to maximize your reach.',
+        a: 'Locus supports publishing to LinkedIn, Medium, Quora, Reddit, and X (Twitter). Each platform comes with detailed step-by-step instructions, SEO ranking tips, and AI-suggested tags/hashtags to maximize your reach.',
+      },
+      {
+        q: 'Does Locus post articles automatically?',
+        a: 'No. Locus provides "Copy Article" and "Download Images" buttons so you can paste the content directly into each platform yourself. This keeps your accounts safe and compliant with platform terms of service. Detailed instructions guide you through each platform.',
       },
     ],
   },
   {
-    category: 'Articles & Content',
+    category: 'Articles & Images',
     questions: [
       {
         q: 'How long are the articles?',
-        a: 'All articles are approximately 1,500 words — the ideal length for SEO ranking and reader engagement. This length is long enough to be authoritative but concise enough to hold attention.',
+        a: 'All articles are approximately 1,500 words — the ideal length for SEO ranking and reader engagement. Long enough to be authoritative, concise enough to hold attention.',
       },
       {
         q: 'Can I edit articles after they are generated?',
-        a: 'Yes. After an article is generated, you can edit the content directly. Your saved articles are available in "My Portfolio" where you can make changes at any time before publishing.',
+        a: 'Yes. After an article is generated, you can edit the content directly. All saved articles are available in "My Portfolio" where you can make changes, regenerate images, or publish at any time.',
       },
       {
         q: 'How do images work?',
-        a: 'After saving an article, click "Generate Images" to go to the Images page. For each section (Header, Mid-Article, Conclusion), you can generate 3 AI image options and pick one, or upload your own image. Images are saved with the article.',
+        a: 'After saving an article, click "Generate Images" to go to the Images page. For each section (Header, Mid-Article, Conclusion), you can generate 3 AI image options and pick one, or upload your own image. Selected images are saved with the article and can be downloaded at any time from My Portfolio or the Publish page.',
       },
       {
         q: 'What is the AI Tone Suggestion?',
-        a: 'In Step 2 of article creation, click "Suggest Best Tone (AI)" and the AI will analyze your topic and recommend the most effective tone (authoritative, conversational, or bold) with an explanation of why it works best.',
+        a: 'In Step 2 of article creation, click "Suggest Best Tone (AI)" and the AI will analyze your topic and recommend the most effective tone (authoritative, conversational, or bold) with an explanation of why it works best for your article.',
       },
     ],
   },
@@ -98,7 +102,7 @@ const faqItems = [
     questions: [
       {
         q: 'What is a promotional link?',
-        a: 'A promotional link is any URL you want placed in your article — such as an affiliate link from Digistore24, Amazon, Etsy, or eBay, or any other product/service link you want to promote.',
+        a: 'A promotional link is any URL you want placed in your article — such as an affiliate link from Digistore24, Amazon, Etsy, or eBay, or any product/service/landing page link. It\'s optional — you can write articles without one.',
       },
       {
         q: 'How do I add a promotional link?',
@@ -110,7 +114,7 @@ const faqItems = [
       },
       {
         q: 'Do I need an affiliate link to use Locus?',
-        a: 'No. You can use any promotional link — affiliate links, your own product pages, landing pages, or even just write articles without links. The link is optional in Step 1.',
+        a: 'No. You can use any promotional link — affiliate links, your own product pages, landing pages, or just write articles without links. The link is optional.',
       },
     ],
   },
@@ -119,15 +123,11 @@ const faqItems = [
     questions: [
       {
         q: 'How does the Publish page work?',
-        a: 'The Publish page is a 3-step flow: (1) Select your article, (2) Choose a platform (LinkedIn, Quora, Medium, Reddit, or X), and (3) Get detailed posting instructions, SEO ranking tips, and AI-generated tags/hashtags for that platform.',
-      },
-      {
-        q: 'Does Locus post articles automatically?',
-        a: 'Locus provides a "Copy Article" button and "Download Images" so you can paste the content directly into each platform. The detailed instructions guide you through the exact steps for each platform.',
+        a: 'The Publish page is a 3-step flow: (1) Select your article, (2) Choose a platform (LinkedIn, Quora, Medium, Reddit, or X), and (3) Get detailed posting instructions, SEO ranking tips, and AI-generated tags/hashtags for that platform. You can also copy the article and download images directly.',
       },
       {
         q: 'What are AI-suggested tags?',
-        a: 'When you select a platform in the Publish page, the AI analyzes your article and suggests the best tags, hashtags, or topics for that specific platform to maximize discoverability and engagement.',
+        a: 'When you select a platform on the Publish page, the AI analyzes your article and suggests the best tags, hashtags, or topics for that specific platform to maximize discoverability and engagement.',
       },
     ],
   },
@@ -136,15 +136,19 @@ const faqItems = [
     questions: [
       {
         q: 'What is 10X Mode?',
-        a: '10X Mode lets you generate 10 unique, high-converting Facebook posts from a single promotional link. Each post uses a different angle (urgency, social proof, storytelling, etc.) to maximize your reach.',
+        a: '10X Mode is a premium feature that generates 10 unique, high-converting Facebook posts from a single promotional link. Each post uses a different angle (urgency, social proof, storytelling, curiosity, etc.) and comes with tips on how to share effectively in Facebook groups for maximum reach.',
       },
       {
         q: 'What is Infinite Mode?',
-        a: 'Infinite Mode gives you access to a library of 100 SEO-researched article topics across 10 profitable niches. Pick any topic and the AI writes a complete article with images — ready to add your links and publish.',
+        a: 'Infinite Mode is a premium feature with 100 pre-written, SEO-optimized authority articles across 10 profitable niches — each with 3 professional images already included. Just add your promotional link (it replaces placeholders automatically), save, and publish.',
+      },
+      {
+        q: 'What is Done-For-You (DFY)?',
+        a: 'Done-For-You is a premium library of fully written articles with 10 social media posts per article and a share directory for each niche. Add your promotional link and it gets applied to the article content and all social posts automatically.',
       },
       {
         q: 'What is Automation Mode?',
-        a: 'Automation Mode lets you set up content workflows that generate articles on a schedule. Set your niche, tone, and platforms, and Locus creates content automatically.',
+        a: 'Automation Mode is a premium feature that lets you set up content workflows to generate articles on a schedule. Set your niche, tone, and platforms, and Locus creates content automatically.',
       },
       {
         q: 'How do I unlock premium features?',
@@ -157,7 +161,7 @@ const faqItems = [
     questions: [
       {
         q: 'How do I contact support?',
-        a: 'Visit the Support page from the sidebar, or email us directly at support@locusaiaccess.com. We\'re available 24/7 to help.',
+        a: 'Visit the Support page from the sidebar, or email us directly at locusAI@neoai.freshdesk.com. We typically respond within 24 hours.',
       },
       {
         q: 'Can I use Locus on mobile?',

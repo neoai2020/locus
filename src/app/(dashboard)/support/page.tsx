@@ -5,16 +5,11 @@ import {
   HelpCircle, 
   MessageCircle, 
   Mail, 
-  FileText, 
   Search,
   ChevronDown,
   ChevronUp,
-  ExternalLink,
   Send,
-  Zap,
-  BookOpen,
   Video,
-  Users
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -24,51 +19,111 @@ import Badge from '@/components/ui/Badge'
 const faqs = [
   {
     id: '1',
-    question: 'How does Locus generate articles?',
-    answer: 'Locus uses advanced AI (powered by GPT-4) to generate publication-ready articles based on your topic, chosen platform, tone, and length preferences. The AI understands authority positioning and creates content optimized for engagement on each platform.',
-    category: 'general'
+    question: 'What is Locus?',
+    answer: 'Locus is an AI-powered content platform that helps you create SEO-optimized authority articles (approx. 1,500 words each), generate professional images, and publish across LinkedIn, Medium, Quora, Reddit, and X (Twitter) — all designed to drive traffic and earn commissions through your promotional links.',
+    category: 'general',
   },
   {
     id: '2',
-    question: 'Does Locus auto-post to my social accounts?',
-    answer: 'No, Locus does NOT auto-post to any platform. This is by design to keep your accounts safe and compliant with platform terms of service. You copy the generated content and manually post it yourself, maintaining full control over what gets published.',
-    category: 'general'
+    question: 'How do I create my first article?',
+    answer: 'Go to "Create Article" from the sidebar. In Step 1, add your promotional link (or pick one from My Portfolio) and select a niche. In Step 2, choose a topic and tone — you can also use "Suggest Best Tone (AI)" for an AI recommendation. In Step 3, the AI writes a complete 1,500-word article. Save it, generate images, and publish.',
+    category: 'general',
   },
   {
     id: '3',
-    question: 'What platforms is the content optimized for?',
-    answer: 'Locus optimizes content for LinkedIn, Medium, Substack, and general publications. Each platform has different best practices for formatting, length, and engagement tactics, and Locus tailors the output accordingly.',
-    category: 'features'
+    question: 'Do I need any writing or SEO experience?',
+    answer: 'No. Locus handles all the writing and SEO optimization for you. The AI generates complete, publish-ready articles. You just provide a topic and optionally a promotional link.',
+    category: 'general',
   },
   {
     id: '4',
-    question: 'How do I unlock premium features?',
-    answer: 'Premium features like 10X Mode, Infinite Mode, Automation, and Done-For-You content packs can be unlocked through their respective unlock pages. Simply enter your email and click unlock to gain access.',
-    category: 'features'
+    question: 'What platforms can I publish to?',
+    answer: 'Locus supports publishing to LinkedIn, Medium, Quora, Reddit, and X (Twitter). Each platform comes with detailed step-by-step instructions, SEO ranking tips, and AI-suggested tags/hashtags to maximize your reach.',
+    category: 'general',
   },
   {
     id: '5',
-    question: 'Can I edit the generated content?',
-    answer: 'Absolutely! All generated content is fully editable. We encourage you to personalize the content with your own experiences, examples, and voice before publishing to make it authentically yours.',
-    category: 'features'
+    question: 'Does Locus post articles automatically?',
+    answer: 'No. Locus provides "Copy Article" and "Download Images" buttons so you can paste the content directly into each platform yourself. This keeps your accounts safe and compliant with platform terms of service. Detailed instructions guide you through each platform.',
+    category: 'general',
   },
   {
     id: '6',
-    question: 'Is there a limit on how many articles I can generate?',
-    answer: 'The free tier has a reasonable limit on generations. You can unlock unlimited generations with Infinite Mode, which removes all caps and throttling.',
-    category: 'billing'
+    question: 'How do images work?',
+    answer: 'After saving an article, click "Generate Images" to go to the Images page. For each section (Header, Mid-Article, Conclusion), you can generate 3 AI image options and pick one, or upload your own image. Selected images are saved with the article and can be downloaded at any time from My Portfolio or the Publish page.',
+    category: 'features',
   },
   {
     id: '7',
-    question: 'How do I connect my OpenAI API key?',
-    answer: 'You can add your OpenAI API key in the settings. This allows you to use your own API credits for generation. Your key is stored securely and never shared.',
-    category: 'technical'
+    question: 'What is a promotional link?',
+    answer: 'A promotional link is any URL you want placed in your article — such as an affiliate link from Digistore24, Amazon, Etsy, or eBay, or any product/service/landing page link. It\'s optional — you can write articles without one.',
+    category: 'features',
   },
   {
     id: '8',
-    question: 'What if I need help with content strategy?',
-    answer: 'Check out our Training Center for comprehensive courses on content strategy, platform mastery, and advanced tactics. We also offer Done-For-You content packs if you want ready-made authority content.',
-    category: 'general'
+    question: 'Where do I manage my saved links and articles?',
+    answer: 'Go to "My Portfolio" from the sidebar. It has two tabs: "Articles" shows all your saved articles (with image thumbnails and download options), and "Promotional Links" lets you create, edit, copy, and delete your saved links.',
+    category: 'features',
+  },
+  {
+    id: '9',
+    question: 'Can I edit articles after they are generated?',
+    answer: 'Yes. After an article is generated, you can edit the content directly. All saved articles are available in "My Portfolio" where you can make changes, regenerate images, or publish at any time.',
+    category: 'features',
+  },
+  {
+    id: '10',
+    question: 'What is 10X Mode?',
+    answer: '10X Mode is a premium feature that generates 10 unique, high-converting Facebook posts from a single promotional link. Each post uses a different angle (urgency, social proof, storytelling, curiosity, etc.) and comes with tips on how to share effectively in Facebook groups for maximum reach.',
+    category: 'premium',
+  },
+  {
+    id: '11',
+    question: 'What is Infinite Mode?',
+    answer: 'Infinite Mode is a premium feature with 100 pre-written, SEO-optimized authority articles across 10 profitable niches — each with 3 professional images already included. Just add your promotional link (it replaces placeholders automatically), save, and publish.',
+    category: 'premium',
+  },
+  {
+    id: '12',
+    question: 'What is Done-For-You (DFY)?',
+    answer: 'Done-For-You is a premium library of fully written articles with 10 social media posts per article and a share directory for each niche. Add your promotional link and it gets applied to the article content and all social posts automatically.',
+    category: 'premium',
+  },
+  {
+    id: '13',
+    question: 'What is Automation Mode?',
+    answer: 'Automation Mode is a premium feature that lets you set up content workflows to generate articles on a schedule. Set your niche, tone, and platforms, and Locus creates content automatically.',
+    category: 'premium',
+  },
+  {
+    id: '14',
+    question: 'How do I unlock premium features?',
+    answer: 'Premium features (10X, Infinite, Automation, Done-For-You) are shown in the sidebar with a lock icon. Click on any locked feature to see details and unlock it.',
+    category: 'premium',
+  },
+  {
+    id: '15',
+    question: 'How do I contact support?',
+    answer: 'Use the contact form on this page, or email us directly at locusAI@neoai.freshdesk.com. We typically respond within 24 hours.',
+    category: 'account',
+  },
+  {
+    id: '16',
+    question: 'Can I use Locus on mobile?',
+    answer: 'Yes. Locus is fully responsive and works on any device — desktop, tablet, or phone. The interface adapts to your screen size automatically.',
+    category: 'account',
+  },
+  {
+    id: '17',
+    question: 'Is my data secure?',
+    answer: 'Yes. Locus uses Supabase for secure authentication and data storage. Your articles, links, and account data are encrypted and protected.',
+    category: 'account',
+  },
+  {
+    id: '18',
+    question: 'What is the AI Tone Suggestion?',
+    answer: 'In Step 2 of article creation, click "Suggest Best Tone (AI)" and the AI will analyze your topic and recommend the most effective tone (authoritative, conversational, or bold) with an explanation of why it works best for your article.',
+    category: 'features',
   },
 ]
 
@@ -76,31 +131,17 @@ const categories = [
   { id: 'all', label: 'All Questions' },
   { id: 'general', label: 'General' },
   { id: 'features', label: 'Features' },
-  { id: 'billing', label: 'Billing' },
-  { id: 'technical', label: 'Technical' },
+  { id: 'premium', label: 'Premium' },
+  { id: 'account', label: 'Account' },
 ]
 
 const resources = [
   {
     title: 'Training Center',
-    description: 'Learn content strategy and platform mastery',
+    description: 'Watch video tutorials and learn the platform',
     icon: Video,
     href: '/training',
-    gradient: 'from-[var(--color-locus-teal)] to-[var(--color-locus-indigo)]'
-  },
-  {
-    title: 'Documentation',
-    description: 'Detailed guides and API reference',
-    icon: BookOpen,
-    href: '#',
-    gradient: 'from-[var(--color-locus-cyan)] to-[var(--color-locus-blue)]'
-  },
-  {
-    title: 'Community',
-    description: 'Join other Locus users',
-    icon: Users,
-    href: '#',
-    gradient: 'from-[var(--color-locus-amber)] to-[var(--color-locus-teal)]'
+    gradient: 'from-[var(--color-locus-teal)] to-[var(--color-locus-indigo)]',
   },
 ]
 
@@ -120,7 +161,8 @@ export default function SupportPage() {
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate sending message
+    const mailtoLink = `mailto:locusAI@neoai.freshdesk.com?subject=${encodeURIComponent(contactForm.subject)}&body=${encodeURIComponent(contactForm.message)}`
+    window.open(mailtoLink, '_blank')
     setMessageSent(true)
     setTimeout(() => {
       setMessageSent(false)
@@ -147,7 +189,7 @@ export default function SupportPage() {
       </div>
 
       {/* Quick Resources */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-1 gap-4 mb-10">
         {resources.map((resource, index) => (
           <Card 
             key={resource.title}
@@ -264,7 +306,7 @@ export default function SupportPage() {
                 </div>
                 <h4 className="font-semibold text-white mb-2">Message Sent!</h4>
                 <p className="text-sm text-[var(--color-locus-muted)]">
-                  We'll get back to you within 24 hours.
+                  We&apos;ll get back to you within 24 hours.
                 </p>
               </div>
             ) : (
@@ -296,13 +338,13 @@ export default function SupportPage() {
             )}
 
             <div className="mt-6 pt-6 border-t border-[var(--color-locus-border)]">
-              <p className="text-xs text-[var(--color-locus-muted)] mb-3">Other ways to reach us:</p>
+              <p className="text-xs text-[var(--color-locus-muted)] mb-3">Or email us directly:</p>
               <a 
-                href="mailto:support@locusaiaccess.com" 
+                href="mailto:locusAI@neoai.freshdesk.com" 
                 className="flex items-center gap-2 text-sm text-[var(--color-locus-text)] hover:text-[var(--color-locus-teal)] transition-colors"
               >
                 <Mail size={14} />
-                support@locusaiaccess.com
+                locusAI@neoai.freshdesk.com
               </a>
             </div>
           </Card>

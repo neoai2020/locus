@@ -282,16 +282,6 @@ function VerifyEmailContent() {
           </div>
         </div>
 
-        {/* Skip link */}
-        <p className="text-center mt-6 text-xs text-locus-muted">
-          Having trouble?{' '}
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="text-locus-teal hover:text-locus-emerald transition-colors font-medium underline underline-offset-2"
-          >
-            Skip verification
-          </button>
-        </p>
       </Card>
     </div>
   )
