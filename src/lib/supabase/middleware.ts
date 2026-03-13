@@ -47,7 +47,7 @@ export async function updateSession(request: NextRequest) {
     )
 
     // Auth routes (redirect to dashboard if logged in)
-    const authRoutes = ['/login', '/signup', '/signup-pro', '/forgot-password', '/verify-email']
+    const authRoutes = ['/login', '/signup', '/signup-pro', '/forgot-password']
     const isAuthRoute = authRoutes.some(route => 
       request.nextUrl.pathname === route
     )
