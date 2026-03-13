@@ -135,7 +135,7 @@ function VerifyEmailContent() {
       <Card className="p-0 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Left: Verification Form */}
-          <div className="p-6 sm:p-8 lg:p-10">
+          <div className="p-6 sm:p-8">
             <div className="text-center lg:text-left mb-8">
               <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 rounded-2xl bg-gradient-to-br from-[rgba(45,212,191,0.15)] to-[rgba(16,185,129,0.15)] border border-[rgba(45,212,191,0.25)] flex items-center justify-center">
                 <ShieldCheck size={26} className="text-locus-teal" />
@@ -150,7 +150,7 @@ function VerifyEmailContent() {
             </div>
 
             {/* OTP Input */}
-            <div className="flex justify-center lg:justify-start gap-2.5 sm:gap-3 mb-6" onPaste={handlePaste}>
+            <div className="flex justify-center lg:justify-start gap-2 sm:gap-2.5 mb-6" onPaste={handlePaste}>
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -163,7 +163,7 @@ function VerifyEmailContent() {
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   disabled={verifying}
                   className={`
-                    w-12 h-14 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold rounded-xl
+                    w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl
                     border-2 transition-all duration-200 outline-none
                     bg-[rgba(255,255,255,0.03)]
                     ${digit 
@@ -255,7 +255,7 @@ function VerifyEmailContent() {
           </div>
 
           {/* Right: Info Panel (visible on all sizes, stacks on mobile) */}
-          <div className="bg-[rgba(255,255,255,0.02)] border-t lg:border-t-0 lg:border-l border-[rgba(255,255,255,0.06)] p-6 sm:p-8 lg:p-10 space-y-5">
+          <div className="bg-[rgba(255,255,255,0.02)] border-t lg:border-t-0 lg:border-l border-[rgba(255,255,255,0.06)] p-6 sm:p-8 space-y-5">
             <p className="text-xs text-locus-muted uppercase tracking-wider font-medium mb-1">
               Important — Check your inbox
             </p>
