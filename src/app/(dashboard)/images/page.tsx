@@ -139,6 +139,11 @@ export default function ImagesPage() {
       
       if (data.url) {
         setSlotUrls(prev => ({ ...prev, [slotId]: data.url }))
+        // Auto-select the first generated image for this section
+        setSelectedSlots(prev => {
+          if (!prev[sectionId]) return { ...prev, [sectionId]: slotId }
+          return prev
+        })
       } else {
         throw new Error('No image URL returned')
       }

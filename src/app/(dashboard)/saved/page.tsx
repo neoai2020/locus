@@ -24,6 +24,8 @@ import {
   Tag,
   ExternalLink,
   Save,
+  Download,
+  Image as ImageIcon,
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -175,6 +177,34 @@ export default function MyPortfolioPage() {
   const getPlatformIcon = (platform: Platform | string[]) => {
     const firstPlatform = Array.isArray(platform) ? platform[0] : platform
     return platformIcons[firstPlatform] || FileText
+  }
+
+  const getImagesForArticle = (article: Article) => {
+    const imageMap = useAppStore.getState().articleImages || {}
+    const fromMap = imageMap[article.id]
+    if (fromMap && fromMap.length > 0) return fromMap
+    if (article.images && article.images.length > 0) return article.images
+    return []
+  }
+
+  const handleDownloadImages = async (e: React.MouseEvent, article: Article) => {
+    e.stopPropagation()
+    const imgs = getImagesForArticle(article)
+    if (imgs.length === 0) return
+    for (const img of imgs) {
+      try {
+        const resp = await fetch(img.url)
+        const blob = await resp.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${article.title.replace(/[^a-z0-9]/gi, '_').substring(0, 40)}_${img.position || img.section}.png`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      } catch { }
+    }
   }
 
   // Affiliate link handlers
@@ -410,6 +440,34 @@ export default function MyPortfolioPage() {
                         <p className="text-sm text-locus-muted line-clamp-2">
                           {stripHtml(article.content).substring(0, 200)}...
                         </p>
+
+                        {/* Image thumbnails + download */}
+                        {(() => {
+                          const imgs = getImagesForArticle(article)
+                          if (imgs.length === 0) return null
+                          return (
+                            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-locus-border" onClick={e => e.stopPropagation()}>
+                              <div className="flex items-center gap-2">
+                                {imgs.map((img, i) => (
+                                  <div key={i} className="w-12 h-12 rounded-lg border border-locus-border overflow-hidden bg-locus-darker shrink-0">
+                                    <img src={img.url} alt={img.alt || img.section} className="w-full h-full object-cover" />
+                                  </div>
+                                ))}
+                              </div>
+                              <span className="text-xs text-emerald-400 flex items-center gap-1">
+                                <ImageIcon size={12} />
+                                {imgs.length} image{imgs.length !== 1 ? 's' : ''}
+                              </span>
+                              <button
+                                onClick={(e) => handleDownloadImages(e, article)}
+                                className="ml-auto flex items-center gap-1.5 text-xs text-locus-teal hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-locus-border hover:border-locus-teal"
+                              >
+                                <Download size={13} />
+                                Download
+                              </button>
+                            </div>
+                          )
+                        })()}
                       </div>
                     </div>
                   </Card>

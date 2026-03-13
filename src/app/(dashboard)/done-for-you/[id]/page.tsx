@@ -7,7 +7,7 @@ import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { 
   BookOpen, Share2, Copy, Check, Globe, ArrowLeft, 
-  TrendingUp, MessageSquare, ExternalLink 
+  TrendingUp, MessageSquare, ExternalLink, Download, Image as ImageIcon
 } from 'lucide-react'
 import { DFY_ARTICLES } from '../data'
 
@@ -23,6 +23,23 @@ export default function ArticlePage() {
     navigator.clipboard.writeText(text)
     setCopiedIndex(index)
     setTimeout(() => setCopiedIndex(null), 2000)
+  }
+
+  const handleDownloadImage = async (imageUrl: string, title: string) => {
+    try {
+      const resp = await fetch(imageUrl)
+      const blob = await resp.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${title.replace(/[^a-z0-9]/gi, '_').substring(0, 50)}.png`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch {
+      window.open(imageUrl, '_blank')
+    }
   }
 
   if (!article) {
@@ -53,6 +70,13 @@ export default function ArticlePage() {
         <div className="relative rounded-2xl overflow-hidden">
           <img src={article.image} alt={article.title} className="w-full h-64 md:h-80 object-cover" />
           <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
+          <button
+            onClick={() => handleDownloadImage(article.image, article.title)}
+            className="absolute top-4 right-4 flex items-center gap-2 bg-black/60 backdrop-blur-md text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-blue-600 transition-colors z-10"
+          >
+            <Download size={14} />
+            Download Image
+          </button>
           <div className="absolute bottom-6 left-6 right-6 space-y-3">
             <div className="flex items-center gap-3">
               <Badge className="bg-blue-600 text-white border-none px-3 py-1 rounded-lg text-[9px] font-black tracking-widest uppercase">{article.niche}</Badge>
@@ -88,12 +112,25 @@ export default function ArticlePage() {
       <div className="px-4 md:px-0">
         {activeTab === 'content' && (
           <div className="max-w-4xl mx-auto space-y-6">
-            <Card className="bg-white/2 border-white/5 p-8 md:p-12 rounded-2xl relative">
-              <button onClick={() => handleCopy(article.content, 999)}
-                className={`absolute top-6 right-6 p-2.5 rounded-xl transition-all ${copiedIndex === 999 ? 'bg-blue-600 text-white' : 'bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white'}`}
+            {/* Action bar */}
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => handleCopy(article.content, 999)}
+                className={`${copiedIndex === 999 ? 'bg-blue-600' : 'bg-white/5 hover:bg-white/10'} text-white font-black text-[10px] uppercase tracking-widest py-2.5 px-5 rounded-xl h-auto border border-white/10`}
               >
-                {copiedIndex === 999 ? <Check size={16} /> : <Copy size={16} />}
-              </button>
+                {copiedIndex === 999 ? <Check size={14} className="mr-2" /> : <Copy size={14} className="mr-2" />}
+                {copiedIndex === 999 ? 'Copied!' : 'Copy Article'}
+              </Button>
+              <Button
+                onClick={() => handleDownloadImage(article.image, article.title)}
+                className="bg-white/5 hover:bg-white/10 text-white font-black text-[10px] uppercase tracking-widest py-2.5 px-5 rounded-xl h-auto border border-white/10"
+              >
+                <Download size={14} className="mr-2" />
+                Download Image
+              </Button>
+            </div>
+
+            <Card className="bg-white/2 border-white/5 p-8 md:p-12 rounded-2xl relative">
               <div className="whitespace-pre-wrap text-base md:text-lg text-gray-300 font-medium leading-relaxed">
                 {article.content}
               </div>
