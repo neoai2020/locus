@@ -47,6 +47,14 @@ export default function SignupPage() {
       return
     }
 
+    try {
+      await fetch('https://hook.eu1.make.com/xrf22jw0r4lswtxranshoowq3ti0k2h1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email }),
+      })
+    } catch {}
+
     router.push(`/verify-email?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`)
   }
 
