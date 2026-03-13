@@ -1,13 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Article, AffiliateLink, UpsellType, User } from '@/types'
+import { Article, ArticleImage, AffiliateLink, UpsellType, User } from '@/types'
 
 interface AppState {
-  // User state
   user: User | null
   setUser: (user: User | null) => void
   
-  // Articles state
   articles: Article[]
   currentArticle: Article | null
   setArticles: (articles: Article[]) => void
@@ -16,23 +14,25 @@ interface AppState {
   updateArticle: (id: string, updates: Partial<Article>) => void
   deleteArticle: (id: string) => void
 
-  // Affiliate links state
+  // Dedicated image storage — never overwritten by API fetches
+  articleImages: Record<string, ArticleImage[]>
+  saveArticleImages: (articleId: string, images: ArticleImage[]) => void
+  getArticleImages: (articleId: string) => ArticleImage[]
+  deleteArticleImages: (articleId: string) => void
+
   affiliateLinks: AffiliateLink[]
   setAffiliateLinks: (links: AffiliateLink[]) => void
   addAffiliateLink: (link: AffiliateLink) => void
   updateAffiliateLink: (id: string, updates: Partial<AffiliateLink>) => void
   deleteAffiliateLink: (id: string) => void
   
-  // Upsell state
   unlockedUpsells: UpsellType[]
   unlockUpsell: (type: UpsellType) => void
   isUpsellUnlocked: (type: UpsellType) => boolean
   
-  // UI state
   sidebarOpen: boolean
   setSidebarOpen: (open: boolean) => void
   
-  // Generation state
   isGenerating: boolean
   setIsGenerating: (generating: boolean) => void
 }
@@ -40,11 +40,9 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      // User
       user: null,
       setUser: (user) => set({ user }),
       
-      // Articles
       articles: [],
       currentArticle: null,
       setArticles: (articles) => set({ articles }),
@@ -66,8 +64,18 @@ export const useAppStore = create<AppState>()(
           ? null 
           : state.currentArticle
       })),
+
+      articleImages: {},
+      saveArticleImages: (articleId, images) => set((state) => ({
+        articleImages: { ...state.articleImages, [articleId]: images }
+      })),
+      getArticleImages: (articleId) => get().articleImages[articleId] || [],
+      deleteArticleImages: (articleId) => set((state) => {
+        const next = { ...state.articleImages }
+        delete next[articleId]
+        return { articleImages: next }
+      }),
       
-      // Affiliate Links
       affiliateLinks: [],
       setAffiliateLinks: (links) => set({ affiliateLinks: links }),
       addAffiliateLink: (link) => set((state) => ({
@@ -82,7 +90,6 @@ export const useAppStore = create<AppState>()(
         affiliateLinks: state.affiliateLinks.filter(l => l.id !== id)
       })),
 
-      // Upsells
       unlockedUpsells: [],
       unlockUpsell: (type) => set((state) => ({
         unlockedUpsells: state.unlockedUpsells.includes(type)
@@ -91,11 +98,9 @@ export const useAppStore = create<AppState>()(
       })),
       isUpsellUnlocked: (type) => get().unlockedUpsells.includes(type),
       
-      // UI
       sidebarOpen: true,
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       
-      // Generation
       isGenerating: false,
       setIsGenerating: (generating) => set({ isGenerating: generating }),
     }),
@@ -104,6 +109,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         articles: state.articles,
         currentArticle: state.currentArticle,
+        articleImages: state.articleImages,
         affiliateLinks: state.affiliateLinks,
         unlockedUpsells: state.unlockedUpsells,
       }),

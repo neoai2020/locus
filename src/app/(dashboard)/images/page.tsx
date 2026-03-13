@@ -20,6 +20,7 @@ import Button from '@/components/ui/Button'
 import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
 import { useAppStore } from '@/store'
+import { ArticleImage } from '@/types'
 import { createClient } from '@/lib/supabase/client'
 
 const imageSections = [
@@ -45,7 +46,7 @@ const imageSections = [
 
 export default function ImagesPage() {
   const router = useRouter()
-  const { currentArticle, articles, setArticles, setCurrentArticle, updateArticle } = useAppStore()
+  const { currentArticle, articles, setArticles, setCurrentArticle, updateArticle, saveArticleImages } = useAppStore()
   
   const [slotUrls, setSlotUrls] = useState<Record<string, string>>({})
   const [generatingSlots, setGeneratingSlots] = useState<Record<string, boolean>>({})
@@ -68,20 +69,19 @@ export default function ImagesPage() {
         const data = await response.json()
         const fetched = data.articles || []
         const local = useAppStore.getState().articles
-        const localMap = new Map<string, any>()
-        local.forEach((a: any) => localMap.set(a.id, a))
+        const imageMap = useAppStore.getState().articleImages || {}
 
-        const fetchedIds = new Set<string>()
-        const merged = fetched.map((a: any) => {
-          fetchedIds.add(a.id)
-          const loc = localMap.get(a.id)
-          if (loc?.images?.length > 0 && (!a.images || a.images.length === 0)) {
-            return { ...a, images: loc.images }
-          }
+        const fetchedIds = new Set(fetched.map((a: any) => a.id))
+        const combined = [
+          ...fetched,
+          ...local.filter((a: any) => !fetchedIds.has(a.id)),
+        ]
+        const final = combined.map((a: any) => {
+          const saved = imageMap[a.id]
+          if (saved && saved.length > 0) return { ...a, images: saved }
           return a
         })
-        local.forEach((a: any) => { if (!fetchedIds.has(a.id)) merged.push(a) })
-        setArticles(merged)
+        setArticles(final)
       }
     } catch (error) {
       console.error('Failed to fetch articles:', error)
@@ -186,30 +186,24 @@ export default function ImagesPage() {
     setSaveError('')
 
     try {
-      const images = getSelectedImages()
-      const updatedArticle = { ...currentArticle, images: images as any }
+      const images = getSelectedImages() as ArticleImage[]
 
+      // Save to dedicated image store (survives any article refetch)
+      saveArticleImages(currentArticle.id, images)
+
+      // Also update the article object itself
+      const updatedArticle = { ...currentArticle, images }
       updateArticle(currentArticle.id, updatedArticle)
       setCurrentArticle(updatedArticle)
 
+      // Try to persist to DB (best effort)
       try {
-        const response = await fetch(`/api/articles?id=${currentArticle.id}`, {
+        await fetch(`/api/articles?id=${currentArticle.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ images }),
         })
-
-        if (response.ok) {
-          const data = await response.json()
-          if (data.article) {
-            const merged = { ...data.article, images: images as any }
-            updateArticle(data.article.id, merged)
-            setCurrentArticle(merged)
-          }
-        }
-      } catch (apiErr) {
-        console.warn('API save failed, images saved locally:', apiErr)
-      }
+      } catch {}
 
       if (navigateToPublish) {
         router.push('/publish')

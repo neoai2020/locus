@@ -59,7 +59,17 @@ interface SuggestedTag {
 export default function PublishPage() {
   const { currentArticle, setCurrentArticle, updateArticle, articles } = useAppStore()
 
-  // If an article was pre-selected (e.g. from Save & Publish), start at step 2
+  // Enrich currentArticle with images from dedicated store on load
+  useEffect(() => {
+    if (currentArticle) {
+      const imageMap = useAppStore.getState().articleImages || {}
+      const saved = imageMap[currentArticle.id]
+      if (saved && saved.length > 0 && (!currentArticle.images || currentArticle.images.length === 0)) {
+        setCurrentArticle({ ...currentArticle, images: saved })
+      }
+    }
+  }, [])
+
   const [step, setStep] = useState<1 | 2 | 3>(currentArticle ? 2 : 1)
   const [searchQuery, setSearchQuery] = useState('')
   const [copied, setCopied] = useState(false)
@@ -78,20 +88,19 @@ export default function PublishPage() {
         .then(data => {
           const fetched = data.articles || []
           const local = useAppStore.getState().articles
-          const localMap = new Map<string, any>()
-          local.forEach((a: any) => localMap.set(a.id, a))
+          const imageMap = useAppStore.getState().articleImages || {}
 
-          const fetchedIds = new Set<string>()
-          const merged = fetched.map((a: any) => {
-            fetchedIds.add(a.id)
-            const loc = localMap.get(a.id)
-            if (loc?.images?.length > 0 && (!a.images || a.images.length === 0)) {
-              return { ...a, images: loc.images }
-            }
+          const fetchedIds = new Set(fetched.map((a: any) => a.id))
+          const combined = [
+            ...fetched,
+            ...local.filter((a: any) => !fetchedIds.has(a.id)),
+          ]
+          const final = combined.map((a: any) => {
+            const saved = imageMap[a.id]
+            if (saved && saved.length > 0) return { ...a, images: saved }
             return a
           })
-          local.forEach((a: any) => { if (!fetchedIds.has(a.id)) merged.push(a) })
-          useAppStore.getState().setArticles(merged)
+          useAppStore.getState().setArticles(final)
         })
         .catch(() => {})
         .finally(() => setIsLoadingArticles(false))
@@ -104,7 +113,10 @@ export default function PublishPage() {
   )
 
   const handleSelectArticle = (article: Article) => {
-    setCurrentArticle(article)
+    const imageMap = useAppStore.getState().articleImages || {}
+    const saved = imageMap[article.id]
+    const enriched = saved && saved.length > 0 ? { ...article, images: saved } : article
+    setCurrentArticle(enriched)
     setStep(2)
   }
 

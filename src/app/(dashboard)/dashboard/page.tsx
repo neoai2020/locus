@@ -70,20 +70,19 @@ export default function DashboardPage() {
           const data = await response.json()
           const fetched = data.articles || []
           const local = useAppStore.getState().articles
-          const localMap = new Map<string, any>()
-          local.forEach((a: any) => localMap.set(a.id, a))
+          const imageMap = useAppStore.getState().articleImages || {}
 
-          const fetchedIds = new Set<string>()
-          const merged = fetched.map((a: any) => {
-            fetchedIds.add(a.id)
-            const loc = localMap.get(a.id)
-            if (loc?.images?.length > 0 && (!a.images || a.images.length === 0)) {
-              return { ...a, images: loc.images }
-            }
+          const fetchedIds = new Set(fetched.map((a: any) => a.id))
+          const combined = [
+            ...fetched,
+            ...local.filter((a: any) => !fetchedIds.has(a.id)),
+          ]
+          const final = combined.map((a: any) => {
+            const saved = imageMap[a.id]
+            if (saved && saved.length > 0) return { ...a, images: saved }
             return a
           })
-          local.forEach((a: any) => { if (!fetchedIds.has(a.id)) merged.push(a) })
-          useAppStore.getState().setArticles(merged)
+          useAppStore.getState().setArticles(final)
         }
       } catch (error) {
         console.error('Failed to fetch articles:', error)

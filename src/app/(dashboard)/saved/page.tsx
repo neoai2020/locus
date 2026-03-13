@@ -82,6 +82,17 @@ export default function MyPortfolioPage() {
     fetchArticles()
   }, [])
 
+  const enrichWithImages = (list: Article[]): Article[] => {
+    const imageMap = useAppStore.getState().articleImages || {}
+    return list.map(a => {
+      const saved = imageMap[a.id]
+      if (saved && saved.length > 0) {
+        return { ...a, images: saved }
+      }
+      return a
+    })
+  }
+
   const fetchArticles = async () => {
     setIsLoading(true)
     try {
@@ -91,35 +102,23 @@ export default function MyPortfolioPage() {
         const fetchedArticles: Article[] = data.articles || []
         const localArticles = useAppStore.getState().articles
 
-        const localMap = new Map<string, Article>()
-        localArticles.forEach(a => localMap.set(a.id, a))
+        const fetchedIds = new Set(fetchedArticles.map(a => a.id))
+        const combined = [
+          ...fetchedArticles,
+          ...localArticles.filter(a => !fetchedIds.has(a.id)),
+        ]
 
-        const fetchedIds = new Set<string>()
-        const merged = fetchedArticles.map((a: Article) => {
-          fetchedIds.add(a.id)
-          const local = localMap.get(a.id)
-          if (local && local.images && local.images.length > 0 && (!a.images || a.images.length === 0)) {
-            return { ...a, images: local.images }
-          }
-          return a
-        })
-
-        localArticles.forEach(a => {
-          if (!fetchedIds.has(a.id)) {
-            merged.push(a)
-          }
-        })
-
-        setArticles(merged)
-        useAppStore.getState().setArticles(merged)
+        const final = enrichWithImages(combined)
+        setArticles(final)
+        useAppStore.getState().setArticles(final)
       } else {
-        const localArticles = useAppStore.getState().articles
-        setArticles(localArticles)
+        const final = enrichWithImages(useAppStore.getState().articles)
+        setArticles(final)
       }
     } catch (error) {
       console.error('Failed to fetch articles:', error)
-      const localArticles = useAppStore.getState().articles
-      setArticles(localArticles)
+      const final = enrichWithImages(useAppStore.getState().articles)
+      setArticles(final)
     } finally {
       setIsLoading(false)
     }
@@ -339,7 +338,10 @@ export default function MyPortfolioPage() {
                     className="animate-fade-in group cursor-pointer hover:border-locus-teal/50 hover:bg-[rgba(255,255,255,0.02)] transition-all"
                     style={{ animationDelay: `${(index + 3) * 0.05}s` }}
                     onClick={() => {
-                      useAppStore.getState().setCurrentArticle(article)
+                      const imageMap = useAppStore.getState().articleImages || {}
+                      const saved = imageMap[article.id]
+                      const enriched = saved && saved.length > 0 ? { ...article, images: saved } : article
+                      useAppStore.getState().setCurrentArticle(enriched)
                       router.push('/create')
                     }}
                   >
