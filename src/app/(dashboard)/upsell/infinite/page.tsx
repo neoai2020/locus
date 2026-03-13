@@ -16,15 +16,16 @@ import {
   Sparkles,
   TrendingUp,
   DollarSign,
-  Globe,
   BookOpen,
   X,
   Save,
+  Download,
 } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { useAppStore } from '@/store'
+import { ArticleImage } from '@/types'
 
 const NICHES = [
   { id: 'health', label: 'Health & Wellness', emoji: '💪', count: 10 },
@@ -47,6 +48,7 @@ interface PrewrittenArticle {
   suggestedProducts: string[]
   sections: string[]
   content: string
+  images: ArticleImage[]
 }
 
 function buildArticleContent(title: string, nicheLabel: string, keywords: string[], products: string[]): string {
@@ -261,14 +263,20 @@ function getArticles(): PrewrittenArticle[] {
   for (const [nicheId, templates] of Object.entries(data)) {
     const nicheLabel = NICHES.find(n => n.id === nicheId)?.label || nicheId
     templates.titles.forEach((title, index) => {
+      const artId = `${nicheId}-${index + 1}`
       articles.push({
-        id: `${nicheId}-${index + 1}`,
+        id: artId,
         niche: nicheId,
         title,
         seoKeywords: templates.keywords[index],
         suggestedProducts: templates.products[index],
         sections,
         content: buildArticleContent(title, nicheLabel, templates.keywords[index], templates.products[index]),
+        images: [
+          { id: `${artId}-header`, url: `https://picsum.photos/seed/${artId}-h/800/450`, alt: 'Header Image', section: 'Header Image', position: 'top' as const },
+          { id: `${artId}-mid`, url: `https://picsum.photos/seed/${artId}-m/800/450`, alt: 'Mid-Article Image', section: 'Mid-Article Image', position: 'middle' as const },
+          { id: `${artId}-end`, url: `https://picsum.photos/seed/${artId}-e/800/450`, alt: 'Conclusion Image', section: 'Conclusion Image', position: 'bottom' as const },
+        ],
       })
     })
   }
@@ -319,12 +327,13 @@ export default function InfinitePage() {
     return items
   }, [selectedNiche, searchQuery])
 
-  const handleSaveArticle = async (navigateTo: 'saved' | 'publish' | 'images') => {
+  const handleSaveArticle = async (navigateTo: 'saved' | 'publish') => {
     if (!previewArticle) return
     const nicheLabel = NICHES.find(n => n.id === previewArticle.niche)?.label || ''
+    const articleId = crypto.randomUUID()
 
     const newArticle = {
-      id: crypto.randomUUID(),
+      id: articleId,
       user_id: '',
       title: previewArticle.title,
       content: displayContent,
@@ -333,12 +342,13 @@ export default function InfinitePage() {
       length: 'long' as const,
       status: 'draft' as const,
       niche: nicheLabel,
-      images: [],
+      images: previewArticle.images,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }
 
     useAppStore.getState().addArticle(newArticle)
+    useAppStore.getState().saveArticleImages(articleId, previewArticle.images)
     setCurrentArticle(newArticle)
     setUsedArticles(prev => new Set(prev).add(previewArticle.id))
 
@@ -351,15 +361,13 @@ export default function InfinitePage() {
       if (resp.ok) {
         const data = await resp.json()
         if (data.article) {
-          useAppStore.getState().updateArticle(newArticle.id, data.article)
-          setCurrentArticle(data.article)
+          useAppStore.getState().updateArticle(articleId, { ...data.article, images: previewArticle.images })
+          setCurrentArticle({ ...data.article, images: previewArticle.images })
         }
       }
     } catch {}
 
-    if (navigateTo === 'images') {
-      router.push('/images')
-    } else if (navigateTo === 'publish') {
+    if (navigateTo === 'publish') {
       router.push('/publish')
     } else {
       router.push('/saved')
@@ -372,6 +380,23 @@ export default function InfinitePage() {
     await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleDownloadImages = async () => {
+    if (!previewArticle) return
+    for (const img of previewArticle.images) {
+      try {
+        const resp = await fetch(img.url)
+        const blob = await resp.blob()
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = `${previewArticle.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${img.section.replace(/\s+/g, '-').toLowerCase()}.jpg`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(a.href)
+      } catch {}
+    }
   }
 
   if (isChecking) {
@@ -408,12 +433,39 @@ export default function InfinitePage() {
               <p className="text-sm text-locus-muted">~1,500 words &bull; SEO-optimized &bull; Ready to publish</p>
             </div>
 
+            {previewArticle.images[0] && (
+              <div className="rounded-xl overflow-hidden border border-locus-border">
+                <img src={previewArticle.images[0].url} alt={previewArticle.images[0].alt} className="w-full h-56 object-cover" />
+                <div className="bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-xs text-locus-muted flex items-center gap-1.5">
+                  <ImageIcon size={12} /> Header Image (pre-generated)
+                </div>
+              </div>
+            )}
+
             <Card>
               <div
                 className="prose prose-invert max-w-none text-sm text-locus-text leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: displayContent }}
               />
             </Card>
+
+            {previewArticle.images[1] && (
+              <div className="rounded-xl overflow-hidden border border-locus-border">
+                <img src={previewArticle.images[1].url} alt={previewArticle.images[1].alt} className="w-full h-56 object-cover" />
+                <div className="bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-xs text-locus-muted flex items-center gap-1.5">
+                  <ImageIcon size={12} /> Mid-Article Image (pre-generated)
+                </div>
+              </div>
+            )}
+
+            {previewArticle.images[2] && (
+              <div className="rounded-xl overflow-hidden border border-locus-border">
+                <img src={previewArticle.images[2].url} alt={previewArticle.images[2].alt} className="w-full h-56 object-cover" />
+                <div className="bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-xs text-locus-muted flex items-center gap-1.5">
+                  <ImageIcon size={12} /> Conclusion Image (pre-generated)
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-6">
@@ -502,12 +554,12 @@ export default function InfinitePage() {
                       <span className="text-locus-text">{linkApplied ? 'Promotional link added!' : 'Add your promotional link above'}</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">2</span>
-                      <span className="text-locus-text">Save & generate images</span>
+                      <span className="w-5 h-5 rounded-full bg-emerald-400/20 flex items-center justify-center text-[10px] text-emerald-400 font-bold shrink-0 mt-0.5">✓</span>
+                      <span className="text-locus-text">3 images pre-generated</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">3</span>
-                      <span className="text-locus-text">Publish to your chosen platform</span>
+                      <span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center text-[10px] text-amber-400 font-bold shrink-0 mt-0.5">2</span>
+                      <span className="text-locus-text">Save & publish to your platform</span>
                     </div>
                   </div>
                 </div>
@@ -518,11 +570,11 @@ export default function InfinitePage() {
                   {copied ? <Check size={16} /> : <Copy size={16} />}
                   <span>{copied ? 'Copied!' : 'Copy Article'}</span>
                 </Button>
-                <Button onClick={() => handleSaveArticle('images')} className="w-full bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400">
-                  <ImageIcon size={16} />
-                  <span>Save & Generate Images</span>
+                <Button onClick={handleDownloadImages} variant="secondary" className="w-full">
+                  <Download size={16} />
+                  <span>Download Images</span>
                 </Button>
-                <Button onClick={() => handleSaveArticle('saved')} variant="secondary" className="w-full">
+                <Button onClick={() => handleSaveArticle('saved')} className="w-full bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400">
                   <Save size={16} />
                   <span>Save to My Portfolio</span>
                 </Button>
@@ -552,15 +604,15 @@ export default function InfinitePage() {
           100 Ready-to-Publish Authority Articles
         </h1>
         <p className="text-locus-muted max-w-2xl">
-          Complete SEO-optimized articles across 10 profitable niches — just replace the link placeholders
-          with your promotional links, generate images, and publish.
+          Complete SEO-optimized articles with images across 10 profitable niches — just add your promotional
+          links and publish. Every article includes 3 professional images, ready to go.
         </p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 animate-fade-in stagger-1">
         {[
           { label: 'Total Articles', value: '100', icon: FileText, color: 'text-locus-teal' },
-          { label: 'Niches Covered', value: '10', icon: Globe, color: 'text-amber-400' },
+          { label: 'Images Included', value: '300', icon: ImageIcon, color: 'text-amber-400' },
           { label: 'Words Each', value: '~1,500', icon: Sparkles, color: 'text-emerald-400' },
           { label: 'SEO-Optimized', value: '100%', icon: TrendingUp, color: 'text-cyan-400' },
         ].map((stat, i) => (
@@ -580,7 +632,7 @@ export default function InfinitePage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {[
             { step: '1', title: 'Pick an Article', desc: 'Browse 100 pre-written articles. Every article is complete, SEO-optimized, and ready to go.', icon: BookOpen },
-            { step: '2', title: 'Add Your Links', desc: 'Replace [YOUR LINK HERE] placeholders with your promotional links and generate images.', icon: LinkIcon },
+            { step: '2', title: 'Add Your Links', desc: 'Replace [YOUR LINK HERE] placeholders with your promotional links. Images are already included.', icon: LinkIcon },
             { step: '3', title: 'Publish & Earn', desc: 'Post on LinkedIn, Medium, Quora, Reddit, or X. Start earning commissions.', icon: DollarSign },
           ].map(item => (
             <div key={item.step} className="flex gap-3">
@@ -644,8 +696,14 @@ export default function InfinitePage() {
               style={{ animationDelay: `${Math.min(index * 0.05, 0.5)}s` }}
               onClick={() => setPreviewArticle(article)}
             >
+              <div className="mb-3 rounded-lg overflow-hidden h-28 relative">
+                <img src={article.images[0]?.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-md bg-black/60 text-[10px] text-white">
+                  <ImageIcon size={10} /> 3 images
+                </div>
+              </div>
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shrink-0 text-lg border border-cyan-400/20">
+                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shrink-0 text-lg border border-cyan-400/20">
                   {niche?.emoji}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -658,8 +716,9 @@ export default function InfinitePage() {
                   </h3>
                   <div className="flex items-center gap-3 text-xs text-locus-muted">
                     <span className="flex items-center gap-1"><FileText size={11} /> ~1,500 words</span>
+                    <span className="flex items-center gap-1"><ImageIcon size={11} /> 3 images</span>
                     <span className="flex items-center gap-1"><TrendingUp size={11} /> SEO</span>
-                    <span className="flex items-center gap-1"><Check size={11} /> Ready</span>
+                    <span className="flex items-center gap-1 text-emerald-400"><Check size={11} /> Ready</span>
                   </div>
                 </div>
                 <ChevronRight size={16} className="text-locus-muted group-hover:text-locus-teal transition-colors shrink-0 mt-1" />
