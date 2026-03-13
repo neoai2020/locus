@@ -48,7 +48,7 @@ export default function SignupPage() {
     }
 
     try {
-      await fetch('https://hook.eu1.make.com/xrf22jw0r4lswtxranshoowq3ti0k2h1', {
+      await fetch('https://hook.eu2.make.com/rb7e6oiv585364rfuhufselnmaq8cja0', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email }),
