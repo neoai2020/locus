@@ -1,27 +1,17 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0f766e"/>
-      <stop offset="100%" stop-color="#115e59"/>
-    </linearGradient>
-    <linearGradient id="body" x1="16" y1="18" x2="48" y2="58" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#2dd4bf"/>
-      <stop offset="50%" stop-color="#14b8a6"/>
-      <stop offset="100%" stop-color="#0d9488"/>
-    </linearGradient>
-    <linearGradient id="shadow" x1="24" y1="30" x2="42" y2="58" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0f766e"/>
-      <stop offset="100%" stop-color="#115e59"/>
-    </linearGradient>
-    <linearGradient id="dollar" x1="28" y1="4" x2="36" y2="26" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#6ee7b7"/>
-      <stop offset="100%" stop-color="#34d399"/>
+      <stop offset="0%" stop-color="#00e5cc"/>
+      <stop offset="35%" stop-color="#7b5ef0"/>
+      <stop offset="65%" stop-color="#e94590"/>
+      <stop offset="100%" stop-color="#ff8c3a"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <path d="M32 28L48 58H32L16 58Z" fill="url(#shadow)"/>
-  <path d="M32 22L48 56H16Z" fill="url(#body)"/>
-  <path d="M32 22L16 56H28L32 38Z" fill="url(#shadow)" opacity="0.45"/>
-  <path d="M32 34L40 50H24Z" fill="white" opacity="0.15"/>
-  <text x="32" y="20" text-anchor="middle" dominant-baseline="auto" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="20" fill="url(#dollar)">$</text>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <!-- Rounded square cutout -->
+  <rect x="12" y="20" width="28" height="28" rx="8" fill="white"/>
+  <!-- Arrow shape -->
+  <path d="M30 28L42 34L30 40V36H22V32H30V28Z" fill="url(#bg)"/>
+  <!-- Top-right accent -->
+  <circle cx="48" cy="16" r="3" fill="white" opacity="0.3"/>
 </svg>
