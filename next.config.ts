@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Image optimization settings
+  output: 'standalone',
+
   images: {
     remotePatterns: [
       {
@@ -15,10 +16,7 @@ const nextConfig: NextConfig = {
     ],
   },
   
-  // Production optimizations
   poweredByHeader: false,
-  
-  // Strict mode for better development
   reactStrictMode: true,
 };
 
