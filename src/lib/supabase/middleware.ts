@@ -48,6 +48,12 @@ export async function updateSession(request: NextRequest) {
 
     // Auth routes (redirect to dashboard if logged in)
     const authRoutes = ['/login', '/signup', '/signup-pro', '/forgot-password']
+
+    const openRoutes = ['/reset-password', '/verify-email']
+    const isOpenRoute = openRoutes.some(route =>
+      request.nextUrl.pathname.startsWith(route)
+    )
+    if (isOpenRoute) return supabaseResponse
     const isAuthRoute = authRoutes.some(route => 
       request.nextUrl.pathname === route
     )
